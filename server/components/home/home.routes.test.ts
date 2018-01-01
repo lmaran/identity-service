@@ -10,7 +10,7 @@ describe("Home routes", () => {
         it("should get a string", async () => {
             res = await request(app).get("/");
             expect(res.status).to.equal(200);
-            expect(res.text).equal("Hello Identity Service");
+            expect(res.text).equal("Hello Identity Service for noApp (noEnv)");
         });
     });
 

@@ -25,7 +25,7 @@ describe("home Controller", () => {
             const expectedData = [{ name: "aaa" }];
             await homeController.getHomePage(<Request>req, <Response>res);
 
-            sinon.assert.calledWith(res.send as sinon.SinonSpy, "Hello Identity Service");
+            sinon.assert.calledWith(res.send as sinon.SinonSpy, "Hello Identity Service for noApp (noEnv)");
         });
     });
 
