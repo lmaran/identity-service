@@ -17,7 +17,7 @@ describe("Home routes", () => {
         it("should get a string", () => __awaiter(this, void 0, void 0, function* () {
             res = yield request(app_1.default).get("/");
             chai_1.expect(res.status).to.equal(200);
-            chai_1.expect(res.text).equal("Hello Identity Service");
+            chai_1.expect(res.text).equal("Hello Identity Service for noApp (noEnv)");
         }));
     });
 });

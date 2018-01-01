@@ -27,7 +27,7 @@ describe("home Controller", () => {
         it("should successful retrieve", () => __awaiter(this, void 0, void 0, function* () {
             const expectedData = [{ name: "aaa" }];
             yield home_controller_1.default.getHomePage(req, res);
-            sinon.assert.calledWith(res.send, "Hello Identity Service");
+            sinon.assert.calledWith(res.send, "Hello Identity Service for noApp (noEnv)");
         }));
     });
 });
