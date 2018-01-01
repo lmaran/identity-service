@@ -42,7 +42,7 @@ const homeController = {
 };
 
 function isReservedSubdomain(s) {
-    const isReserved1 = ["stg", "temp", "temp-stg", "dev"].includes(s);
+    const isReserved1 = ["stg", "temp", "temp-stg", "dev", "blue", "green"].includes(s);
     const isReserved2 = stringUtil.endsWithValueFromList(s, [".blue", "-blue", ".green", "-green", ".blue-stg", "-blue-stg", ".green-stg", "-green-stg"]);
     return isReserved1 || isReserved2;
 }
