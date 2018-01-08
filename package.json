@@ -20,9 +20,20 @@
         "clean": "rimraf dist"
     },
     "dependencies": {
+        "base64url": "^2.0.0",
+        "body-parser": "^1.18.2",
+        "consolidate": "^0.15.0",
         "express": "~4.15.5",
+        "jsrsasign": "^8.0.4",
         "lodash": "^4.17.4",
-        "mongodb": "^2.2.33"
+        "mongodb": "^2.2.33",
+        "nosql": "^6.1.0",
+        "qs": "^6.5.1",
+        "querystring": "^0.2.0",
+        "randomstring": "^1.1.5",
+        "underscore": "^1.8.3",
+        "underscore.string": "^3.3.4",
+        "url": "^0.11.0"
     },
     "devDependencies": {
         "@types/chai": "^4.0.4",
