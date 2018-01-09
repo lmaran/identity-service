@@ -12,8 +12,10 @@ const nosql = nosql2.load("database.nosql");
 import * as querystring from "querystring";
 import * as qs from "qs";
 import * as __ from "underscore";
-__.string = require("underscore.string");
-import * as base64url from "base64url";
+import * as __string from "underscore.string";
+
+
+// import base64url from "base64url";
 import * as jose from "jsrsasign";
 
 const app: express.Application = express();
@@ -23,13 +25,13 @@ app.use(bodyParser.urlencoded({ extended: true })); // support form-encoded bodi
 
 app.engine("html", cons.underscore);
 app.set("view engine", "html");
-app.set("views", "files/authorizationServer");
+app.set("views", "server/files");
 app.set("json spaces", 4);
 
 // authorization server information
 const authServer = {
-    authorizationEndpoint: "http://localhost:9001/authorize",
-    tokenEndpoint: "http://localhost:9001/token"
+    authorizationEndpoint: "http://localhost:1420/authorize",
+    tokenEndpoint: "http://localhost:1420/token"
 };
 
 // client information
@@ -37,7 +39,7 @@ const clients = [
     {
         "client_id": "oauth-client-1",
         "client_secret": "oauth-client-secret-1",
-        "redirect_uris": ["http://localhost:9000/callback"],
+        "redirect_uris": ["http://localhost:1412/callback"],
         "scope": "openid profile email phone address"
     }
 ];
@@ -250,25 +252,25 @@ app.post("/token", function (req, res) {
 
                 const header = { "typ": "JWT", "alg": rsaKey.alg, "kid": rsaKey.kid };
 
-                /*
-				var payload = {
-					iss: 'http://localhost:9001/',
-					sub: code.user ? code.user.sub : null,
-					aud: 'http://localhost:9002/',
-					iat: Math.floor(Date.now() / 1000),
-					exp: Math.floor(Date.now() / 1000) + (5 * 60),
-					jti: randomstring.generate(8)
-				};
-				console.log(payload);
-				var stringHeader = JSON.stringify(header);
-				var stringPayload = JSON.stringify(payload);
-				//var encodedHeader = base64url.encode(JSON.stringify(header));
-				//var encodedPayload = base64url.encode(JSON.stringify(payload));
-				//var access_token = encodedHeader + '.' + encodedPayload + '.';
-				//var access_token = jose.jws.JWS.sign('HS256', stringHeader, stringPayload, new Buffer(sharedTokenSecret).toString('hex'));
-				var privateKey = jose.KEYUTIL.getKey(rsaKey);
-				var access_token = jose.jws.JWS.sign(rsaKey.alg, stringHeader, stringPayload, privateKey);
-				*/
+
+                // var payload = {
+                // 	iss: 'http://localhost:9001/',
+                // 	sub: code.user ? code.user.sub : null,
+                // 	aud: 'http://localhost:9002/',
+                // 	iat: Math.floor(Date.now() / 1000),
+                // 	exp: Math.floor(Date.now() / 1000) + (5 * 60),
+                // 	jti: randomstring.generate(8)
+                // };
+                // console.log(payload);
+                // var stringHeader = JSON.stringify(header);
+                // var stringPayload = JSON.stringify(payload);
+                // //var encodedHeader = base64url.encode(JSON.stringify(header));
+                // //var encodedPayload = base64url.encode(JSON.stringify(payload));
+                // //var access_token = encodedHeader + '.' + encodedPayload + '.';
+                // //var access_token = jose.jws.JWS.sign('HS256', stringHeader, stringPayload, new Buffer(sharedTokenSecret).toString('hex'));
+                // var privateKey = jose.KEYUTIL.getKey(rsaKey);
+                // var access_token = jose.jws.JWS.sign(rsaKey.alg, stringHeader, stringPayload, privateKey);
+
 
                 const access_token = randomstring.generate();
                 nosql.insert({ access_token: access_token, client_id: clientId, scope: code.scope, user: code.user });
@@ -285,7 +287,7 @@ app.post("/token", function (req, res) {
 
                 if (__.contains(code.scope, "openid")) {
                     const ipayload: any = {
-                        iss: "http://localhost:9001/",
+                        iss: "http://localhost:1420/",
                         sub: code.user.sub,
                         aud: client.client_id,
                         iat: Math.floor(Date.now() / 1000),
@@ -345,7 +347,7 @@ const buildUrl = function (base, options, hash) {
 };
 
 const getScopesFromForm = function (body) {
-    return __.filter(__.keys(body), function (s) { return __.string.startsWith(s, "scope_"); })
+    return __.filter(__.keys(body), function (s) { return __string.startsWith(s, "scope_"); })
         .map(function (s) { return s.slice("scope_".length); });
 };
 
@@ -356,7 +358,7 @@ const decodeClientCredentials = function (auth) {
     return { id: clientId, secret: clientSecret };
 };
 
-app.use("/", express.static("files/authorizationServer"));
+app.use("/", express.static("server/files"));
 
 // clear the database
 nosql.clear();

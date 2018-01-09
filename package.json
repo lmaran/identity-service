@@ -20,6 +20,13 @@
         "clean": "rimraf dist"
     },
     "dependencies": {
+        "@types/body-parser": "^1.16.8",
+        "@types/consolidate": "0.0.33",
+        "@types/js-url": "^1.8.28",
+        "@types/qs": "^6.5.1",
+        "@types/randomstring": "^1.1.6",
+        "@types/underscore": "^1.8.6",
+        "@types/underscore.string": "0.0.32",
         "base64url": "^2.0.0",
         "body-parser": "^1.18.2",
         "consolidate": "^0.15.0",
