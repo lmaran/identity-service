@@ -1,7 +1,7 @@
 import config from "../config";
 import { MongoClient, ObjectID, Db } from "mongodb";
 
-let theDb: Db = undefined; // this will be re-used so the db is only created once (on first request).
+let theDb: Db; // this will be re-used so the db is only created once (on first request).
 const service = {
 
     getDb: async () => {
@@ -32,8 +32,7 @@ const service = {
     normalizedId: (id: any) => {
         if (ObjectID.isValid(id)) {
             return new ObjectID(id);
-        }
-        else { return id; }
+        } else { return id; }
     },
 
     // // read

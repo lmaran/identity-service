@@ -9,21 +9,17 @@ let res: Partial<Response>;
 
 describe("home Controller", () => {
 
-    beforeEach(function() {
+    beforeEach(() => {
         req = {};
         res = {
             send: sinon.spy(),
         };
     });
 
-    it("should exist", function() {
-        expect(homeController).to.exist;
-    });
-
     describe("getHomePage", () => {
         it("should successful retrieve", async () => {
             const expectedData = [{ name: "aaa" }];
-            await homeController.getHomePage(<Request>req, <Response>res);
+            await homeController.getHomePage(req as Request, res as Response);
 
             sinon.assert.calledWith(res.send as sinon.SinonSpy, "Hello Identity Service for noApp (noEnv)");
         });
