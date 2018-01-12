@@ -12,7 +12,7 @@ const chai_1 = require("chai");
 const mongo_service_1 = require("./mongo.service");
 const config_1 = require("../config");
 const mongodb_1 = require("mongodb");
-describe("Mongo service", function () {
+describe("Mongo service", () => {
     let db;
     it("should have the right database in place", () => __awaiter(this, void 0, void 0, function* () {
         config_1.default.mongo.uri = "mongodb://localhost";
@@ -22,7 +22,7 @@ describe("Mongo service", function () {
             const adminDb = db.admin();
             const dbs = yield adminDb.listDatabases();
             if (config_1.default.env === "development") {
-                chai_1.expect(dbs.databases.some((item) => item.name == "identity-service-dev")).to.be.true;
+                chai_1.expect(dbs.databases.some((item) => item.name === "identity-service-dev")).to.be.true;
             }
         }
         catch (err) {
@@ -36,7 +36,7 @@ describe("Mongo service", function () {
             db = yield mongo_service_1.default.getDb();
             console.log(db.databaseName);
             const collections = yield db.listCollections().toArray();
-            chai_1.expect(collections.some((item) => item.name == "users")).to.be.true;
+            chai_1.expect(collections.some(item => item.name === "users")).to.be.true;
         }
         catch (err) {
             chai_1.expect(err).to.be.not.null;

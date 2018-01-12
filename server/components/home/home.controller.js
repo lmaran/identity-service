@@ -17,10 +17,10 @@ const homeController = {
         if (subdomains) {
             if (subdomains.length > 0 && subdomains.length < 4) {
                 if (subdomains[0] === "identity") {
-                    if (subdomains.length == 1) {
+                    if (subdomains.length === 1) {
                         envSubdomain = "prod";
                     }
-                    if (subdomains.length == 2) {
+                    if (subdomains.length === 2) {
                         const s = subdomains[1];
                         if (isReservedSubdomain(s)) {
                             envSubdomain = s;
@@ -29,7 +29,7 @@ const homeController = {
                             appSubdomain = s;
                         }
                     }
-                    if (subdomains.length == 3) {
+                    if (subdomains.length === 3) {
                         const s = subdomains[1];
                         if (isReservedSubdomain(s)) {
                             envSubdomain = s;
@@ -43,7 +43,7 @@ const homeController = {
     }),
 };
 function isReservedSubdomain(s) {
-    const isReserved1 = ["stg", "temp", "temp-stg", "blue", "blue-stg", "green", "green-stg", "dev",].includes(s);
+    const isReserved1 = ["stg", "temp", "temp-stg", "blue", "blue-stg", "green", "green-stg", "dev"].includes(s);
     const isReserved2 = string_1.default.endsWithValueFromList(s, ["-blue", "-green", "-blue-stg", "-green-stg"]);
     return isReserved1 || isReserved2;
 }

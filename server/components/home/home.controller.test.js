@@ -9,19 +9,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const sinon = require("sinon");
-const chai_1 = require("chai");
 const home_controller_1 = require("./home.controller");
 let req;
 let res;
 describe("home Controller", () => {
-    beforeEach(function () {
+    beforeEach(() => {
         req = {};
         res = {
             send: sinon.spy(),
         };
-    });
-    it("should exist", function () {
-        chai_1.expect(home_controller_1.default).to.exist;
     });
     describe("getHomePage", () => {
         it("should successful retrieve", () => __awaiter(this, void 0, void 0, function* () {

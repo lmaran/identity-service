@@ -10,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const config_1 = require("../config");
 const mongodb_1 = require("mongodb");
-let theDb = undefined;
+let theDb;
 const service = {
     getDb: () => __awaiter(this, void 0, void 0, function* () {
         try {
