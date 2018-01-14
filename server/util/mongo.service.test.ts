@@ -1,3 +1,4 @@
+/* tslint:disable no-unused-expression */
 import { expect } from "chai";
 import * as chai from "chai";
 import * as sinon from "sinon";
@@ -6,7 +7,7 @@ import mongoService from "./mongo.service";
 import config, { EnvironmentType } from "../config";
 import { ObjectID, Db } from "mongodb";
 
-describe("Mongo service", function () {
+describe("Mongo service", () => {
 
     let db: Db;
 
@@ -23,9 +24,8 @@ describe("Mongo service", function () {
             const dbs = await adminDb.listDatabases();
 
             if (config.env === EnvironmentType.DEVELOPMENT) {
-                expect(dbs.databases.some((item: IDBDatabase) => item.name == "identity-service-dev")).to.be.true;
+                expect(dbs.databases.some((item: IDBDatabase) => item.name === "identity-service-dev")).to.be.true;
             }
-
 
         } catch (err) {
             expect(err).to.be.null;
@@ -40,9 +40,8 @@ describe("Mongo service", function () {
             db = await mongoService.getDb();
             console.log(db.databaseName);
 
-
             const collections = await db.listCollections().toArray();
-            expect(collections.some((item) => item.name == "users")).to.be.true;
+            expect(collections.some(item => item.name === "users")).to.be.true;
             // expect(collections).to.deep.include({ name: "users" }); // don't work with incomplete properties
 
         } catch (err) {
@@ -111,7 +110,6 @@ describe("Mongo service", function () {
             expect(err).to.be.null;
         }
     });
-
 
     it("should return a correct normalized value", () => {
         // check for valid ObjectID

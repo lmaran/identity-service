@@ -13,10 +13,10 @@ const homeController = {
         if (subdomains) {
             if (subdomains.length > 0 && subdomains.length < 4) {
                 if (subdomains[0] === "identity") {
-                    if (subdomains.length == 1) { // ["identity"]
+                    if (subdomains.length === 1) { // ["identity"]
                         envSubdomain = "prod";
                     }
-                    if (subdomains.length == 2) { // ["identity", "dev"] or ["identity", app1"]
+                    if (subdomains.length === 2) { // ["identity", "dev"] or ["identity", app1"]
                         const s = subdomains[1];
                         if (isReservedSubdomain(s)) {
                             envSubdomain = s;
@@ -24,7 +24,7 @@ const homeController = {
                             appSubdomain = s;
                         }
                     }
-                    if (subdomains.length == 3) { // ["identity", "dev", app1"]
+                    if (subdomains.length === 3) { // ["identity", "dev", app1"]
                         const s = subdomains[1];
                         if (isReservedSubdomain(s)) {
                             envSubdomain = s;
@@ -35,14 +35,13 @@ const homeController = {
             } // else localhost or wrong app
         }
 
-
         res.send(`Hello Identity Service for ${appSubdomain} (${envSubdomain})`);
     },
 
 };
 
 function isReservedSubdomain(s) {
-    const isReserved1 = ["stg", "temp", "temp-stg", "blue", "blue-stg", "green", "green-stg", "dev", ].includes(s);
+    const isReserved1 = ["stg", "temp", "temp-stg", "blue", "blue-stg", "green", "green-stg", "dev"].includes(s);
     const isReserved2 = stringUtil.endsWithValueFromList(s, ["-blue", "-green", "-blue-stg", "-green-stg"]);
     return isReserved1 || isReserved2;
 }

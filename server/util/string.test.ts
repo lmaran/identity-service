@@ -4,7 +4,7 @@ import * as sinon from "sinon";
 
 import stringUtil from "./string";
 
-describe("String util", function () {
+describe("String util", () => {
 
     it("should work for endsWith", () => {
         expect(stringUtil.endsWithValueFromList("aaa", ["aa"])).equal(true);
