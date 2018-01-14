@@ -17,6 +17,8 @@ import * as jose from "jsrsasign";
 import * as exphbs from "express-handlebars";
 // var exphbs = require('express-handlebars');
 
+import {requests, codes} from "./components/shared/data";
+
 const app: express.Application = express();
 
 app.use(bodyParser.json());
@@ -109,9 +111,9 @@ const getUser = username => {
     return userInfo[username];
 };
 
-const codes = {};
+// const codes = {};
 
-const requests = {};
+// const requests = {};
 
 const getClient = clientId => {
     return __.find(clients, client => client.client_id === clientId);
@@ -125,102 +127,102 @@ app.get("/", (req, res) => {
     res.render("index", { clients, authServer });
 });
 
-app.get("/authorize", (req, res) => {
+// app.get("/authorize", (req, res) => {
 
-    const client = getClient(req.query.client_id);
+//     const client = getClient(req.query.client_id);
 
-    if (!client) {
-        console.log("Unknown client %s", req.query.client_id);
-        res.render("error", { error: "Unknown client" });
-        return;
-    } else if (!__.contains(client.redirect_uris, req.query.redirect_uri)) {
-        console.log("Mismatched redirect URI, expected %s got %s", client.redirect_uris, req.query.redirect_uri);
-        res.render("error", { error: "Invalid redirect URI" });
-        return;
-    } else {
+//     if (!client) {
+//         console.log("Unknown client %s", req.query.client_id);
+//         res.render("error", { error: "Unknown client"});
+//         return;
+//     } else if (!__.contains(client.redirect_uris, req.query.redirect_uri)) {
+//         console.log("Mismatched redirect URI, expected %s got %s", client.redirect_uris, req.query.redirect_uri);
+//         res.render("error", { error: "Invalid redirect URI" });
+//         return;
+//     } else {
 
-        const rscope = req.query.scope ? req.query.scope.split(" ") : undefined;
-        const cscope = client.scope ? client.scope.split(" ") : undefined;
-        if (__.difference(rscope, cscope).length > 0) {
-            // client asked for a scope it couldn't have
-            const urlParsed = buildUrl(req.query.redirect_uri, {
-                error: "invalid_scope",
-            }, undefined);
-            res.redirect(urlParsed);
-            return;
-        }
+//         const rscope = req.query.scope ? req.query.scope.split(" ") : undefined;
+//         const cscope = client.scope ? client.scope.split(" ") : undefined;
+//         if (__.difference(rscope, cscope).length > 0) {
+//             // client asked for a scope it couldn't have
+//             const urlParsed = buildUrl(req.query.redirect_uri, {
+//                 error: "invalid_scope",
+//             }, undefined);
+//             res.redirect(urlParsed);
+//             return;
+//         }
 
-        const reqid = randomstring.generate(8);
+//         const reqid = randomstring.generate(8);
 
-        requests[reqid] = req.query;
+//         requests[reqid] = req.query;
 
-        res.render("approve", { client, reqid, scope: rscope });
-        return;
-    }
+//         res.render("approve", { client, reqid, scope: rscope });
+//         return;
+//     }
 
-});
+// });
 
-app.post("/approve", (req, res) => {
+// app.post("/approve", (req, res) => {
 
-    const reqid = req.body.reqid;
-    const query = requests[reqid];
-    delete requests[reqid];
+//     const reqid = req.body.reqid;
+//     const query = requests[reqid];
+//     delete requests[reqid];
 
-    let urlParsed;
+//     let urlParsed;
 
-    if (!query) {
-        // there was no matching saved request, this is an error
-        res.render("error", { error: "No matching authorization request" });
-        return;
-    }
+//     if (!query) {
+//         // there was no matching saved request, this is an error
+//         res.render("error", { error: "No matching authorization request" });
+//         return;
+//     }
 
-    if (req.body.approve) {
-        if (query.response_type === "code") {
-            // user approved access
-            const code = randomstring.generate(8);
+//     if (req.body.approve) {
+//         if (query.response_type === "code") {
+//             // user approved access
+//             const code = randomstring.generate(8);
 
-            const user = getUser(req.body.user);
+//             const user = getUser(req.body.user);
 
-            const scope = getScopesFromForm(req.body);
+//             const scope = getScopesFromForm(req.body);
 
-            const client = getClient(query.client_id);
-            const cscope = client.scope ? client.scope.split(" ") : undefined;
-            if (__.difference(scope, cscope).length > 0) {
-                // client asked for a scope it couldn't have
-                urlParsed = buildUrl(query.redirect_uri, {
-                    error: "invalid_scope",
-                }, undefined);
-                res.redirect(urlParsed);
-                return;
-            }
+//             const client = getClient(query.client_id);
+//             const cscope = client.scope ? client.scope.split(" ") : undefined;
+//             if (__.difference(scope, cscope).length > 0) {
+//                 // client asked for a scope it couldn't have
+//                 urlParsed = buildUrl(query.redirect_uri, {
+//                     error: "invalid_scope",
+//                 }, undefined);
+//                 res.redirect(urlParsed);
+//                 return;
+//             }
 
-            // save the code and request for later
-            codes[code] = { request: query, scope, user };
+//             // save the code and request for later
+//             codes[code] = { request: query, scope, user };
 
-            urlParsed = buildUrl(query.redirect_uri, {
-                code,
-                state: query.state,
-            }, undefined);
-            res.redirect(urlParsed);
-            return;
-        } else {
-            // we got a response type we don't understand
-            urlParsed = buildUrl(query.redirect_uri, {
-                error: "unsupported_response_type",
-            }, undefined);
-            res.redirect(urlParsed);
-            return;
-        }
-    } else {
-        // user denied access
-        urlParsed = buildUrl(query.redirect_uri, {
-            error: "access_denied",
-        }, undefined);
-        res.redirect(urlParsed);
-        return;
-    }
+//             urlParsed = buildUrl(query.redirect_uri, {
+//                 code,
+//                 state: query.state,
+//             }, undefined);
+//             res.redirect(urlParsed);
+//             return;
+//         } else {
+//             // we got a response type we don't understand
+//             urlParsed = buildUrl(query.redirect_uri, {
+//                 error: "unsupported_response_type",
+//             }, undefined);
+//             res.redirect(urlParsed);
+//             return;
+//         }
+//     } else {
+//         // user denied access
+//         urlParsed = buildUrl(query.redirect_uri, {
+//             error: "access_denied",
+//         }, undefined);
+//         res.redirect(urlParsed);
+//         return;
+//     }
 
-});
+// });
 
 app.post("/token", (req, res) => {
 
@@ -461,57 +463,6 @@ const userInfoEndpoint = (req, res) => {
     res.status(200).json(out);
     return;
 };
-
-app.get("/aaa", (req, res) => {
-    console.log(111);
-    let out = {aaa: 3};
-
-    nosql.insert(out);
-
-    nosql.one().make(filter => {
-        // filter.where("age", ">", 20);
-        filter.where("aaa", 3);
-        filter.callback((err, response) => {
-
-            console.log(err, response);
-            out = response;
-            res.status(200).json(out);
-        });
-    });
-
-    // nosql.one().make(filter => {
-    //     // filter.where("age", ">", 20);
-    //     filter.where("aaa", 3);
-    //     filter.callback((err, response) => {
-
-    //         console.log(err, response);
-    //         out = response;
-    //         res.status(200).json(out);
-    //     });
-    // });
-
-    // nosql.one().make(builder => {
-    //     // filter.where("age", ">", 20);
-    //     // filter.where("aaa", 3);
-    //     builder.filter(x => x.aaa === 3)
-    //     filter.callback((err, response) => {
-
-    //         console.log(err, response);
-    //         out = response;
-    //         res.status(200).json(out);
-    //     });
-    // });
-
-    // nosql.find(token => {
-    //     if (token.access_token === "aaa") {
-    //         return token;
-    //     }
-    // }, (err, token) => {
-    //     out.aaa = 4;
-    //     res.status(200).json(out);
-    // });
-
-});
 
 app.get("/userinfo", getAccessToken, requireAccessToken, userInfoEndpoint);
 
