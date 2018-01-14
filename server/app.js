@@ -1,23 +1,39 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const express = require("express");
+const path = require("path");
 const routes_1 = require("./routes");
 const url = require("url");
 const bodyParser = require("body-parser");
 const randomstring = require("randomstring");
-const cons = require("consolidate");
 const nosql2 = require("nosql");
 const nosql = nosql2.load("database.nosql");
 const querystring = require("querystring");
 const __ = require("underscore");
 const __string = require("underscore.string");
 const jose = require("jsrsasign");
+const exphbs = require("express-handlebars");
+const data_1 = require("./components/shared/data");
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.engine("html", cons.underscore);
-app.set("view engine", "html");
-app.set("views", "server/files");
+app.engine(".hbs", exphbs({
+    defaultLayout: "main",
+    extname: ".hbs",
+    layoutsDir: path.join(__dirname, "/views/layouts/"),
+    partialsDir: path.join(__dirname, "/views/partials/"),
+    helpers: {
+        section: (name, options) => {
+            if (!this._sections) {
+                this._sections = {};
+            }
+            this._sections[name] = options.fn(this);
+            return null;
+        },
+    },
+}));
+app.set("view engine", ".hbs");
+app.set("views", path.join(__dirname, "/files/"));
 app.set("json spaces", 4);
 const authServer = {
     authorizationEndpoint: "http://localhost:1420/authorize",
@@ -63,7 +79,7 @@ const userInfo = {
     carol: {
         sub: "F5Q1-L6LGG-959FS",
         preferred_username: "carol",
-        name: "Carol",
+        name: "Carol2",
         email: "carol.lewis@example.net",
         email_verified: true,
         username: "clewis",
@@ -73,8 +89,6 @@ const userInfo = {
 const getUser = username => {
     return userInfo[username];
 };
-const codes = {};
-const requests = {};
 const getClient = clientId => {
     return __.find(clients, client => client.client_id === clientId);
 };
@@ -83,81 +97,6 @@ const getProtectedResource = resourceId => {
 };
 app.get("/", (req, res) => {
     res.render("index", { clients, authServer });
-});
-app.get("/authorize", (req, res) => {
-    const client = getClient(req.query.client_id);
-    if (!client) {
-        console.log("Unknown client %s", req.query.client_id);
-        res.render("error", { error: "Unknown client" });
-        return;
-    }
-    else if (!__.contains(client.redirect_uris, req.query.redirect_uri)) {
-        console.log("Mismatched redirect URI, expected %s got %s", client.redirect_uris, req.query.redirect_uri);
-        res.render("error", { error: "Invalid redirect URI" });
-        return;
-    }
-    else {
-        const rscope = req.query.scope ? req.query.scope.split(" ") : undefined;
-        const cscope = client.scope ? client.scope.split(" ") : undefined;
-        if (__.difference(rscope, cscope).length > 0) {
-            const urlParsed = buildUrl(req.query.redirect_uri, {
-                error: "invalid_scope",
-            }, undefined);
-            res.redirect(urlParsed);
-            return;
-        }
-        const reqid = randomstring.generate(8);
-        requests[reqid] = req.query;
-        res.render("approve", { client, reqid, scope: rscope });
-        return;
-    }
-});
-app.post("/approve", (req, res) => {
-    const reqid = req.body.reqid;
-    const query = requests[reqid];
-    delete requests[reqid];
-    let urlParsed;
-    if (!query) {
-        res.render("error", { error: "No matching authorization request" });
-        return;
-    }
-    if (req.body.approve) {
-        if (query.response_type === "code") {
-            const code = randomstring.generate(8);
-            const user = getUser(req.body.user);
-            const scope = getScopesFromForm(req.body);
-            const client = getClient(query.client_id);
-            const cscope = client.scope ? client.scope.split(" ") : undefined;
-            if (__.difference(scope, cscope).length > 0) {
-                urlParsed = buildUrl(query.redirect_uri, {
-                    error: "invalid_scope",
-                }, undefined);
-                res.redirect(urlParsed);
-                return;
-            }
-            codes[code] = { request: query, scope, user };
-            urlParsed = buildUrl(query.redirect_uri, {
-                code,
-                state: query.state,
-            }, undefined);
-            res.redirect(urlParsed);
-            return;
-        }
-        else {
-            urlParsed = buildUrl(query.redirect_uri, {
-                error: "unsupported_response_type",
-            }, undefined);
-            res.redirect(urlParsed);
-            return;
-        }
-    }
-    else {
-        urlParsed = buildUrl(query.redirect_uri, {
-            error: "access_denied",
-        }, undefined);
-        res.redirect(urlParsed);
-        return;
-    }
 });
 app.post("/token", (req, res) => {
     const auth = req.headers.authorization;
@@ -189,9 +128,9 @@ app.post("/token", (req, res) => {
         return;
     }
     if (req.body.grant_type === "authorization_code") {
-        const code = codes[req.body.code];
+        const code = data_1.codes[req.body.code];
         if (code) {
-            delete codes[req.body.code];
+            delete data_1.codes[req.body.code];
             if (code.request.client_id === clientId) {
                 const header = { typ: "JWT", alg: rsaKey.alg, kid: rsaKey.kid };
                 const access_token = randomstring.generate();
@@ -242,6 +181,95 @@ app.post("/token", (req, res) => {
         res.status(400).json({ error: "unsupported_grant_type" });
     }
 });
+const getAccessToken = (req, res, next) => {
+    const auth = req.headers.authorization;
+    let inToken = null;
+    if (auth && auth.toLowerCase().indexOf("bearer") === 0) {
+        inToken = auth.slice("bearer ".length);
+    }
+    else if (req.body && req.body.access_token) {
+        inToken = req.body.access_token;
+    }
+    else if (req.query && req.query.access_token) {
+        inToken = req.query.access_token;
+    }
+    console.log("Incoming token: %s", inToken);
+    nosql.one().make(filter => {
+        filter.where("access_token", inToken);
+        filter.callback((err, token) => {
+            if (token) {
+                console.log("We found a matching token: %s", inToken);
+            }
+            else {
+                console.log("No matching token was found.");
+            }
+            req.access_token = token;
+            next();
+            return;
+        });
+    });
+};
+const requireAccessToken = (req, res, next) => {
+    if (req.access_token) {
+        next();
+    }
+    else {
+        res.status(401).end();
+    }
+};
+const userInfoEndpoint = (req, res) => {
+    if (!__.contains(req.access_token.scope, "openid")) {
+        res.status(403).end();
+        return;
+    }
+    const user = req.access_token.user;
+    if (!user) {
+        res.status(404).end();
+        return;
+    }
+    const out = {};
+    __.each(req.access_token.scope, scope => {
+        if (scope === "openid") {
+            __.each(["sub"], claim => {
+                if (user[claim]) {
+                    out[claim] = user[claim];
+                }
+            });
+        }
+        else if (scope === "profile") {
+            __.each(["name", "family_name", "given_name", "middle_name", "nickname", "preferred_username", "profile", "picture", "website", "gender", "birthdate", "zoneinfo", "locale", "updated_at"], function (claim) {
+                if (user[claim]) {
+                    out[claim] = user[claim];
+                }
+            });
+        }
+        else if (scope === "email") {
+            __.each(["email", "email_verified"], claim => {
+                if (user[claim]) {
+                    out[claim] = user[claim];
+                }
+            });
+        }
+        else if (scope === "address") {
+            __.each(["address"], claim => {
+                if (user[claim]) {
+                    out[claim] = user[claim];
+                }
+            });
+        }
+        else if (scope === "phone") {
+            __.each(["phone_number", "phone_number_verified"], claim => {
+                if (user[claim]) {
+                    out[claim] = user[claim];
+                }
+            });
+        }
+    });
+    res.status(200).json(out);
+    return;
+};
+app.get("/userinfo", getAccessToken, requireAccessToken, userInfoEndpoint);
+app.post("/userinfo", getAccessToken, requireAccessToken, userInfoEndpoint);
 const buildUrl = (base, options, hash) => {
     const newUrl = url.parse(base, true);
     delete newUrl.search;

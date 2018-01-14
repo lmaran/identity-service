@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang='en'>
+
+<head>
+    <base href="/" />
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OAuth in Action: OAuth Authorization Server</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <style>
+        body {
+            padding-top: 60px;
+        }
+
+        .navbar-inverse {
+            background-color: #322;
+        }
+    </style>
+    {{!--
+    <link rel='stylesheet' , href='/public/css/app.css' /> --}} {{{_sections.head}}}
+
+</head>
+
+<body>
+
+    {{{body}}}
+
+    <script src='//ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js'></script>
+    <script src='//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js'></script> {{!-- ensure the javascript is at the bottom of the code if you have to use jQuery; http://stackoverflow.com/a/25307270
+    --}} {{{_sections.script}}}
+</body>
+
+</html>
