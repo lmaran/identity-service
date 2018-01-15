@@ -224,127 +224,127 @@ app.get("/", (req, res) => {
 
 // });
 
-app.post("/token", (req, res) => {
+// app.post("/token", (req, res) => {
 
-    const auth = req.headers.authorization;
-    let clientId;
-    let clientSecret;
-    if (auth) {
-        // check the auth header
-        const clientCredentials = decodeClientCredentials(auth);
-        clientId = clientCredentials.id;
-        clientSecret = clientCredentials.secret;
-    }
+//     const auth = req.headers.authorization;
+//     let clientId;
+//     let clientSecret;
+//     if (auth) {
+//         // check the auth header
+//         const clientCredentials = decodeClientCredentials(auth);
+//         clientId = clientCredentials.id;
+//         clientSecret = clientCredentials.secret;
+//     }
 
-    // otherwise, check the post body
-    if (req.body.client_id) {
-        if (clientId) {
-            // if we've already seen the client's credentials in the authorization header, this is an error
-            console.log("Client attempted to authenticate with multiple methods");
-            res.status(401).json({ error: "invalid_client" });
-            return;
-        }
+//     // otherwise, check the post body
+//     if (req.body.client_id) {
+//         if (clientId) {
+//             // if we've already seen the client's credentials in the authorization header, this is an error
+//             console.log("Client attempted to authenticate with multiple methods");
+//             res.status(401).json({ error: "invalid_client" });
+//             return;
+//         }
 
-        clientId = req.body.client_id;
-        clientSecret = req.body.client_secret;
-    }
+//         clientId = req.body.client_id;
+//         clientSecret = req.body.client_secret;
+//     }
 
-    const client = getClient(clientId);
-    if (!client) {
-        console.log("Unknown client %s", clientId);
-        res.status(401).json({ error: "invalid_client" });
-        return;
-    }
+//     const client = getClient(clientId);
+//     if (!client) {
+//         console.log("Unknown client %s", clientId);
+//         res.status(401).json({ error: "invalid_client" });
+//         return;
+//     }
 
-    if (client.client_secret !== clientSecret) {
-        console.log("Mismatched client secret, expected %s got %s", client.client_secret, clientSecret);
-        res.status(401).json({ error: "invalid_client" });
-        return;
-    }
+//     if (client.client_secret !== clientSecret) {
+//         console.log("Mismatched client secret, expected %s got %s", client.client_secret, clientSecret);
+//         res.status(401).json({ error: "invalid_client" });
+//         return;
+//     }
 
-    if (req.body.grant_type === "authorization_code") {
+//     if (req.body.grant_type === "authorization_code") {
 
-        const code = codes[req.body.code];
+//         const code = codes[req.body.code];
 
-        if (code) {
-            delete codes[req.body.code]; // burn our code, it's been used
-            if (code.request.client_id === clientId) {
+//         if (code) {
+//             delete codes[req.body.code]; // burn our code, it's been used
+//             if (code.request.client_id === clientId) {
 
-                const header = { typ: "JWT", alg: rsaKey.alg, kid: rsaKey.kid };
+//                 const header = { typ: "JWT", alg: rsaKey.alg, kid: rsaKey.kid };
 
-                // var payload = {
-                // 	iss: 'http://localhost:9001/',
-                // 	sub: code.user ? code.user.sub : null,
-                // 	aud: 'http://localhost:9002/',
-                // 	iat: Math.floor(Date.now() / 1000),
-                // 	exp: Math.floor(Date.now() / 1000) + (5 * 60),
-                // 	jti: randomstring.generate(8)
-                // };
-                // console.log(payload);
-                // var stringHeader = JSON.stringify(header);
-                // var stringPayload = JSON.stringify(payload);
-                // //var encodedHeader = base64url.encode(JSON.stringify(header));
-                // //var encodedPayload = base64url.encode(JSON.stringify(payload));
-                // //var access_token = encodedHeader + '.' + encodedPayload + '.';
-                // //var access_token = jose.jws.JWS.sign('HS256', stringHeader, stringPayload, new Buffer(sharedTokenSecret).toString('hex'));
-                // var privateKey = jose.KEYUTIL.getKey(rsaKey);
-                // var access_token = jose.jws.JWS.sign(rsaKey.alg, stringHeader, stringPayload, privateKey);
+//                 // var payload = {
+//                 // 	iss: 'http://localhost:9001/',
+//                 // 	sub: code.user ? code.user.sub : null,
+//                 // 	aud: 'http://localhost:9002/',
+//                 // 	iat: Math.floor(Date.now() / 1000),
+//                 // 	exp: Math.floor(Date.now() / 1000) + (5 * 60),
+//                 // 	jti: randomstring.generate(8)
+//                 // };
+//                 // console.log(payload);
+//                 // var stringHeader = JSON.stringify(header);
+//                 // var stringPayload = JSON.stringify(payload);
+//                 // //var encodedHeader = base64url.encode(JSON.stringify(header));
+//                 // //var encodedPayload = base64url.encode(JSON.stringify(payload));
+//                 // //var access_token = encodedHeader + '.' + encodedPayload + '.';
+//                 // //var access_token = jose.jws.JWS.sign('HS256', stringHeader, stringPayload, new Buffer(sharedTokenSecret).toString('hex'));
+//                 // var privateKey = jose.KEYUTIL.getKey(rsaKey);
+//                 // var access_token = jose.jws.JWS.sign(rsaKey.alg, stringHeader, stringPayload, privateKey);
 
-                const access_token = randomstring.generate();
-                nosql.insert({ access_token, client_id: clientId, scope: code.scope, user: code.user });
+//                 const access_token = randomstring.generate();
+//                 nosql.insert({ access_token, client_id: clientId, scope: code.scope, user: code.user });
 
-                console.log("Issuing access token %s", access_token);
-                console.log("with scope %s", code.scope);
+//                 console.log("Issuing access token %s", access_token);
+//                 console.log("with scope %s", code.scope);
 
-                let cscope;
-                if (code.scope) {
-                    cscope = code.scope.join(" ");
-                }
+//                 let cscope;
+//                 if (code.scope) {
+//                     cscope = code.scope.join(" ");
+//                 }
 
-                const token_response: any = { access_token, token_type: "Bearer", scope: cscope };
+//                 const token_response: any = { access_token, token_type: "Bearer", scope: cscope };
 
-                if (__.contains(code.scope, "openid")) {
-                    const ipayload: any = {
-                        iss: "http://localhost:1420/",
-                        sub: code.user.sub,
-                        aud: client.client_id,
-                        iat: Math.floor(Date.now() / 1000),
-                        exp: Math.floor(Date.now() / 1000) + (5 * 60),
-                    };
-                    if (code.request.nonce) {
-                        ipayload.nonce = code.request.nonce;
-                    }
+//                 if (__.contains(code.scope, "openid")) {
+//                     const ipayload: any = {
+//                         iss: "http://localhost:1420/",
+//                         sub: code.user.sub,
+//                         aud: client.client_id,
+//                         iat: Math.floor(Date.now() / 1000),
+//                         exp: Math.floor(Date.now() / 1000) + (5 * 60),
+//                     };
+//                     if (code.request.nonce) {
+//                         ipayload.nonce = code.request.nonce;
+//                     }
 
-                    const istringHeader = JSON.stringify(header);
-                    const istringPayload = JSON.stringify(ipayload);
-                    const privateKey = jose.KEYUTIL.getKey(rsaKey);
-                    const id_token = jose.jws.JWS.sign(rsaKey.alg, istringHeader, istringPayload, privateKey);
+//                     const istringHeader = JSON.stringify(header);
+//                     const istringPayload = JSON.stringify(ipayload);
+//                     const privateKey = jose.KEYUTIL.getKey(rsaKey);
+//                     const id_token = jose.jws.JWS.sign(rsaKey.alg, istringHeader, istringPayload, privateKey);
 
-                    console.log("Issuing ID token %s", id_token);
+//                     console.log("Issuing ID token %s", id_token);
 
-                    token_response.id_token = id_token;
+//                     token_response.id_token = id_token;
 
-                }
+//                 }
 
-                res.status(200).json(token_response);
-                console.log("Issued tokens for code %s", req.body.code);
+//                 res.status(200).json(token_response);
+//                 console.log("Issued tokens for code %s", req.body.code);
 
-                return;
-            } else {
-                console.log("Client mismatch, expected %s got %s", code.request.client_id, clientId);
-                res.status(400).json({ error: "invalid_grant" });
-                return;
-            }
-        } else {
-            console.log("Unknown code, %s", req.body.code);
-            res.status(400).json({ error: "invalid_grant" });
-            return;
-        }
-    } else {
-        console.log("Unknown grant type %s", req.body.grant_type);
-        res.status(400).json({ error: "unsupported_grant_type" });
-    }
-});
+//                 return;
+//             } else {
+//                 console.log("Client mismatch, expected %s got %s", code.request.client_id, clientId);
+//                 res.status(400).json({ error: "invalid_grant" });
+//                 return;
+//             }
+//         } else {
+//             console.log("Unknown code, %s", req.body.code);
+//             res.status(400).json({ error: "invalid_grant" });
+//             return;
+//         }
+//     } else {
+//         console.log("Unknown grant type %s", req.body.grant_type);
+//         res.status(400).json({ error: "unsupported_grant_type" });
+//     }
+// });
 
 const getAccessToken = (req, res, next) => {
     // check the auth header first

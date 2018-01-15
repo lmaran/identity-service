@@ -5,6 +5,7 @@ import homeRoutes from "./components/home/home.routes";
 import checkRoutes from "./components/check/check.routes";
 import authorizeRoutes from "./components/authorize/authorize.routes";
 import approveRoutes from "./components/approve/approve.routes";
+import tokenRoutes from "./components/token/token.routes";
 
 const router = Router();
 
@@ -12,6 +13,7 @@ router.use("/contact", contactRoutes);
 router.use("/check", checkRoutes);
 router.use("/authorize", authorizeRoutes);
 router.use("/approve", approveRoutes);
+router.use("/token", tokenRoutes);
 router.use("", homeRoutes);
 
 export default router;
