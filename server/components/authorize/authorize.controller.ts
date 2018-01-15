@@ -38,7 +38,7 @@ const authorizeController = {
 
             requests[reqid] = req.query;
 
-            res.render("approve", { client, reqid, scope: rscope });
+            res.render("../components/approve/approve", { client, reqid, scope: rscope });
             return;
         }
 
@@ -76,6 +76,17 @@ const buildUrl = (base, options, hash) => {
     return url.format(newUrl);
 };
 
-// const requests = {};
+// not used yet
+const protectedResources = [
+    {
+        resource_id: "protected-resource-1",
+        resource_secret: "protected-resource-secret-1",
+    },
+];
+
+// not used yet
+const getProtectedResource = resourceId => {
+    return __.find(protectedResources, resource => resource.resource_id === resourceId);
+};
 
 export default authorizeController;

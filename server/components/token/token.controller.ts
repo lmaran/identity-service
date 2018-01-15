@@ -165,4 +165,7 @@ const rsaKey = {
     kid: "authserver",
 };
 
+// clear the database
+nosql.clear();
+
 export default tokenController;

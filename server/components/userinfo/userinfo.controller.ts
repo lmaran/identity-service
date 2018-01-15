@@ -10,7 +10,7 @@ import * as __ from "underscore";
 
 const userinfoController = {
 
-    // POST
+    // GET, POST
     getUserinfo: async (req: Request, res: Response) => {
         if (!__.contains(req.access_token.scope, "openid")) {
             res.status(403).end();
