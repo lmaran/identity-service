@@ -346,58 +346,58 @@ app.get("/", (req, res) => {
 //     }
 // });
 
-const getAccessToken = (req, res, next) => {
-    // check the auth header first
-    const auth = req.headers.authorization;
-    let inToken = null;
-    if (auth && auth.toLowerCase().indexOf("bearer") === 0) {
-        inToken = auth.slice("bearer ".length);
-    } else if (req.body && req.body.access_token) {
-        // not in the header, check in the form body
-        inToken = req.body.access_token;
-    } else if (req.query && req.query.access_token) {
-        inToken = req.query.access_token;
-    }
+// const getAccessToken = (req, res, next) => {
+//     // check the auth header first
+//     const auth = req.headers.authorization;
+//     let inToken = null;
+//     if (auth && auth.toLowerCase().indexOf("bearer") === 0) {
+//         inToken = auth.slice("bearer ".length);
+//     } else if (req.body && req.body.access_token) {
+//         // not in the header, check in the form body
+//         inToken = req.body.access_token;
+//     } else if (req.query && req.query.access_token) {
+//         inToken = req.query.access_token;
+//     }
 
-    console.log("Incoming token: %s", inToken);
-    // nosql.one(token => {
-    //     if (token.access_token === inToken) {
-    //         return token;
-    //     }
-    // }, (err, token) => {
-    //     if (token) {
-    //         console.log("We found a matching token: %s", inToken);
-    //     } else {
-    //         console.log("No matching token was found.");
-    //     }
-    //     req.access_token = token;
-    //     next();
-    //     return;
-    // });
+//     console.log("Incoming token: %s", inToken);
+//     // nosql.one(token => {
+//     //     if (token.access_token === inToken) {
+//     //         return token;
+//     //     }
+//     // }, (err, token) => {
+//     //     if (token) {
+//     //         console.log("We found a matching token: %s", inToken);
+//     //     } else {
+//     //         console.log("No matching token was found.");
+//     //     }
+//     //     req.access_token = token;
+//     //     next();
+//     //     return;
+//     // });
 
-    nosql.one().make(filter => {
-        filter.where("access_token", inToken);
-        filter.callback((err, token) => {
-            if (token) {
-                console.log("We found a matching token: %s", inToken);
-            } else {
-                console.log("No matching token was found.");
-            }
-            req.access_token = token;
-            next();
-            return;
-        });
-    });
+//     nosql.one().make(filter => {
+//         filter.where("access_token", inToken);
+//         filter.callback((err, token) => {
+//             if (token) {
+//                 console.log("We found a matching token: %s", inToken);
+//             } else {
+//                 console.log("No matching token was found.");
+//             }
+//             req.access_token = token;
+//             next();
+//             return;
+//         });
+//     });
 
-};
+// };
 
-const requireAccessToken = (req, res, next) => {
-    if (req.access_token) {
-        next();
-    } else {
-        res.status(401).end();
-    }
-};
+// const requireAccessToken = (req, res, next) => {
+//     if (req.access_token) {
+//         next();
+//     } else {
+//         res.status(401).end();
+//     }
+// };
 
 // app.options("/resource", cors());
 
@@ -411,62 +411,62 @@ const requireAccessToken = (req, res, next) => {
 
 // });
 
-const userInfoEndpoint = (req, res) => {
+// const userInfoEndpoint = (req, res) => {
 
-    if (!__.contains(req.access_token.scope, "openid")) {
-        res.status(403).end();
-        return;
-    }
+//     if (!__.contains(req.access_token.scope, "openid")) {
+//         res.status(403).end();
+//         return;
+//     }
 
-    const user = req.access_token.user;
-    if (!user) {
-        res.status(404).end();
-        return;
-    }
+//     const user = req.access_token.user;
+//     if (!user) {
+//         res.status(404).end();
+//         return;
+//     }
 
-    const out = {};
-    __.each(req.access_token.scope, scope => {
-        if (scope === "openid") {
-            __.each(["sub"], claim => {
-                if (user[claim]) {
-                    out[claim] = user[claim];
-                }
-            });
-        } else if (scope === "profile") {
-            __.each(["name", "family_name", "given_name", "middle_name", "nickname", "preferred_username", "profile", "picture", "website", "gender", "birthdate", "zoneinfo", "locale", "updated_at"], function(claim) {
-                if (user[claim]) {
-                    out[claim] = user[claim];
-                }
-            });
-        } else if (scope === "email") {
-            __.each(["email", "email_verified"], claim => {
-                if (user[claim]) {
-                    out[claim] = user[claim];
-                }
-            });
-        } else if (scope === "address") {
-            __.each(["address"], claim => {
-                if (user[claim]) {
-                    out[claim] = user[claim];
-                }
-            });
-        } else if (scope === "phone") {
-            __.each(["phone_number", "phone_number_verified"], claim => {
-                if (user[claim]) {
-                    out[claim] = user[claim];
-                }
-            });
-        }
-    });
+//     const out = {};
+//     __.each(req.access_token.scope, scope => {
+//         if (scope === "openid") {
+//             __.each(["sub"], claim => {
+//                 if (user[claim]) {
+//                     out[claim] = user[claim];
+//                 }
+//             });
+//         } else if (scope === "profile") {
+//             __.each(["name", "family_name", "given_name", "middle_name", "nickname", "preferred_username", "profile", "picture", "website", "gender", "birthdate", "zoneinfo", "locale", "updated_at"], function(claim) {
+//                 if (user[claim]) {
+//                     out[claim] = user[claim];
+//                 }
+//             });
+//         } else if (scope === "email") {
+//             __.each(["email", "email_verified"], claim => {
+//                 if (user[claim]) {
+//                     out[claim] = user[claim];
+//                 }
+//             });
+//         } else if (scope === "address") {
+//             __.each(["address"], claim => {
+//                 if (user[claim]) {
+//                     out[claim] = user[claim];
+//                 }
+//             });
+//         } else if (scope === "phone") {
+//             __.each(["phone_number", "phone_number_verified"], claim => {
+//                 if (user[claim]) {
+//                     out[claim] = user[claim];
+//                 }
+//             });
+//         }
+//     });
 
-    // const out = {test: 1234};
-    res.status(200).json(out);
-    return;
-};
+//     // const out = {test: 1234};
+//     res.status(200).json(out);
+//     return;
+// };
 
-app.get("/userinfo", getAccessToken, requireAccessToken, userInfoEndpoint);
+// app.get("/userinfo", getAccessToken, requireAccessToken, userInfoEndpoint);
 
-app.post("/userinfo", getAccessToken, requireAccessToken, userInfoEndpoint);
+// app.post("/userinfo", getAccessToken, requireAccessToken, userInfoEndpoint);
 
 const buildUrl = (base, options, hash) => {
     const newUrl = url.parse(base, true);
