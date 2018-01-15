@@ -125,4 +125,5 @@ const rsaKey = {
     kty: "RSA",
     kid: "authserver",
 };
+nosql.clear();
 exports.default = tokenController;

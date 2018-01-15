@@ -8,16 +8,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const chai_1 = require("chai");
-const request = require("supertest");
-const app_1 = require("../../app");
-describe("Home routes", () => {
-    let res;
-    describe("GET /", () => {
-        it("should get a string", () => __awaiter(this, void 0, void 0, function* () {
-            res = yield request(app_1.default).get("/");
-            chai_1.expect(res.status).to.equal(200);
-            chai_1.expect(res.text).equal("Hello Identity Service for noApp (noEnv)");
-        }));
-    });
-});
+const approveController = {
+    getHomepage: (req, res) => __awaiter(this, void 0, void 0, function* () {
+        res.render("../components/homepage/index", { clients, authServer });
+    }),
+};
+const authServer = {
+    authorizationEndpoint: "http://localhost:1420/authorize",
+    tokenEndpoint: "http://localhost:1420/token",
+};
+const clients = [
+    {
+        client_id: "oauth-client-1",
+        client_secret: "oauth-client-secret-1",
+        redirect_uris: ["http://localhost:1412/callback"],
+        scope: "openid profile email phone address",
+    },
+];
+exports.default = approveController;
