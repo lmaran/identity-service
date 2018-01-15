@@ -12,7 +12,7 @@
         "build-prod": "run-s clean build-tsc-prod copy-hbs",
         "build-tsc": "tsc -p server/tsconfig.dev.json",
         "build-tsc-prod": "tsc -p server/tsconfig.prod.json",
-        "copy-hbs": "cpx server/**/*.hbs dist/server",
+        "copy-hbs": "cpx \"server/**/*.hbs\" \"dist/server\"",
         "watch": "run-p \"watch-*\"",
         "watch-tsc": "tsc -p server/tsconfig.dev.json --watch",
         "watch-hbs": "cpx server/**/*.hbs dist/server --watch --no-initial --verbose",
