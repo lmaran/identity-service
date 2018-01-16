@@ -1,7 +1,7 @@
 import * as nosql2 from "nosql";
 const nosql = nosql2.load("database.nosql");
 
-const getAccessToken1 = (req, res, next) => {
+export const getAccessToken = (req, res, next) => {
     // check the auth header first
     const auth = req.headers.authorization;
     let inToken = null;
@@ -46,13 +46,10 @@ const getAccessToken1 = (req, res, next) => {
 
 };
 
-const requireAccessToken1 = (req, res, next) => {
+export const requireAccessToken = (req, res, next) => {
     if (req.access_token) {
         next();
     } else {
         res.status(401).end();
     }
 };
-
-export let getAccessToken = getAccessToken1;
-export let requireAccessToken = requireAccessToken1;

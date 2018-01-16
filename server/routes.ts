@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {getAccessToken, requireAccessToken} from "../server/util/token";
+import {getAccessToken, requireAccessToken} from "../server/helpers/token";
 
 import contactController from "./components/contact/contact.controller";
 import checkController from "./components/check/check.controller";

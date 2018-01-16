@@ -4,7 +4,8 @@ import * as chai from "chai";
 import * as sinon from "sinon";
 
 import mongoService from "./mongo.service";
-import config, { EnvironmentType } from "../config";
+import { EnvironmentType } from "../constants";
+import config from "../config";
 import { ObjectID, Db } from "mongodb";
 
 describe("Mongo service", () => {

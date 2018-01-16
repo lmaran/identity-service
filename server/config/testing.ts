@@ -1,6 +1,6 @@
-import { IConfig } from "./";
+import { IEnvConfig } from "../interfaces";
 
-const config: IConfig = {
+const config: IEnvConfig = {
     port: process.env.PORT || 1416,
     mongo: {
         uri: "mongodb://localhost/identity-service-test",

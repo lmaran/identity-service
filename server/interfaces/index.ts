@@ -1,0 +1,48 @@
+interface IBlobSecrets {
+    account: string;
+    key: string;
+}
+
+interface IMongoSecrets {
+    uri?: string;
+    options?: object;
+}
+
+export interface IEnvConfig {
+    env?: string;
+    root?: string;
+    port?: string | number;
+    userRoles?: string[];
+    mongo?: IMongoSecrets;
+    rollbarToken?: string;
+    azureBlobStorage?: IBlobSecrets;
+    azureBlobStorageCool?: IBlobSecrets;
+    authRootUrl?: string;
+}
+
+export interface IClient {
+    client_id: string;
+    client_secret: string;
+    redirect_uris: string[];
+    scope: string;
+}
+
+export interface IUser {
+    sub: string;
+    preferred_username: string;
+    name: string;
+    email: string;
+    email_verified: boolean;
+    username?: string;
+    password?: string;
+}
+
+export interface IUsersObj {
+    [key: string]: IUser;
+}
+
+export interface IOptionsUri {
+    error?: string;
+    code?: string;
+    state?: string;
+}

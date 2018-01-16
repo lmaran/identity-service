@@ -1,43 +1,48 @@
 import { Request, Response } from "express";
-// import * as __ from "underscore";
 import * as _ from "lodash";
-import * as url from "url";
 import * as randomstring from "randomstring";
 import { requests } from "../shared/data";
+import { IClient } from "../../interfaces";
+import { buildUrl } from "../../helpers/url";
 
 const authorizeController = {
 
     getAuthorize: async (req: Request, res: Response) => {
-        const client = getClient(req.query.client_id);
+        // requested values
+        const reqClientId: string = req.query.client_id;
+        const reqRedirectUri: string = req.query.redirect_uri;
+        const reqScopes = req.query.scope ? req.query.scope.split(" ") : null;
+
+        const client: IClient = getClient(reqClientId);
+
+        // accepted valus
+        const accRedirectUris: string[] = client.redirect_uris;
+        const accScopes = client.scope ? client.scope.split(" ") : null;
 
         if (!client) {
-            console.log("Unknown client %s", req.query.client_id);
+            console.log("Unknown client %s", reqClientId);
             res.render("error", { error: "Unknown client" });
             return;
-        } else if (!_.includes(client.redirect_uris, req.query.redirect_uri)) {
-            console.log("Mismatched redirect URI, expected %s got %s", client.redirect_uris, req.query.redirect_uri);
+        } else if (!_.includes(accRedirectUris, reqRedirectUri)) {
+            console.log("Mismatched redirect URI, expected %s got %s", accRedirectUris, reqRedirectUri);
             res.render("error", { error: "Invalid redirect URI" });
             return;
         } else {
-
-            const requestedScopes = req.query.scope ? req.query.scope.split(" ") : undefined;
-            const acceptedScopes = client.scope ? client.scope.split(" ") : undefined;
-
             // _.difference([2, 1], [2, 3]); => [1]
-            if (_.difference(requestedScopes, acceptedScopes).length > 0) {
+            if (_.difference(reqScopes, accScopes).length > 0) {
                 // client asked for a scope it couldn't have
-                const urlParsed = buildUrl(req.query.redirect_uri, {
+                const urlParsed = buildUrl(reqRedirectUri, {
                     error: "invalid_scope",
-                }, undefined);
+                }, null);
                 res.redirect(urlParsed);
                 return;
             }
 
-            const reqid = randomstring.generate(8);
+            const requestId = randomstring.generate(8);
 
-            requests[reqid] = req.query;
+            requests[requestId] = req.query;
 
-            res.render("../components/approve/approve", { client, reqid, scope: requestedScopes });
+            res.render("../components/approve/approve", { client, requestId, scopes: reqScopes });
             return;
         }
 
@@ -46,7 +51,7 @@ const authorizeController = {
 };
 
 // client information
-const clients = [
+const clients: IClient[] = [
     {
         client_id: "oauth-client-1",
         client_secret: "oauth-client-secret-1",
@@ -55,25 +60,25 @@ const clients = [
     },
 ];
 
-const getClient = clientId => {
+const getClient = (clientId: string): IClient => {
     return _.find(clients, client => client.client_id === clientId);
 };
 
-const buildUrl = (base, options, hash) => {
-    const newUrl = url.parse(base, true);
-    delete newUrl.search;
-    if (!newUrl.query) {
-        newUrl.query = {};
-    }
-    _.each(options, (value, key, list) => {
-        newUrl.query[key] = value;
-    });
-    if (hash) {
-        newUrl.hash = hash;
-    }
+// const buildUrl = (base, options, hash) => {
+//     const newUrl = url.parse(base, true);
+//     delete newUrl.search;
+//     if (!newUrl.query) {
+//         newUrl.query = {};
+//     }
+//     _.each(options, (value, key, list) => {
+//         newUrl.query[key] = value;
+//     });
+//     if (hash) {
+//         newUrl.hash = hash;
+//     }
 
-    return url.format(newUrl);
-};
+//     return url.format(newUrl);
+// };
 
 // // not used yet
 // const protectedResources = [

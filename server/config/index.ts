@@ -1,43 +1,15 @@
 import * as _ from "lodash";
 import * as path from "path";
+import { EnvironmentType } from "../constants";
+import { IEnvConfig } from "../interfaces";
 
 const env: string = (process.env.NODE_ENV || "development").toLowerCase();
-const envConfig: IConfig = require(`./${env}`).default;
-
-interface IBlobSecrets {
-    account: string;
-    key: string;
-}
-
-interface IMongoSecrets {
-    uri?: string;
-    options?: object;
-}
-
-const enum EnvironmentType {
-    DEVELOPMENT = "development",
-    STAGING = "staging",
-    PRODUCTION = "production",
-    TEST = "testing",
-}
-
-interface IConfig {
-    env?: string;
-    root?: string;
-    port?: string | number;
-    userRoles?: string[];
-    mongo?: IMongoSecrets;
-    rollbarToken?: string;
-    // externalUrl?: string;
-    azureBlobStorage?: IBlobSecrets;
-    azureBlobStorageCool?: IBlobSecrets;
-    authRootUrl?: string;
-}
+const envConfig: IEnvConfig = require(`./${env}`).default;
 
 // All configurations will extend these options
 // ============================================
 
-const common: IConfig = {
+const common: IEnvConfig = {
     env,
     mongo: {
         options: {
@@ -53,5 +25,4 @@ const common: IConfig = {
 
 const config = _.merge(common, envConfig);
 
-export { IConfig, EnvironmentType };
 export default config;

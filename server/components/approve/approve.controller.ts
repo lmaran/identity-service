@@ -3,14 +3,16 @@ import * as _ from "lodash";
 import * as url from "url";
 import * as randomstring from "randomstring";
 import {requests, codes} from "../shared/data";
+import { IClient, IUser, IUsersObj } from "../../interfaces";
+import { buildUrl } from "../../helpers/url";
 
 const approveController = {
 
     // POST
     approve: async (req: Request, res: Response) => {
-        const reqid = req.body.reqid;
-        const query = requests[reqid];
-        delete requests[reqid];
+        const requestId = req.body.requestId;
+        const query = requests[requestId];
+        delete requests[requestId];
 
         let urlParsed;
 
@@ -27,34 +29,34 @@ const approveController = {
 
                 const user = getUser(req.body.user);
 
-                const scope = getScopesFromForm(req.body);
+                const scopes = getScopesFromForm(req.body);
 
                 const client = getClient(query.client_id);
                 const cscope = client.scope ? client.scope.split(" ") : undefined;
                 // _.difference([2, 1], [2, 3]); => [1]
-                if (_.difference(scope, cscope).length > 0) {
+                if (_.difference(scopes, cscope).length > 0) {
                     // client asked for a scope it couldn't have
                     urlParsed = buildUrl(query.redirect_uri, {
                         error: "invalid_scope",
-                    }, undefined);
+                    }, null);
                     res.redirect(urlParsed);
                     return;
                 }
 
                 // save the code and request for later
-                codes[code] = { request: query, scope, user };
+                codes[code] = { request: query, scopes, user };
 
                 urlParsed = buildUrl(query.redirect_uri, {
                     code,
                     state: query.state,
-                }, undefined);
+                }, null);
                 res.redirect(urlParsed);
                 return;
             } else {
                 // we got a response type we don't understand
                 urlParsed = buildUrl(query.redirect_uri, {
                     error: "unsupported_response_type",
-                }, undefined);
+                }, null);
                 res.redirect(urlParsed);
                 return;
             }
@@ -62,7 +64,7 @@ const approveController = {
             // user denied access
             urlParsed = buildUrl(query.redirect_uri, {
                 error: "access_denied",
-            }, undefined);
+            }, null);
             res.redirect(urlParsed);
             return;
         }
@@ -71,8 +73,7 @@ const approveController = {
 
 };
 
-// client information
-const clients = [
+const clients: IClient[] = [
     {
         client_id: "oauth-client-1",
         client_secret: "oauth-client-secret-1",
@@ -81,27 +82,11 @@ const clients = [
     },
 ];
 
-const getClient = clientId => {
+const getClient = (clientId: string): IClient => {
     return _.find(clients, client => client.client_id === clientId);
 };
 
-const buildUrl = (base, options, hash) => {
-    const newUrl = url.parse(base, true);
-    delete newUrl.search;
-    if (!newUrl.query) {
-        newUrl.query = {};
-    }
-    _.each(options, (value, key, list) => {
-        newUrl.query[key] = value;
-    });
-    if (hash) {
-        newUrl.hash = hash;
-    }
-
-    return url.format(newUrl);
-};
-
-const userInfo = {
+const userInfo: IUsersObj = {
 
     alice: {
         sub: "9XE3-JI34-00132A",
@@ -130,18 +115,14 @@ const userInfo = {
     },
 };
 
-const getUser = username => {
+const getUser = (username: string): IUser => {
     return userInfo[username];
 };
-
-// const requests = {};
 
 const getScopesFromForm = body => {
     // _.keys({one: 1, two: 2); => => ["one", "two"]
     return _.filter(_.keys(body), s => _.startsWith(s, "scope_"))
         .map(s => s.slice("scope_".length));
 };
-
-// const codes = {};
 
 export default approveController;
