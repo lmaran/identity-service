@@ -8,16 +8,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const __ = require("underscore");
-const __string = require("underscore.string");
-const url = require("url");
+const _ = require("lodash");
 const randomstring = require("randomstring");
 const data_1 = require("../shared/data");
+const url_1 = require("../../helpers/url");
 const approveController = {
     approve: (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const reqid = req.body.reqid;
-        const query = data_1.requests[reqid];
-        delete data_1.requests[reqid];
+        const requestId = req.body.requestId;
+        const query = data_1.requests[requestId];
+        delete data_1.requests[requestId];
         let urlParsed;
         if (!query) {
             res.render("error", { error: "No matching authorization request" });
@@ -27,36 +26,36 @@ const approveController = {
             if (query.response_type === "code") {
                 const code = randomstring.generate(8);
                 const user = getUser(req.body.user);
-                const scope = getScopesFromForm(req.body);
+                const scopes = getScopesFromForm(req.body);
                 const client = getClient(query.client_id);
                 const cscope = client.scope ? client.scope.split(" ") : undefined;
-                if (__.difference(scope, cscope).length > 0) {
-                    urlParsed = buildUrl(query.redirect_uri, {
+                if (_.difference(scopes, cscope).length > 0) {
+                    urlParsed = url_1.buildUrl(query.redirect_uri, {
                         error: "invalid_scope",
-                    }, undefined);
+                    }, null);
                     res.redirect(urlParsed);
                     return;
                 }
-                data_1.codes[code] = { request: query, scope, user };
-                urlParsed = buildUrl(query.redirect_uri, {
+                data_1.codes[code] = { request: query, scopes, user };
+                urlParsed = url_1.buildUrl(query.redirect_uri, {
                     code,
                     state: query.state,
-                }, undefined);
+                }, null);
                 res.redirect(urlParsed);
                 return;
             }
             else {
-                urlParsed = buildUrl(query.redirect_uri, {
+                urlParsed = url_1.buildUrl(query.redirect_uri, {
                     error: "unsupported_response_type",
-                }, undefined);
+                }, null);
                 res.redirect(urlParsed);
                 return;
             }
         }
         else {
-            urlParsed = buildUrl(query.redirect_uri, {
+            urlParsed = url_1.buildUrl(query.redirect_uri, {
                 error: "access_denied",
-            }, undefined);
+            }, null);
             res.redirect(urlParsed);
             return;
         }
@@ -70,22 +69,8 @@ const clients = [
         scope: "openid profile email phone address",
     },
 ];
-const getClient = clientId => {
-    return __.find(clients, client => client.client_id === clientId);
-};
-const buildUrl = (base, options, hash) => {
-    const newUrl = url.parse(base, true);
-    delete newUrl.search;
-    if (!newUrl.query) {
-        newUrl.query = {};
-    }
-    __.each(options, (value, key, list) => {
-        newUrl.query[key] = value;
-    });
-    if (hash) {
-        newUrl.hash = hash;
-    }
-    return url.format(newUrl);
+const getClient = (clientId) => {
+    return _.find(clients, client => client.client_id === clientId);
 };
 const userInfo = {
     alice: {
@@ -112,11 +97,11 @@ const userInfo = {
         password: "user password!",
     },
 };
-const getUser = username => {
+const getUser = (username) => {
     return userInfo[username];
 };
 const getScopesFromForm = body => {
-    return __.filter(__.keys(body), s => __string.startsWith(s, "scope_"))
+    return _.filter(_.keys(body), s => _.startsWith(s, "scope_"))
         .map(s => s.slice("scope_".length));
 };
 exports.default = approveController;

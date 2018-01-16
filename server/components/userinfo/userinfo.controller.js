@@ -8,10 +8,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const __ = require("underscore");
+const _ = require("lodash");
 const userinfoController = {
     getUserinfo: (req, res) => __awaiter(this, void 0, void 0, function* () {
-        if (!__.contains(req.access_token.scope, "openid")) {
+        if (!_.includes(req.access_token.scope, "openid")) {
             res.status(403).end();
             return;
         }
@@ -21,37 +21,37 @@ const userinfoController = {
             return;
         }
         const out = {};
-        __.each(req.access_token.scope, scope => {
+        _.each(req.access_token.scope, scope => {
             if (scope === "openid") {
-                __.each(["sub"], claim => {
+                _.each(["sub"], claim => {
                     if (user[claim]) {
                         out[claim] = user[claim];
                     }
                 });
             }
             else if (scope === "profile") {
-                __.each(["name", "family_name", "given_name", "middle_name", "nickname", "preferred_username", "profile", "picture", "website", "gender", "birthdate", "zoneinfo", "locale", "updated_at"], function (claim) {
+                _.each(["name", "family_name", "given_name", "middle_name", "nickname", "preferred_username", "profile", "picture", "website", "gender", "birthdate", "zoneinfo", "locale", "updated_at"], function (claim) {
                     if (user[claim]) {
                         out[claim] = user[claim];
                     }
                 });
             }
             else if (scope === "email") {
-                __.each(["email", "email_verified"], claim => {
+                _.each(["email", "email_verified"], claim => {
                     if (user[claim]) {
                         out[claim] = user[claim];
                     }
                 });
             }
             else if (scope === "address") {
-                __.each(["address"], claim => {
+                _.each(["address"], claim => {
                     if (user[claim]) {
                         out[claim] = user[claim];
                     }
                 });
             }
             else if (scope === "phone") {
-                __.each(["phone_number", "phone_number_verified"], claim => {
+                _.each(["phone_number", "phone_number_verified"], claim => {
                     if (user[claim]) {
                         out[claim] = user[claim];
                     }

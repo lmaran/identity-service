@@ -8,7 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const __ = require("underscore");
+const _ = require("lodash");
 const querystring = require("querystring");
 const randomstring = require("randomstring");
 const data_1 = require("../shared/data");
@@ -60,7 +60,7 @@ const tokenController = {
                         cscope = code.scope.join(" ");
                     }
                     const token_response = { access_token, token_type: "Bearer", scope: cscope };
-                    if (__.contains(code.scope, "openid")) {
+                    if (_.includes(code.scope, "openid")) {
                         const ipayload = {
                             iss: "http://localhost:1420/",
                             sub: code.user.sub,
@@ -109,7 +109,7 @@ const clients = [
     },
 ];
 const getClient = clientId => {
-    return __.find(clients, client => client.client_id === clientId);
+    return _.find(clients, client => client.client_id === clientId);
 };
 const decodeClientCredentials = auth => {
     const clientCredentials = new Buffer(auth.slice("basic ".length), "base64").toString().split(":");

@@ -8,7 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const string_1 = require("../../util/string");
+const string_1 = require("../../helpers/string");
 const homeController = {
     getHomePage: (req, res) => __awaiter(this, void 0, void 0, function* () {
         const subdomains = req.subdomains;
@@ -44,7 +44,7 @@ const homeController = {
 };
 function isReservedSubdomain(s) {
     const isReserved1 = ["stg", "temp", "temp-stg", "blue", "blue-stg", "green", "green-stg", "dev"].includes(s);
-    const isReserved2 = string_1.default.endsWithValueFromList(s, ["-blue", "-green", "-blue-stg", "-green-stg"]);
+    const isReserved2 = string_1.endsWithValueFromList(s, ["-blue", "-green", "-blue-stg", "-green-stg"]);
     return isReserved1 || isReserved2;
 }
 exports.default = homeController;

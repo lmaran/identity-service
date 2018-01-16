@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const token_1 = require("../server/util/token");
+const token_1 = require("../server/helpers/token");
 const contact_controller_1 = require("./components/contact/contact.controller");
 const check_controller_1 = require("./components/check/check.controller");
 const authorize_controller_1 = require("./components/authorize/authorize.controller");

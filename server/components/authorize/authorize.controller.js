@@ -8,36 +8,39 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const __ = require("underscore");
-const url = require("url");
+const _ = require("lodash");
 const randomstring = require("randomstring");
 const data_1 = require("../shared/data");
+const url_1 = require("../../helpers/url");
 const authorizeController = {
     getAuthorize: (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const client = getClient(req.query.client_id);
+        const reqClientId = req.query.client_id;
+        const reqRedirectUri = req.query.redirect_uri;
+        const reqScopes = req.query.scope ? req.query.scope.split(" ") : null;
+        const client = getClient(reqClientId);
+        const accRedirectUris = client.redirect_uris;
+        const accScopes = client.scope ? client.scope.split(" ") : null;
         if (!client) {
-            console.log("Unknown client %s", req.query.client_id);
+            console.log("Unknown client %s", reqClientId);
             res.render("error", { error: "Unknown client" });
             return;
         }
-        else if (!__.contains(client.redirect_uris, req.query.redirect_uri)) {
-            console.log("Mismatched redirect URI, expected %s got %s", client.redirect_uris, req.query.redirect_uri);
+        else if (!_.includes(accRedirectUris, reqRedirectUri)) {
+            console.log("Mismatched redirect URI, expected %s got %s", accRedirectUris, reqRedirectUri);
             res.render("error", { error: "Invalid redirect URI" });
             return;
         }
         else {
-            const rscope = req.query.scope ? req.query.scope.split(" ") : undefined;
-            const cscope = client.scope ? client.scope.split(" ") : undefined;
-            if (__.difference(rscope, cscope).length > 0) {
-                const urlParsed = buildUrl(req.query.redirect_uri, {
+            if (_.difference(reqScopes, accScopes).length > 0) {
+                const urlParsed = url_1.buildUrl(reqRedirectUri, {
                     error: "invalid_scope",
-                }, undefined);
+                }, null);
                 res.redirect(urlParsed);
                 return;
             }
-            const reqid = randomstring.generate(8);
-            data_1.requests[reqid] = req.query;
-            res.render("../components/approve/approve", { client, reqid, scope: rscope });
+            const requestId = randomstring.generate(8);
+            data_1.requests[requestId] = req.query;
+            res.render("../components/approve/approve", { client, requestId, scopes: reqScopes });
             return;
         }
     }),
@@ -50,30 +53,7 @@ const clients = [
         scope: "openid profile email phone address",
     },
 ];
-const getClient = clientId => {
-    return __.find(clients, client => client.client_id === clientId);
-};
-const buildUrl = (base, options, hash) => {
-    const newUrl = url.parse(base, true);
-    delete newUrl.search;
-    if (!newUrl.query) {
-        newUrl.query = {};
-    }
-    __.each(options, (value, key, list) => {
-        newUrl.query[key] = value;
-    });
-    if (hash) {
-        newUrl.hash = hash;
-    }
-    return url.format(newUrl);
-};
-const protectedResources = [
-    {
-        resource_id: "protected-resource-1",
-        resource_secret: "protected-resource-secret-1",
-    },
-];
-const getProtectedResource = resourceId => {
-    return __.find(protectedResources, resource => resource.resource_id === resourceId);
+const getClient = (clientId) => {
+    return _.find(clients, client => client.client_id === clientId);
 };
 exports.default = authorizeController;
