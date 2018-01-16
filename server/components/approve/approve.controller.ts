@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
-import * as __ from "underscore";
-import * as __string from "underscore.string";
+import * as _ from "lodash";
 import * as url from "url";
 import * as randomstring from "randomstring";
 import {requests, codes} from "../shared/data";
@@ -9,10 +8,6 @@ const approveController = {
 
     // POST
     approve: async (req: Request, res: Response) => {
-        // set DEPLOYMET_SLOT as env variable on remote server
-        // e.g. "celebrate-taste-blue-staging"
-        // res.send("identity-service-" + (process.env.DEPLOYMENT_SLOT || "noslot") + "-" + process.env.NODE_ENV);
-
         const reqid = req.body.reqid;
         const query = requests[reqid];
         delete requests[reqid];
@@ -36,7 +31,8 @@ const approveController = {
 
                 const client = getClient(query.client_id);
                 const cscope = client.scope ? client.scope.split(" ") : undefined;
-                if (__.difference(scope, cscope).length > 0) {
+                // _.difference([2, 1], [2, 3]); => [1]
+                if (_.difference(scope, cscope).length > 0) {
                     // client asked for a scope it couldn't have
                     urlParsed = buildUrl(query.redirect_uri, {
                         error: "invalid_scope",
@@ -86,7 +82,7 @@ const clients = [
 ];
 
 const getClient = clientId => {
-    return __.find(clients, client => client.client_id === clientId);
+    return _.find(clients, client => client.client_id === clientId);
 };
 
 const buildUrl = (base, options, hash) => {
@@ -95,7 +91,7 @@ const buildUrl = (base, options, hash) => {
     if (!newUrl.query) {
         newUrl.query = {};
     }
-    __.each(options, (value, key, list) => {
+    _.each(options, (value, key, list) => {
         newUrl.query[key] = value;
     });
     if (hash) {
@@ -141,7 +137,8 @@ const getUser = username => {
 // const requests = {};
 
 const getScopesFromForm = body => {
-    return __.filter(__.keys(body), s => __string.startsWith(s, "scope_"))
+    // _.keys({one: 1, two: 2); => => ["one", "two"]
+    return _.filter(_.keys(body), s => _.startsWith(s, "scope_"))
         .map(s => s.slice("scope_".length));
 };
 

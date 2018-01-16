@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import * as __ from "underscore";
+import * as _ from "lodash";
 import * as querystring from "querystring";
 import * as randomstring from "randomstring";
 import {requests, codes} from "../shared/data";
@@ -89,7 +89,7 @@ const tokenController = {
 
                     const token_response: any = { access_token, token_type: "Bearer", scope: cscope };
 
-                    if (__.contains(code.scope, "openid")) {
+                    if (_.includes(code.scope, "openid")) {
                         const ipayload: any = {
                             iss: "http://localhost:1420/",
                             sub: code.user.sub,
@@ -146,7 +146,7 @@ const clients = [
 ];
 
 const getClient = clientId => {
-    return __.find(clients, client => client.client_id === clientId);
+    return _.find(clients, client => client.client_id === clientId);
 };
 
 const decodeClientCredentials = auth => {
