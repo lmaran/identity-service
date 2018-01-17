@@ -44,7 +44,7 @@ const approveController = {
                 }
 
                 // save the code and request for later
-                codes[code] = { request: query, scopes, user };
+                codes[code] = { request: query, scope: scopes, user };
 
                 urlParsed = buildUrl(query.redirect_uri, {
                     code,
