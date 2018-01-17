@@ -14,6 +14,7 @@ const randomstring = require("randomstring");
 const data_1 = require("../shared/data");
 const jose = require("jsrsasign");
 const nosql2 = require("nosql");
+const client_service_1 = require("../client/client.service");
 const nosql = nosql2.load("database.nosql");
 const tokenController = {
     getToken: (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -34,7 +35,7 @@ const tokenController = {
             clientId = req.body.client_id;
             clientSecret = req.body.client_secret;
         }
-        const client = getClient(clientId);
+        const client = client_service_1.default.getClient(clientId);
         if (!client) {
             console.log("Unknown client %s", clientId);
             res.status(401).json({ error: "invalid_client" });
@@ -99,17 +100,6 @@ const tokenController = {
             res.status(400).json({ error: "unsupported_grant_type" });
         }
     }),
-};
-const clients = [
-    {
-        client_id: "oauth-client-1",
-        client_secret: "oauth-client-secret-1",
-        redirect_uris: ["http://localhost:1412/callback"],
-        scope: "openid profile email phone address",
-    },
-];
-const getClient = clientId => {
-    return _.find(clients, client => client.client_id === clientId);
 };
 const decodeClientCredentials = auth => {
     const clientCredentials = new Buffer(auth.slice("basic ".length), "base64").toString().split(":");

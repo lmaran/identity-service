@@ -11,13 +11,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const _ = require("lodash");
 const randomstring = require("randomstring");
 const data_1 = require("../shared/data");
-const url_1 = require("../../helpers/url");
+const helpers_1 = require("../../helpers");
+const client_service_1 = require("../client/client.service");
 const authorizeController = {
     getAuthorize: (req, res) => __awaiter(this, void 0, void 0, function* () {
         const reqClientId = req.query.client_id;
         const reqRedirectUri = req.query.redirect_uri;
         const reqScopes = req.query.scope ? req.query.scope.split(" ") : null;
-        const client = getClient(reqClientId);
+        const client = client_service_1.default.getClient(reqClientId);
         const accRedirectUris = client.redirect_uris;
         const accScopes = client.scope ? client.scope.split(" ") : null;
         if (!client) {
@@ -32,7 +33,7 @@ const authorizeController = {
         }
         else {
             if (_.difference(reqScopes, accScopes).length > 0) {
-                const urlParsed = url_1.buildUrl(reqRedirectUri, {
+                const urlParsed = helpers_1.buildUrl(reqRedirectUri, {
                     error: "invalid_scope",
                 }, null);
                 res.redirect(urlParsed);
@@ -44,16 +45,5 @@ const authorizeController = {
             return;
         }
     }),
-};
-const clients = [
-    {
-        client_id: "oauth-client-1",
-        client_secret: "oauth-client-secret-1",
-        redirect_uris: ["http://localhost:1412/callback"],
-        scope: "openid profile email phone address",
-    },
-];
-const getClient = (clientId) => {
-    return _.find(clients, client => client.client_id === clientId);
 };
 exports.default = authorizeController;

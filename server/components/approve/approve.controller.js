@@ -11,7 +11,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const _ = require("lodash");
 const randomstring = require("randomstring");
 const data_1 = require("../shared/data");
-const url_1 = require("../../helpers/url");
+const helpers_1 = require("../../helpers");
+const client_service_1 = require("../client/client.service");
 const approveController = {
     approve: (req, res) => __awaiter(this, void 0, void 0, function* () {
         const requestId = req.body.requestId;
@@ -27,17 +28,17 @@ const approveController = {
                 const code = randomstring.generate(8);
                 const user = getUser(req.body.user);
                 const scopes = getScopesFromForm(req.body);
-                const client = getClient(query.client_id);
+                const client = client_service_1.default.getClient(query.client_id);
                 const cscope = client.scope ? client.scope.split(" ") : undefined;
                 if (_.difference(scopes, cscope).length > 0) {
-                    urlParsed = url_1.buildUrl(query.redirect_uri, {
+                    urlParsed = helpers_1.buildUrl(query.redirect_uri, {
                         error: "invalid_scope",
                     }, null);
                     res.redirect(urlParsed);
                     return;
                 }
                 data_1.codes[code] = { request: query, scope: scopes, user };
-                urlParsed = url_1.buildUrl(query.redirect_uri, {
+                urlParsed = helpers_1.buildUrl(query.redirect_uri, {
                     code,
                     state: query.state,
                 }, null);
@@ -45,7 +46,7 @@ const approveController = {
                 return;
             }
             else {
-                urlParsed = url_1.buildUrl(query.redirect_uri, {
+                urlParsed = helpers_1.buildUrl(query.redirect_uri, {
                     error: "unsupported_response_type",
                 }, null);
                 res.redirect(urlParsed);
@@ -53,24 +54,13 @@ const approveController = {
             }
         }
         else {
-            urlParsed = url_1.buildUrl(query.redirect_uri, {
+            urlParsed = helpers_1.buildUrl(query.redirect_uri, {
                 error: "access_denied",
             }, null);
             res.redirect(urlParsed);
             return;
         }
     }),
-};
-const clients = [
-    {
-        client_id: "oauth-client-1",
-        client_secret: "oauth-client-secret-1",
-        redirect_uris: ["http://localhost:1412/callback"],
-        scope: "openid profile email phone address",
-    },
-];
-const getClient = (clientId) => {
-    return _.find(clients, client => client.client_id === clientId);
 };
 const userInfo = {
     alice: {
