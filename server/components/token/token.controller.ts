@@ -5,6 +5,7 @@ import * as randomstring from "randomstring";
 import {requests, codes} from "../shared/data";
 import * as jose from "jsrsasign";
 import * as nosql2 from "nosql";
+import clientService from "../client/client.service";
 
 const nosql = nosql2.load("database.nosql");
 
@@ -35,7 +36,7 @@ const tokenController = {
             clientSecret = req.body.client_secret;
         }
 
-        const client = getClient(clientId);
+        const client = clientService.getClient(clientId);
         if (!client) {
             console.log("Unknown client %s", clientId);
             res.status(401).json({ error: "invalid_client" });
@@ -133,20 +134,6 @@ const tokenController = {
 
     },
 
-};
-
-// client information
-const clients = [
-    {
-        client_id: "oauth-client-1",
-        client_secret: "oauth-client-secret-1",
-        redirect_uris: ["http://localhost:1412/callback"],
-        scope: "openid profile email phone address",
-    },
-];
-
-const getClient = clientId => {
-    return _.find(clients, client => client.client_id === clientId);
 };
 
 const decodeClientCredentials = auth => {

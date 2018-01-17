@@ -5,6 +5,7 @@ import * as randomstring from "randomstring";
 import {requests, codes} from "../shared/data";
 import { IClient, IUser, IUsersObj } from "@interfaces";
 import { buildUrl } from "../../helpers";
+import clientService from "../client/client.service";
 
 const approveController = {
 
@@ -31,7 +32,7 @@ const approveController = {
 
                 const scopes = getScopesFromForm(req.body);
 
-                const client = getClient(query.client_id);
+                const client = clientService.getClient(query.client_id);
                 const cscope = client.scope ? client.scope.split(" ") : undefined;
                 // _.difference([2, 1], [2, 3]); => [1]
                 if (_.difference(scopes, cscope).length > 0) {
@@ -71,19 +72,6 @@ const approveController = {
 
     },
 
-};
-
-const clients: IClient[] = [
-    {
-        client_id: "oauth-client-1",
-        client_secret: "oauth-client-secret-1",
-        redirect_uris: ["http://localhost:1412/callback"],
-        scope: "openid profile email phone address",
-    },
-];
-
-const getClient = (clientId: string): IClient => {
-    return _.find(clients, client => client.client_id === clientId);
 };
 
 const userInfo: IUsersObj = {

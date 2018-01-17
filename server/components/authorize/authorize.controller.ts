@@ -4,6 +4,7 @@ import * as randomstring from "randomstring";
 import { requests } from "../shared/data";
 import { IClient } from "@interfaces";
 import { buildUrl } from "../../helpers";
+import clientService from "../client/client.service";
 
 const authorizeController = {
 
@@ -13,7 +14,7 @@ const authorizeController = {
         const reqRedirectUri: string = req.query.redirect_uri;
         const reqScopes = req.query.scope ? req.query.scope.split(" ") : null;
 
-        const client: IClient = getClient(reqClientId);
+        const client: IClient = clientService.getClient(reqClientId);
 
         // accepted valus
         const accRedirectUris: string[] = client.redirect_uris;
@@ -49,48 +50,5 @@ const authorizeController = {
     },
 
 };
-
-// client information
-const clients: IClient[] = [
-    {
-        client_id: "oauth-client-1",
-        client_secret: "oauth-client-secret-1",
-        redirect_uris: ["http://localhost:1412/callback"],
-        scope: "openid profile email phone address",
-    },
-];
-
-const getClient = (clientId: string): IClient => {
-    return _.find(clients, client => client.client_id === clientId);
-};
-
-// const buildUrl = (base, options, hash) => {
-//     const newUrl = url.parse(base, true);
-//     delete newUrl.search;
-//     if (!newUrl.query) {
-//         newUrl.query = {};
-//     }
-//     _.each(options, (value, key, list) => {
-//         newUrl.query[key] = value;
-//     });
-//     if (hash) {
-//         newUrl.hash = hash;
-//     }
-
-//     return url.format(newUrl);
-// };
-
-// // not used yet
-// const protectedResources = [
-//     {
-//         resource_id: "protected-resource-1",
-//         resource_secret: "protected-resource-secret-1",
-//     },
-// ];
-
-// // not used yet
-// const getProtectedResource = resourceId => {
-//     return _.find(protectedResources, resource => resource.resource_id === resourceId);
-// };
 
 export default authorizeController;
