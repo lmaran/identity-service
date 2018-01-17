@@ -1,7 +1,7 @@
 import * as _ from "lodash";
 import * as path from "path";
 import { EnvironmentType } from "../constants";
-import { IEnvConfig } from "../interfaces";
+import { IEnvConfig } from "@interfaces";
 
 const env: string = (process.env.NODE_ENV || "development").toLowerCase();
 const envConfig: IEnvConfig = require(`./${env}`).default;

@@ -2,14 +2,14 @@ import { expect } from "chai";
 import * as chai from "chai";
 import * as sinon from "sinon";
 
-import { endsWithValueFromList } from "./string";
+import { strEndsWithValueFromList } from "../helpers";
 
 describe("String util", () => {
 
     it("should work for endsWith", () => {
-        expect(endsWithValueFromList("aaa", ["aa"])).equal(true);
-        expect(endsWithValueFromList("aaa", ["aa", , "bb"])).equal(true);
-        expect(endsWithValueFromList("aaa", ["bb", "cc"])).equal(false);
+        expect(strEndsWithValueFromList("aaa", ["aa"])).equal(true);
+        expect(strEndsWithValueFromList("aaa", ["aa", , "bb"])).equal(true);
+        expect(strEndsWithValueFromList("aaa", ["bb", "cc"])).equal(false);
     });
 
     // it("should work for equalsWith", () => {

@@ -1,4 +1,4 @@
-import { IEnvConfig } from "../interfaces";
+import { IEnvConfig } from "@interfaces";
 
 const config: IEnvConfig = {
     port: process.env.PORT,

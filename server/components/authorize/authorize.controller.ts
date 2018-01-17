@@ -2,8 +2,8 @@ import { Request, Response } from "express";
 import * as _ from "lodash";
 import * as randomstring from "randomstring";
 import { requests } from "../shared/data";
-import { IClient } from "../../interfaces";
-import { buildUrl } from "../../helpers/url";
+import { IClient } from "@interfaces";
+import { buildUrl } from "../../helpers";
 
 const authorizeController = {
 

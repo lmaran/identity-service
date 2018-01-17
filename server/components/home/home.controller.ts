@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { endsWithValueFromList } from "../../helpers/string";
+import { strEndsWithValueFromList } from "../../helpers";
 
 const homeController = {
 
@@ -40,9 +40,9 @@ const homeController = {
 
 };
 
-function isReservedSubdomain(s) {
-    const isReserved1 = ["stg", "temp", "temp-stg", "blue", "blue-stg", "green", "green-stg", "dev"].includes(s);
-    const isReserved2 = endsWithValueFromList(s, ["-blue", "-green", "-blue-stg", "-green-stg"]);
+function isReservedSubdomain(subdomain) {
+    const isReserved1 = ["stg", "temp", "temp-stg", "blue", "blue-stg", "green", "green-stg", "dev"].includes(subdomain);
+    const isReserved2 = strEndsWithValueFromList(subdomain, ["-blue", "-green", "-blue-stg", "-green-stg"]);
     return isReserved1 || isReserved2;
 }
 

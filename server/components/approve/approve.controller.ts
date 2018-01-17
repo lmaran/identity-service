@@ -4,7 +4,7 @@ import * as url from "url";
 import * as randomstring from "randomstring";
 import {requests, codes} from "../shared/data";
 import { IClient, IUser, IUsersObj } from "@interfaces";
-import { buildUrl } from "../../helpers/url";
+import { buildUrl } from "../../helpers";
 
 const approveController = {
 

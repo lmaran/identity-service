@@ -1,6 +1,6 @@
 import * as url from "url";
 import * as _ from "lodash";
-import { IOptionsUri } from "../interfaces";
+import { IOptionsUri } from "@interfaces";
 import { Url, UrlObject } from "url";
 
 // merge 'options' into 'redirectUri' (as query string)
