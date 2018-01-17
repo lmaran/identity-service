@@ -36,7 +36,7 @@ const approveController = {
                     res.redirect(urlParsed);
                     return;
                 }
-                data_1.codes[code] = { request: query, scopes, user };
+                data_1.codes[code] = { request: query, scope: scopes, user };
                 urlParsed = url_1.buildUrl(query.redirect_uri, {
                     code,
                     state: query.state,
