@@ -1,5 +1,12 @@
+{"access_token":"bxPivUxMftRcJIAAGjuBNcOuw0o1mzA0","client_id":"oauth-client-1","scope":["openid","profile","email","phone","address"],"user":{"_id":"5a60cb44774d7e1df9e044c1","sub":"9XE3-JI34-00132A","preferred_username":"alice","name":"Alice","email":"alice.wonderland@example.com","email_verified":true,"userId":"alice"}}
+{"refresh_token":"JROSrOp4Fn4uvsNs62pnhUSEBS7fSjU1","client_id":"oauth-client-1","scope":["openid","profile","email","phone","address"],"user":{"_id":"5a60cb44774d7e1df9e044c1","sub":"9XE3-JI34-00132A","preferred_username":"alice","name":"Alice","email":"alice.wonderland@example.com","email_verified":true,"userId":"alice"}}
+{"access_token":"t5XQiYEFIM6bMqQCP5SJzBtmbAfYDr7e","client_id":"oauth-client-1","scope":["openid","profile","email","phone","address"],"user":{"_id":"5a60cb44774d7e1df9e044c1","sub":"9XE3-JI34-00132A","preferred_username":"alice","name":"Alice","email":"alice.wonderland@example.com","email_verified":true,"userId":"alice"}}
+{"refresh_token":"VI3kVkPZRgccTix6arwDgWSNhbeFVCHE","client_id":"oauth-client-1","scope":["openid","profile","email","phone","address"],"user":{"_id":"5a60cb44774d7e1df9e044c1","sub":"9XE3-JI34-00132A","preferred_username":"alice","name":"Alice","email":"alice.wonderland@example.com","email_verified":true,"userId":"alice"}}
+{"access_token":"pqhqhe6bH7LIw0NdPxWdZ83Aa6cYa0jC","client_id":"oauth-client-1","scope":["openid","profile","email","phone","address"],"user":{"_id":"5a60cb44774d7e1df9e044c1","sub":"9XE3-JI34-00132A","preferred_username":"alice","name":"Alice","email":"alice.wonderland@example.com","email_verified":true,"userId":"alice"}}
+{"refresh_token":"9iY7BTuJajZ6IoIuhDbEeonxUtWKNJau","client_id":"oauth-client-1","scope":["openid","profile","email","phone","address"],"user":{"_id":"5a60cb44774d7e1df9e044c1","sub":"9XE3-JI34-00132A","preferred_username":"alice","name":"Alice","email":"alice.wonderland@example.com","email_verified":true,"userId":"alice"}}
+{"access_token":"iI7Ez2uQCeBOWabw980U9oldm9H2QbS2","client_id":"oauth-client-1","scope":["openid","profile","email","phone","address"],"user":{"_id":"5a60cb44774d7e1df9e044c1","sub":"9XE3-JI34-00132A","preferred_username":"alice","name":"Alice","email":"alice.wonderland@example.com","email_verified":true,"userId":"alice"}}
 {
-    "access_token": "WxYLKVGkcjZBfyOaWqWPI1VRldwEL4I1",
+    "refresh_token": "wPzT4OoXnjq1VSQgg8ZhrkjANIRijHCS",
     "client_id": "oauth-client-1",
     "scope": [
         "openid",

@@ -12,11 +12,11 @@ const clientDal = {
     },
 
     // // ---------- CRUD ----------
-    getById: async (id: any) => {
-        const db = await mongoService.getDb();
-        id = mongoService.normalizedId(id);
-        return await db.collection(collection).findOne({ _id: id });
-    },
+    // getById: async (id: any) => {
+    //     const db = await mongoService.getDb();
+    //     id = mongoService.normalizedId(id);
+    //     return await db.collection(collection).findOne({ _id: id });
+    // },
 
     getClient: async (clientId: string) => {
         // return _.find(clients, client => client.client_id === clientId);

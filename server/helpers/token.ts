@@ -1,7 +1,8 @@
 import * as nosql2 from "nosql";
 const nosql = nosql2.load("database.nosql");
+import tokenService from "../components/token/token.service";
 
-export const getAccessToken = (req, res, next) => {
+export const getAccessToken = async (req, res, next) => {
     // check the auth header first
     const auth = req.headers.authorization;
     let inToken = null;
@@ -15,34 +16,30 @@ export const getAccessToken = (req, res, next) => {
     }
 
     console.log("Incoming token: %s", inToken);
-    // nosql.one(token => {
-    //     if (token.access_token === inToken) {
-    //         return token;
-    //     }
-    // }, (err, token) => {
-    //     if (token) {
-    //         console.log("We found a matching token: %s", inToken);
-    //     } else {
-    //         console.log("No matching token was found.");
-    //     }
-    //     req.access_token = token;
-    //     next();
-    //     return;
+
+    // nosql.one().make(filter => {
+    //     filter.where("access_token", inToken);
+    //     filter.callback((err, token) => {
+    //         if (token) {
+    //             console.log("We found a matching token: %s", inToken);
+    //         } else {
+    //             console.log("No matching token was found.");
+    //         }
+    //         req.access_token = token;
+    //         next();
+    //         return;
+    //     });
     // });
 
-    nosql.one().make(filter => {
-        filter.where("access_token", inToken);
-        filter.callback((err, token) => {
-            if (token) {
-                console.log("We found a matching token: %s", inToken);
-            } else {
-                console.log("No matching token was found.");
-            }
-            req.access_token = token;
-            next();
-            return;
-        });
-    });
+    const token = await tokenService.getAccessToken(inToken);
+    if (token) {
+        console.log("We found a matching token: %s", inToken);
+    } else {
+        console.log("No matching token was found.");
+    }
+    req.access_token = token;
+    next();
+    return;
 
 };
 
