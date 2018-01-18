@@ -26,6 +26,7 @@ router.post("/approve", approveController.approve);
 
 // token
 router.post("/token", tokenController.getToken);
+router.post("/revoke", tokenController.revokeToken);
 
 // userinfo
 router.get("/userinfo", getAccessToken, requireAccessToken, userinfoController.getUserinfo);

@@ -162,6 +162,56 @@ const tokenController = {
 
     },
 
+    revokeToken: async (req: Request, res: Response) => {
+        const auth = req.headers.authorization;
+        let clientId;
+        let clientSecret;
+
+        if (auth) {
+            // check the auth header
+            const clientCredentials = decodeClientCredentials(auth);
+            clientId = clientCredentials.id;
+            clientSecret = clientCredentials.secret;
+        }
+
+        // otherwise, check the post body
+        if (req.body.client_id) {
+            if (clientId) {
+                // if we've already seen the client's credentials in the authorization header, this is an error
+                console.log("Client attempted to authenticate with multiple methods");
+                res.status(401).json({ error: "invalid_client" });
+                return;
+            }
+
+            clientId = req.body.client_id;
+            clientSecret = req.body.client_secret;
+        }
+
+        const client = await clientService.getClient(clientId);
+        if (!client) {
+            console.log("Unknown client %s", clientId);
+            res.status(401).json({ error: "invalid_client" });
+            return;
+        }
+
+        if (client.client_secret !== clientSecret) {
+            console.log("Mismatched client secret, expected %s got %s", client.client_secret, clientSecret);
+            res.status(401).json({ error: "invalid_client" });
+            return;
+        }
+
+        const inToken = req.body.token;
+        nosql.remove( token => {
+            if (token.access_token === inToken && token.client_id === clientId) {
+                return true;
+            }
+        }, (err, count) => {
+            console.log("Removed %s tokens", count);
+            res.status(204).end();
+            return;
+        });
+    },
+
 };
 
 const decodeClientCredentials = auth => {
