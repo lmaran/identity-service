@@ -26,14 +26,4 @@ const clientDal = {
 
 };
 
-// client information
-const clients: IClient[] = [
-    {
-        client_id: "oauth-client-1",
-        client_secret: "oauth-client-secret-1",
-        redirect_uris: ["http://localhost:1412/callback"],
-        scope: "openid profile email phone address",
-    },
-];
-
 export default clientDal;

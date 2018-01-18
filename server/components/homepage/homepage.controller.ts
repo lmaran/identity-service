@@ -6,7 +6,10 @@ const approveController = {
     // GET
     getHomepage: async (req: Request, res: Response) => {
         const clients = await clientService.getAll();
-        res.render("../components/homepage/index", { clients, authServer });
+
+        const testUrl = req.protocol + "://" + req.get("host");
+
+        res.render("../components/homepage/index", { clients, authServer, testUrl });
     },
 
 };
