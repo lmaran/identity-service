@@ -37,9 +37,9 @@ export interface IUser {
     password?: string;
 }
 
-export interface IUsersObj {
-    [key: string]: IUser;
-}
+// export interface IUsersObj {
+//     [key: string]: IUser;
+// }
 
 export interface IOptionsUri {
     error?: string;

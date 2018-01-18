@@ -1,6 +1,7 @@
 import mongoService from "../../util/mongo.service";
-const collection = "users";
+import { IUser } from "@interfaces";
 
+const collection = "users";
 const userDal = {
 
     getAll: async () => {
@@ -9,11 +10,16 @@ const userDal = {
         return  await db.collection(collection).find().toArray();
     },
 
-    // // ---------- CRUD ----------
+    // ---------- CRUD ----------
     getById: async (id: any) => {
         const db = await mongoService.getDb();
         id = mongoService.normalizedId(id);
         return await db.collection(collection).findOne({ _id: id });
+    },
+
+    getUser: async (userName: string) => {
+        const db = await mongoService.getDb();
+        return await db.collection(collection).findOne({ userId: userName });
     },
 
 };

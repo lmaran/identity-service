@@ -1,12 +1,5 @@
 import { Request, Response } from "express";
 import * as _ from "lodash";
-// import * as querystring from "querystring";
-// import * as randomstring from "randomstring";
-// import {requests, codes} from "../shared/data";
-// import * as jose from "jsrsasign";
-// import * as nosql2 from "nosql";
-
-// const nosql = nosql2.load("database.nosql");
 
 const userinfoController = {
 
@@ -58,7 +51,6 @@ const userinfoController = {
             }
         });
 
-        // const out = {test: 1234};
         res.status(200).json(out);
         return;
     },

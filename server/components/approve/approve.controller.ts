@@ -3,9 +3,10 @@ import * as _ from "lodash";
 import * as url from "url";
 import * as randomstring from "randomstring";
 import {requests, codes} from "../shared/data";
-import { IClient, IUser, IUsersObj } from "@interfaces";
+import { IClient, IUser } from "@interfaces";
 import { buildUrl } from "../../helpers";
 import clientService from "../client/client.service";
+import userService from "../user/user.service";
 
 const approveController = {
 
@@ -28,7 +29,7 @@ const approveController = {
                 // user approved access
                 const code = randomstring.generate(8);
 
-                const user = getUser(req.body.user);
+                const user = await userService.getUser(req.body.user);
 
                 const scopes = getScopesFromForm(req.body);
 
@@ -72,39 +73,6 @@ const approveController = {
 
     },
 
-};
-
-const userInfo: IUsersObj = {
-
-    alice: {
-        sub: "9XE3-JI34-00132A",
-        preferred_username: "alice",
-        name: "Alice",
-        email: "alice.wonderland@example.com",
-        email_verified: true,
-    },
-
-    bob: {
-        sub: "1ZT5-OE63-57383B",
-        preferred_username: "bob",
-        name: "Bob",
-        email: "bob.loblob@example.net",
-        email_verified: false,
-    },
-
-    carol: {
-        sub: "F5Q1-L6LGG-959FS",
-        preferred_username: "carol",
-        name: "Carol2",
-        email: "carol.lewis@example.net",
-        email_verified: true,
-        username: "clewis",
-        password: "user password!",
-    },
-};
-
-const getUser = (username: string): IUser => {
-    return userInfo[username];
 };
 
 const getScopesFromForm = body => {
