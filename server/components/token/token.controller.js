@@ -15,6 +15,7 @@ const data_1 = require("../shared/data");
 const jose = require("jsrsasign");
 const nosql2 = require("nosql");
 const client_service_1 = require("../client/client.service");
+const token_service_1 = require("../token/token.service");
 const nosql = nosql2.load("database.nosql");
 const tokenController = {
     getToken: (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -53,14 +54,16 @@ const tokenController = {
                 if (code.request.client_id === clientId) {
                     const header = { typ: "JWT", alg: rsaKey.alg, kid: rsaKey.kid };
                     const access_token = randomstring.generate();
-                    nosql.insert({ access_token, client_id: clientId, scope: code.scope, user: code.user });
+                    const refresh_token = randomstring.generate();
+                    token_service_1.default.createToken({ access_token, client_id: clientId, scope: code.scope, user: code.user });
+                    token_service_1.default.createToken({ refresh_token, client_id: clientId, scope: code.scope, user: code.user });
                     console.log("Issuing access token %s", access_token);
                     console.log("with scope %s", code.scope);
                     let cscope;
                     if (code.scope) {
                         cscope = code.scope.join(" ");
                     }
-                    const token_response = { access_token, token_type: "Bearer", scope: cscope };
+                    const token_response = { access_token, refresh_token, token_type: "Bearer", scope: cscope };
                     if (_.includes(code.scope, "openid")) {
                         const ipayload = {
                             iss: "http://localhost:1420/",
@@ -95,10 +98,65 @@ const tokenController = {
                 return;
             }
         }
+        else if (req.body.grant_type === "refresh_token") {
+            const token = yield token_service_1.default.getRefreshToken(req.body.refresh_token);
+            if (token) {
+                console.log("We found a matching refresh token: %s", req.body.refresh_token);
+                if (token.client_id !== clientId) {
+                    const count = yield token_service_1.default.deleteRefreshToken(req.body.refresh_token);
+                    res.status(400).json({ error: "invalid_grant" });
+                    return;
+                }
+                const access_token = randomstring.generate();
+                token_service_1.default.createToken({ access_token, client_id: clientId });
+                const token_response = { access_token, token_type: "Bearer", refresh_token: token.refresh_token };
+                res.status(200).json(token_response);
+                return;
+            }
+            else {
+                console.log("No matching token was found.");
+                res.status(400).json({ error: "invalid_grant" });
+                return;
+            }
+        }
         else {
             console.log("Unknown grant type %s", req.body.grant_type);
             res.status(400).json({ error: "unsupported_grant_type" });
         }
+    }),
+    revokeToken: (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const auth = req.headers.authorization;
+        let clientId;
+        let clientSecret;
+        if (auth) {
+            const clientCredentials = decodeClientCredentials(auth);
+            clientId = clientCredentials.id;
+            clientSecret = clientCredentials.secret;
+        }
+        if (req.body.client_id) {
+            if (clientId) {
+                console.log("Client attempted to authenticate with multiple methods");
+                res.status(401).json({ error: "invalid_client" });
+                return;
+            }
+            clientId = req.body.client_id;
+            clientSecret = req.body.client_secret;
+        }
+        const client = yield client_service_1.default.getClient(clientId);
+        if (!client) {
+            console.log("Unknown client %s", clientId);
+            res.status(401).json({ error: "invalid_client" });
+            return;
+        }
+        if (client.client_secret !== clientSecret) {
+            console.log("Mismatched client secret, expected %s got %s", client.client_secret, clientSecret);
+            res.status(401).json({ error: "invalid_client" });
+            return;
+        }
+        const inToken = req.body.token;
+        const count = yield token_service_1.default.deleteAccessToken(inToken, clientId);
+        console.log("Removed %s tokens", count);
+        res.sendStatus(204);
     }),
 };
 const decodeClientCredentials = auth => {
@@ -115,5 +173,4 @@ const rsaKey = {
     kty: "RSA",
     kid: "authserver",
 };
-nosql.clear();
 exports.default = tokenController;

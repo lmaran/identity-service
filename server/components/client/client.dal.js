@@ -15,11 +15,6 @@ const clientDal = {
         const db = yield mongo_service_1.default.getDb();
         return yield db.collection(collection).find().toArray();
     }),
-    getById: (id) => __awaiter(this, void 0, void 0, function* () {
-        const db = yield mongo_service_1.default.getDb();
-        id = mongo_service_1.default.normalizedId(id);
-        return yield db.collection(collection).findOne({ _id: id });
-    }),
     getClient: (clientId) => __awaiter(this, void 0, void 0, function* () {
         const db = yield mongo_service_1.default.getDb();
         return yield db.collection(collection).findOne({ client_id: clientId });

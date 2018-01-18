@@ -14,8 +14,8 @@ const userService = {
         const users = yield user_dal_1.default.getAll();
         return (users);
     }),
-    getById: (id) => __awaiter(this, void 0, void 0, function* () {
-        const user = yield user_dal_1.default.getById(id);
+    getUser: (userName) => __awaiter(this, void 0, void 0, function* () {
+        const user = yield user_dal_1.default.getUser(userName);
         return (user);
     }),
 };

@@ -14,10 +14,6 @@ const clientService = {
         const clients = yield client_dal_1.default.getAll();
         return (clients);
     }),
-    getById: (id) => __awaiter(this, void 0, void 0, function* () {
-        const client = yield client_dal_1.default.getById(id);
-        return (client);
-    }),
     getClient: (id) => __awaiter(this, void 0, void 0, function* () {
         const client = yield client_dal_1.default.getClient(id);
         return (client);

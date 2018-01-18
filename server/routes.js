@@ -16,6 +16,7 @@ router.get("/check", check_controller_1.default.getCheckPage);
 router.get("/authorize", authorize_controller_1.default.getAuthorize);
 router.post("/approve", approve_controller_1.default.approve);
 router.post("/token", token_controller_1.default.getToken);
+router.post("/revoke", token_controller_1.default.revokeToken);
 router.get("/userinfo", helpers_1.getAccessToken, helpers_1.requireAccessToken, userinfo_controller_1.default.getUserinfo);
 router.post("/userinfo", helpers_1.getAccessToken, helpers_1.requireAccessToken, userinfo_controller_1.default.getUserinfo);
 router.get("/homepage", homepage_controller_1.default.getHomepage);

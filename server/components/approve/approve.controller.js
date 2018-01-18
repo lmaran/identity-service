@@ -13,6 +13,7 @@ const randomstring = require("randomstring");
 const data_1 = require("../shared/data");
 const helpers_1 = require("../../helpers");
 const client_service_1 = require("../client/client.service");
+const user_service_1 = require("../user/user.service");
 const approveController = {
     approve: (req, res) => __awaiter(this, void 0, void 0, function* () {
         const requestId = req.body.requestId;
@@ -26,7 +27,7 @@ const approveController = {
         if (req.body.approve) {
             if (query.response_type === "code") {
                 const code = randomstring.generate(8);
-                const user = getUser(req.body.user);
+                const user = yield user_service_1.default.getUser(req.body.user);
                 const scopes = getScopesFromForm(req.body);
                 const client = yield client_service_1.default.getClient(query.client_id);
                 const cscope = client.scope ? client.scope.split(" ") : undefined;
@@ -61,34 +62,6 @@ const approveController = {
             return;
         }
     }),
-};
-const userInfo = {
-    alice: {
-        sub: "9XE3-JI34-00132A",
-        preferred_username: "alice",
-        name: "Alice",
-        email: "alice.wonderland@example.com",
-        email_verified: true,
-    },
-    bob: {
-        sub: "1ZT5-OE63-57383B",
-        preferred_username: "bob",
-        name: "Bob",
-        email: "bob.loblob@example.net",
-        email_verified: false,
-    },
-    carol: {
-        sub: "F5Q1-L6LGG-959FS",
-        preferred_username: "carol",
-        name: "Carol2",
-        email: "carol.lewis@example.net",
-        email_verified: true,
-        username: "clewis",
-        password: "user password!",
-    },
-};
-const getUser = (username) => {
-    return userInfo[username];
 };
 const getScopesFromForm = body => {
     return _.filter(_.keys(body), s => _.startsWith(s, "scope_"))
