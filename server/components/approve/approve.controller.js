@@ -28,7 +28,7 @@ const approveController = {
                 const code = randomstring.generate(8);
                 const user = getUser(req.body.user);
                 const scopes = getScopesFromForm(req.body);
-                const client = client_service_1.default.getClient(query.client_id);
+                const client = yield client_service_1.default.getClient(query.client_id);
                 const cscope = client.scope ? client.scope.split(" ") : undefined;
                 if (_.difference(scopes, cscope).length > 0) {
                     urlParsed = helpers_1.buildUrl(query.redirect_uri, {

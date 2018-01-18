@@ -9,7 +9,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongo_service_1 = require("../../util/mongo.service");
-const _ = require("lodash");
 const collection = "clients";
 const clientDal = {
     getAll: () => __awaiter(this, void 0, void 0, function* () {
@@ -21,16 +20,9 @@ const clientDal = {
         id = mongo_service_1.default.normalizedId(id);
         return yield db.collection(collection).findOne({ _id: id });
     }),
-    getClient: (clientId) => {
-        return _.find(clients, client => client.client_id === clientId);
-    },
+    getClient: (clientId) => __awaiter(this, void 0, void 0, function* () {
+        const db = yield mongo_service_1.default.getDb();
+        return yield db.collection(collection).findOne({ client_id: clientId });
+    }),
 };
-const clients = [
-    {
-        client_id: "oauth-client-1",
-        client_secret: "oauth-client-secret-1",
-        redirect_uris: ["http://localhost:1412/callback"],
-        scope: "openid profile email phone address",
-    },
-];
 exports.default = clientDal;

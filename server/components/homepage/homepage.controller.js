@@ -8,21 +8,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const client_service_1 = require("../client/client.service");
 const approveController = {
     getHomepage: (req, res) => __awaiter(this, void 0, void 0, function* () {
-        res.render("../components/homepage/index", { clients, authServer });
+        const clients = yield client_service_1.default.getAll();
+        const testUrl = req.protocol + "://" + req.get("host");
+        res.render("../components/homepage/index", { clients, authServer, testUrl });
     }),
 };
 const authServer = {
     authorizationEndpoint: "http://localhost:1420/authorize",
     tokenEndpoint: "http://localhost:1420/token",
 };
-const clients = [
-    {
-        client_id: "oauth-client-1",
-        client_secret: "oauth-client-secret-1",
-        redirect_uris: ["http://localhost:1412/callback"],
-        scope: "openid profile email phone address",
-    },
-];
 exports.default = approveController;

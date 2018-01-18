@@ -18,7 +18,7 @@ const authorizeController = {
         const reqClientId = req.query.client_id;
         const reqRedirectUri = req.query.redirect_uri;
         const reqScopes = req.query.scope ? req.query.scope.split(" ") : null;
-        const client = client_service_1.default.getClient(reqClientId);
+        const client = yield client_service_1.default.getClient(reqClientId);
         const accRedirectUris = client.redirect_uris;
         const accScopes = client.scope ? client.scope.split(" ") : null;
         if (!client) {
