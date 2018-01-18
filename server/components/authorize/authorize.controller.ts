@@ -14,7 +14,7 @@ const authorizeController = {
         const reqRedirectUri: string = req.query.redirect_uri;
         const reqScopes = req.query.scope ? req.query.scope.split(" ") : null;
 
-        const client: IClient = clientService.getClient(reqClientId);
+        const client: IClient = await clientService.getClient(reqClientId);
 
         // accepted valus
         const accRedirectUris: string[] = client.redirect_uris;

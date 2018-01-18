@@ -18,8 +18,10 @@ const clientDal = {
         return await db.collection(collection).findOne({ _id: id });
     },
 
-    getClient: (clientId: string): IClient => {
-        return _.find(clients, client => client.client_id === clientId);
+    getClient: async (clientId: string) => {
+        // return _.find(clients, client => client.client_id === clientId);
+        const db = await mongoService.getDb();
+        return await db.collection(collection).findOne({ client_id: clientId });
     },
 
 };

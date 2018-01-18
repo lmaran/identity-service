@@ -36,7 +36,7 @@ const tokenController = {
             clientSecret = req.body.client_secret;
         }
 
-        const client = clientService.getClient(clientId);
+        const client = await clientService.getClient(clientId);
         if (!client) {
             console.log("Unknown client %s", clientId);
             res.status(401).json({ error: "invalid_client" });
