@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import * as _ from "lodash";
 import * as querystring from "querystring";
 import * as randomstring from "randomstring";
-import {requests, codes} from "../shared/data";
+import { requests, codes } from "../shared/data";
 import * as jose from "jsrsasign";
 import * as nosql2 from "nosql";
 import clientService from "../client/client.service";
@@ -78,7 +78,10 @@ const tokenController = {
                     // var access_token = jose.jws.JWS.sign(rsaKey.alg, stringHeader, stringPayload, privateKey);
 
                     const access_token = randomstring.generate();
+                    const refresh_token = randomstring.generate();
+
                     nosql.insert({ access_token, client_id: clientId, scope: code.scope, user: code.user });
+                    nosql.insert({ refresh_token, client_id: clientId, scope: code.scope, user: code.user });
 
                     console.log("Issuing access token %s", access_token);
                     console.log("with scope %s", code.scope);
@@ -88,7 +91,7 @@ const tokenController = {
                         cscope = code.scope.join(" ");
                     }
 
-                    const token_response: any = { access_token, token_type: "Bearer", scope: cscope };
+                    const token_response: any = { access_token, refresh_token, token_type: "Bearer", scope: cscope };
 
                     if (_.includes(code.scope, "openid")) {
                         const ipayload: any = {
@@ -127,6 +130,31 @@ const tokenController = {
                 res.status(400).json({ error: "invalid_grant" });
                 return;
             }
+        } else if (req.body.grant_type === "refresh_token") {
+            nosql.one(token => {
+                if (token.refresh_token === req.body.refresh_token) {
+                    return token;
+                }
+            }, (err, token) => {
+                if (token) {
+                    console.log("We found a matching refresh token: %s", req.body.refresh_token);
+                    if (token.client_id !== clientId) {
+                        // tslint:disable-next-line:no-empty
+                        nosql.remove(found => found === token, () => { });
+                        res.status(400).json({ error: "invalid_grant" });
+                        return;
+                    }
+                    const access_token = randomstring.generate();
+                    nosql.insert({ access_token, client_id: clientId });
+                    const token_response = { access_token, token_type: "Bearer", refresh_token: token.refresh_token };
+                    res.status(200).json(token_response);
+                    return;
+                } else {
+                    console.log("No matching token was found.");
+                    res.status(400).json({ error: "invalid_grant" });
+                    return;
+                }
+            });
         } else {
             console.log("Unknown grant type %s", req.body.grant_type);
             res.status(400).json({ error: "unsupported_grant_type" });

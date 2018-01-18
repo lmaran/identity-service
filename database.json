@@ -1,0 +1,20 @@
+{
+    "access_token": "WxYLKVGkcjZBfyOaWqWPI1VRldwEL4I1",
+    "client_id": "oauth-client-1",
+    "scope": [
+        "openid",
+        "profile",
+        "email",
+        "phone",
+        "address"
+    ],
+    "user": {
+        "_id": "5a60cb44774d7e1df9e044c1",
+        "sub": "9XE3-JI34-00132A",
+        "preferred_username": "alice",
+        "name": "Alice",
+        "email": "alice.wonderland@example.com",
+        "email_verified": true,
+        "userId": "alice"
+    }
+}
