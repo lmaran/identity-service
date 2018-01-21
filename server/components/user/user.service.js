@@ -18,5 +18,9 @@ const userService = {
         const user = yield user_dal_1.default.getUser(userName);
         return (user);
     }),
+    getUserByEmail: (email) => __awaiter(this, void 0, void 0, function* () {
+        const user = yield user_dal_1.default.getUserByEmail(email);
+        return (user);
+    }),
 };
 exports.default = userService;

@@ -8,25 +8,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const mongo_service_1 = require("../../util/mongo.service");
-const collection = "users";
-const userDal = {
+const mongo_service_1 = require("../util/mongo.service");
+const collection = "codes";
+exports.codeService = {
     getAll: () => __awaiter(this, void 0, void 0, function* () {
         const db = yield mongo_service_1.default.getDb();
         return yield db.collection(collection).find().toArray();
     }),
-    getById: (id) => __awaiter(this, void 0, void 0, function* () {
+    create: (code) => __awaiter(this, void 0, void 0, function* () {
         const db = yield mongo_service_1.default.getDb();
-        id = mongo_service_1.default.normalizedId(id);
-        return yield db.collection(collection).findOne({ _id: id });
+        return yield db.collection(collection).insertOne(code);
     }),
-    getUser: (userName) => __awaiter(this, void 0, void 0, function* () {
+    get: (id) => __awaiter(this, void 0, void 0, function* () {
         const db = yield mongo_service_1.default.getDb();
-        return yield db.collection(collection).findOne({ userId: userName });
+        return yield db.collection(collection).findOne({ code: id });
     }),
-    getUserByEmail: (email) => __awaiter(this, void 0, void 0, function* () {
+    delete: (id) => __awaiter(this, void 0, void 0, function* () {
         const db = yield mongo_service_1.default.getDb();
-        return yield db.collection(collection).findOne({ email });
+        const result = yield db.collection(collection).deleteOne({ code: id });
+        return result.deletedCount;
     }),
 };
-exports.default = userDal;

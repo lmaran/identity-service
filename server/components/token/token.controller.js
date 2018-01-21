@@ -11,7 +11,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const _ = require("lodash");
 const querystring = require("querystring");
 const randomstring = require("randomstring");
-const data_1 = require("../shared/data");
+const services_1 = require("../../services");
 const jose = require("jsrsasign");
 const nosql2 = require("nosql");
 const client_service_1 = require("../client/client.service");
@@ -48,9 +48,9 @@ const tokenController = {
             return;
         }
         if (req.body.grant_type === "authorization_code") {
-            const code = data_1.codes[req.body.code];
+            const code = yield services_1.codeService.get(req.body.code);
             if (code) {
-                delete data_1.codes[req.body.code];
+                services_1.codeService.delete(req.body.code);
                 if (code.request.client_id === clientId) {
                     const header = { typ: "JWT", alg: rsaKey.alg, kid: rsaKey.kid };
                     const access_token = randomstring.generate();

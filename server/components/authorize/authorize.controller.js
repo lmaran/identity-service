@@ -10,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const _ = require("lodash");
 const randomstring = require("randomstring");
-const data_1 = require("../shared/data");
+const services_1 = require("../../services");
 const helpers_1 = require("../../helpers");
 const client_service_1 = require("../client/client.service");
 const authorizeController = {
@@ -40,7 +40,7 @@ const authorizeController = {
                 return;
             }
             const requestId = randomstring.generate(8);
-            data_1.requests[requestId] = req.query;
+            services_1.requestService.create({ requestId, query: req.query });
             res.render("../components/approve/approve", { client, requestId, scopes: reqScopes });
             return;
         }
