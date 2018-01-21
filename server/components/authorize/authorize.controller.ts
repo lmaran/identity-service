@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import * as _ from "lodash";
 import * as randomstring from "randomstring";
-import { requests } from "../shared/data";
+import { requestService } from "../../services";
 import { IClient } from "@interfaces";
 import { buildUrl } from "../../helpers";
 import clientService from "../client/client.service";
@@ -40,8 +40,7 @@ const authorizeController = {
             }
 
             const requestId = randomstring.generate(8);
-
-            requests[requestId] = req.query;
+            requestService.create({requestId, query: req.query}); // don't have to wait to complete
 
             res.render("../components/approve/approve", { client, requestId, scopes: reqScopes });
             return;

@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import * as _ from "lodash";
 import * as url from "url";
 import * as randomstring from "randomstring";
-import {requests, codes} from "../shared/data";
+import { requestService, codeService } from "../../services";
 import { IClient, IUser } from "@interfaces";
 import { buildUrl } from "../../helpers";
 import clientService from "../client/client.service";
@@ -13,8 +13,9 @@ const approveController = {
     // POST
     approve: async (req: Request, res: Response) => {
         const requestId = req.body.requestId;
-        const query = requests[requestId];
-        delete requests[requestId];
+        const request = await requestService.get(requestId);
+        const query = request.query;
+        requestService.delete(requestId); // don't have to wait to complete
 
         let urlParsed;
 
@@ -46,7 +47,7 @@ const approveController = {
                 }
 
                 // save the code and request for later
-                codes[code] = { request: query, scope: scopes, user };
+                codeService.create({code, request: query, scope: scopes, user }); // don't have to wait to complete
 
                 urlParsed = buildUrl(query.redirect_uri, {
                     code,

@@ -1,7 +1,7 @@
 {
     "verbose": false,
     "watch": ["dist/server"],
-    "ignore": ["**/*.test.js", "**/*.test.html"],
+    "ignore": ["**/*.test.js", "**/*.test.html", "**/*.js.map"],
     "exec": "node dist/server/server.js",
     "ext": "js",
     "delay": 100

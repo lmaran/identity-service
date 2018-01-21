@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import * as _ from "lodash";
 import * as querystring from "querystring";
 import * as randomstring from "randomstring";
-import { requests, codes } from "../shared/data";
+import { codeService } from "../../services";
 import * as jose from "jsrsasign";
 import * as nosql2 from "nosql";
 import clientService from "../client/client.service";
@@ -52,10 +52,11 @@ const tokenController = {
 
         if (req.body.grant_type === "authorization_code") {
 
-            const code = codes[req.body.code];
+            const code = await codeService.get(req.body.code);
 
             if (code) {
-                delete codes[req.body.code]; // burn our code, it's been used
+                codeService.delete(req.body.code); // don't have to wait to complete
+
                 if (code.request.client_id === clientId) {
 
                     const header = { typ: "JWT", alg: rsaKey.alg, kid: rsaKey.kid };
