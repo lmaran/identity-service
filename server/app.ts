@@ -6,8 +6,6 @@ import * as url from "url";
 import * as bodyParser from "body-parser";
 import * as exphbs from "express-handlebars";
 
-import {requests, codes} from "./components/shared/data";
-
 const app: express.Application = express();
 
 app.use(bodyParser.json());

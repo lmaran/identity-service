@@ -8,8 +8,6 @@
         "baseUrl": ".",
         "paths": {
             "@interfaces": [ "server/interfaces" ],
-            "@helpersUrl": [ "server/helpers/url" ],
-            "@helpers/*": [ "server/helpers/*" ],
             "*": [
                 "node_modules/*",
                 "server/types/*"
