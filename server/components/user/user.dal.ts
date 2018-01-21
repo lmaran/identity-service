@@ -22,6 +22,10 @@ const userDal = {
         return await db.collection(collection).findOne({ userId: userName });
     },
 
+    getUserByEmail: async (email: string) => {
+        const db = await mongoService.getDb();
+        return await db.collection(collection).findOne({ email });
+    },
 };
 
 export default userDal;

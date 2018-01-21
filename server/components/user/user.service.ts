@@ -18,6 +18,11 @@ const userService = {
         return(user);
     },
 
+    getUserByEmail: async (email: string): Promise<IUser> => {
+        const user: IUser = await userDal.getUserByEmail(email);
+        return(user);
+    },
+
 };
 
 export default userService;

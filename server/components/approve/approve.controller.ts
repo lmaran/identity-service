@@ -3,10 +3,11 @@ import * as _ from "lodash";
 import * as url from "url";
 import * as randomstring from "randomstring";
 import { requestService, codeService } from "../../services";
-import { IClient, IUser } from "@interfaces";
-import { buildUrl } from "../../helpers";
+import { IClient, IUser, IPersistedPassword } from "@interfaces";
+import { buildUrl, passwordMatch, generateHashPassword } from "../../helpers";
 import clientService from "../client/client.service";
 import userService from "../user/user.service";
+import * as crypto from "crypto";
 
 const approveController = {
 
@@ -30,7 +31,36 @@ const approveController = {
                 // user approved access
                 const code = randomstring.generate(8);
 
-                const user = await userService.getUser(req.body.user);
+                // const user = await userService.getUser(req.body.user);
+                const user = await userService.getUserByEmail(req.body.email);
+
+                console.log(user);
+
+                if (!user) {
+                    // client asked for a scope it couldn't have
+                    urlParsed = buildUrl(query.redirect_uri, {
+                        error: "user not found",
+                    }, null);
+                    res.redirect(urlParsed);
+                    return;
+                }
+
+                const persistedPassword = {
+                    salt: user.salt,
+                    hashedPassword: user.hashedPassword,
+                };
+
+                const pswMatch = passwordMatch(persistedPassword, req.body.password);
+                // const isPswCorrect = pswMatch(req.body.password, user.hashedPassword, user.salt);
+
+                if (!pswMatch) {
+                    // client asked for a scope it couldn't have
+                    urlParsed = buildUrl(query.redirect_uri, {
+                        error: "incorrect password",
+                    }, null);
+                    res.redirect(urlParsed);
+                    return;
+                }
 
                 const scopes = getScopesFromForm(req.body);
 
@@ -80,6 +110,23 @@ const getScopesFromForm = body => {
     // _.keys({one: 1, two: 2); => => ["one", "two"]
     return _.filter(_.keys(body), s => _.startsWith(s, "scope_"))
         .map(s => s.slice("scope_".length));
+};
+
+// const makeSalt = () => {
+//     return crypto.randomBytes(16).toString("base64");
+// };
+
+const encryptPassword2 = (password, salt) => {
+    // if (!password || !salt) { return ""; }
+    const newSalt = new Buffer(salt, "base64");
+    const iterations = 10000;
+    const keylen = 64;
+    const digest = "sha1";
+    return crypto.pbkdf2Sync(password, newSalt, iterations, keylen, digest).toString("base64");
+};
+
+const isPasswordCorrect2 = (plainText, hashedPassword, salt) => {
+    return encryptPassword2(plainText, salt) === hashedPassword;
 };
 
 export default approveController;

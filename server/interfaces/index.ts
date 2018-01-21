@@ -34,7 +34,8 @@ export interface IUser {
     email: string;
     email_verified: boolean;
     username?: string;
-    password?: string;
+    hashedPassword?: string;
+    salt?: string;
 }
 
 // export interface IUsersObj {
@@ -45,4 +46,9 @@ export interface IOptionsUri {
     error?: string;
     code?: string;
     state?: string;
+}
+
+export interface IPersistedPassword {
+    salt: string;
+    hashedPassword: string;
 }
