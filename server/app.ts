@@ -20,7 +20,8 @@ app.engine(".hbs", exphbs({
     // ensure the javascript is at the bottom of the code in express-handlebars template
     // http://stackoverflow.com/a/25307270, http://stackoverflow.com/a/21740214
     helpers: {
-        section: (name, options) => {
+        // tslint:disable-next-line:object-literal-shorthand
+        section: function(this: any, name, options) {
             if (!this._sections) { this._sections = {}; }
             this._sections[name] = options.fn(this);
             return null;

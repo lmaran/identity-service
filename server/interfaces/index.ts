@@ -1,6 +1,6 @@
 interface IBlobSecrets {
-    account: string;
-    key: string;
+    account?: string;
+    key?: string;
 }
 
 interface IMongoSecrets {
@@ -49,6 +49,6 @@ export interface IOptionsUri {
 }
 
 export interface IPersistedPassword {
-    salt: string;
-    hashedPassword: string;
+    salt?: string;
+    hashedPassword?: string;
 }

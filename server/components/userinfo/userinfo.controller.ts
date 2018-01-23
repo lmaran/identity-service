@@ -25,7 +25,7 @@ const userinfoController = {
                     }
                 });
             } else if (scope === "profile") {
-                _.each(["name", "family_name", "given_name", "middle_name", "nickname", "preferred_username", "profile", "picture", "website", "gender", "birthdate", "zoneinfo", "locale", "updated_at"], function (claim) {
+                _.each(["name", "family_name", "given_name", "middle_name", "nickname", "preferred_username", "profile", "picture", "website", "gender", "birthdate", "zoneinfo", "locale", "updated_at"], claim => {
                     if (user[claim]) {
                         out[claim] = user[claim];
                     }

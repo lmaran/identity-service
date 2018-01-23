@@ -65,7 +65,7 @@ const approveController = {
                 const scopes = getScopesFromForm(req.body);
 
                 const client = await clientService.getClient(query.client_id);
-                const cscope = client.scope ? client.scope.split(" ") : undefined;
+                const cscope = client.scope ? client.scope.split(" ") : [];
                 // _.difference([2, 1], [2, 3]); => [1]
                 if (_.difference(scopes, cscope).length > 0) {
                     // client asked for a scope it couldn't have

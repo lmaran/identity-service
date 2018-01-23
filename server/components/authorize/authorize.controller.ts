@@ -18,7 +18,7 @@ const authorizeController = {
 
         // accepted valus
         const accRedirectUris: string[] = client.redirect_uris;
-        const accScopes = client.scope ? client.scope.split(" ") : null;
+        const accScopes = client.scope ? client.scope.split(" ") : [];
 
         if (!client) {
             console.log("Unknown client %s", reqClientId);
