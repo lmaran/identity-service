@@ -13,7 +13,9 @@ describe("Mongo service", () => {
     let db: Db;
 
     it("should have the right database in place", async () => {
-        config.mongo.uri = "mongodb://localhost";
+        if (config.mongo) {
+            config.mongo.uri = "mongodb://localhost";
+        }
         mongoService.removeDbFromCache();
         try {
 
@@ -34,7 +36,9 @@ describe("Mongo service", () => {
     });
 
     it("should have all collections in place", async () => {
-        config.mongo.uri = "mongodb://localhost/identity-service-dev";
+        if (config.mongo) {
+            config.mongo.uri = "mongodb://localhost/identity-service-dev";
+        }
         mongoService.removeDbFromCache();
         try {
 
@@ -56,7 +60,9 @@ describe("Mongo service", () => {
     });
 
     it("should connect to the database (for correct uri)", async () => {
-        config.mongo.uri = "mongodb://localhost/identity-service-dev";
+        if (config.mongo) {
+            config.mongo.uri = "mongodb://localhost/identity-service-dev";
+        }
         mongoService.removeDbFromCache();
         try {
 
@@ -79,7 +85,9 @@ describe("Mongo service", () => {
     });
 
     it("should respond with an error object (for incorrect uri)", async () => {
-        config.mongo.uri = "mongodb3://localhost/identity-service-dev";
+        if (config.mongo) {
+            config.mongo.uri = "mongodb3://localhost/identity-service-dev";
+        }
         mongoService.removeDbFromCache();
         try {
             db = await mongoService.getDb();
@@ -90,7 +98,9 @@ describe("Mongo service", () => {
     });
 
     it("should respond with an error object (for missing uri)", async () => {
-        config.mongo.uri = undefined;
+        if (config.mongo) {
+            config.mongo.uri = undefined;
+        }
         mongoService.removeDbFromCache();
         try {
             db = await mongoService.getDb();
@@ -101,7 +111,9 @@ describe("Mongo service", () => {
     });
 
     it("should respond with a cached DB instance (for correct uri)", async () => {
-        config.mongo.uri = "mongodb://localhost/identity-service-dev";
+        if (config.mongo) {
+            config.mongo.uri = "mongodb://localhost/identity-service-dev";
+        }
         mongoService.removeDbFromCache();
         try {
             db = await mongoService.getDb();

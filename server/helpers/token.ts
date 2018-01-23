@@ -5,7 +5,7 @@ import tokenService from "../components/token/token.service";
 export const getAccessToken = async (req, res, next) => {
     // check the auth header first
     const auth = req.headers.authorization;
-    let inToken = null;
+    let inToken;
     if (auth && auth.toLowerCase().indexOf("bearer") === 0) {
         inToken = auth.slice("bearer ".length);
     } else if (req.body && req.body.access_token) {

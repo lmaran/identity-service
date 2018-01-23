@@ -8,7 +8,7 @@ describe("String util", () => {
 
     it("should work for endsWith", () => {
         expect(strEndsWithValueFromList("aaa", ["aa"])).equal(true);
-        expect(strEndsWithValueFromList("aaa", ["aa", , "bb"])).equal(true);
+        expect(strEndsWithValueFromList("aaa", ["aa", "", "bb"])).equal(true);
         expect(strEndsWithValueFromList("aaa", ["bb", "cc"])).equal(false);
     });
 
