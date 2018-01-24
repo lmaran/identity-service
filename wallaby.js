@@ -6,7 +6,7 @@ module.exports = () => {
         ],
 
         tests: [
-            'server/**/*.test.ts'
+            'server/test/**/*.test.ts'
         ],
 
         testFramework: 'mocha',

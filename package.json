@@ -29,8 +29,6 @@
         "jsrsasign": "^8.0.4",
         "lodash": "^4.17.4",
         "mongodb": "^3.0.1",
-        "nosql": "^6.1.0",
-        "qs": "^6.5.1",
         "querystring": "^0.2.0",
         "randomstring": "^1.1.5",
         "url": "^0.11.0"
@@ -45,7 +43,6 @@
         "@types/mocha": "^2.2.44",
         "@types/mongodb": "^3.0.3",
         "@types/node": "^8.0.51",
-        "@types/qs": "^6.5.1",
         "@types/randomstring": "^1.1.6",
         "@types/sinon": "^4.0.0",
         "@types/supertest": "^2.0.4",

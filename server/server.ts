@@ -1,6 +1,6 @@
+import * as http from "http";
 import config from "./config";
 import app from "./app";
-import * as http from "http";
 
 // const app = expressApp.getInstance();
 const httpServer: http.Server = http.createServer(app);
