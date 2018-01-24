@@ -15,10 +15,11 @@ const service = {
     getDb: () => __awaiter(this, void 0, void 0, function* () {
         try {
             if (!theDb) {
-                if (!config_1.default.mongo.uri) {
+                if (!config_1.default.mongo || !config_1.default.mongo.uri) {
                     throw new Error("Nu este definit un connection string pentru Mongo.");
                 }
-                const db = yield mongodb_1.MongoClient.connect(config_1.default.mongo.uri, config_1.default.mongo.options);
+                const client = yield mongodb_1.MongoClient.connect(config_1.default.mongo.uri, config_1.default.mongo.options);
+                const db = client.db("identity-service-dev");
                 theDb = db;
                 return db;
             }
@@ -32,7 +33,7 @@ const service = {
         }
     }),
     removeDbFromCache: () => {
-        theDb = undefined;
+        theDb = null;
     },
     normalizedId: (id) => {
         if (mongodb_1.ObjectID.isValid(id)) {

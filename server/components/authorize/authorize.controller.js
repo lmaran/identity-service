@@ -20,7 +20,7 @@ const authorizeController = {
         const reqScopes = req.query.scope ? req.query.scope.split(" ") : null;
         const client = yield client_service_1.default.getClient(reqClientId);
         const accRedirectUris = client.redirect_uris;
-        const accScopes = client.scope ? client.scope.split(" ") : null;
+        const accScopes = client.scope ? client.scope.split(" ") : [];
         if (!client) {
             console.log("Unknown client %s", reqClientId);
             res.render("error", { error: "Unknown client" });

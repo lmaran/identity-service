@@ -13,7 +13,7 @@ const nosql = nosql2.load("database.nosql");
 const token_service_1 = require("../components/token/token.service");
 exports.getAccessToken = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
     const auth = req.headers.authorization;
-    let inToken = null;
+    let inToken;
     if (auth && auth.toLowerCase().indexOf("bearer") === 0) {
         inToken = auth.slice("bearer ".length);
     }

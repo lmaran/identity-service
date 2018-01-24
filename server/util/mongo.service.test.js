@@ -15,7 +15,9 @@ const mongodb_1 = require("mongodb");
 describe("Mongo service", () => {
     let db;
     it("should have the right database in place", () => __awaiter(this, void 0, void 0, function* () {
-        config_1.default.mongo.uri = "mongodb://localhost";
+        if (config_1.default.mongo) {
+            config_1.default.mongo.uri = "mongodb://localhost";
+        }
         mongo_service_1.default.removeDbFromCache();
         try {
             db = yield mongo_service_1.default.getDb();
@@ -30,7 +32,9 @@ describe("Mongo service", () => {
         }
     }));
     it("should have all collections in place", () => __awaiter(this, void 0, void 0, function* () {
-        config_1.default.mongo.uri = "mongodb://localhost/identity-service-dev";
+        if (config_1.default.mongo) {
+            config_1.default.mongo.uri = "mongodb://localhost/identity-service-dev";
+        }
         mongo_service_1.default.removeDbFromCache();
         try {
             db = yield mongo_service_1.default.getDb();
@@ -45,7 +49,9 @@ describe("Mongo service", () => {
         }
     }));
     it("should connect to the database (for correct uri)", () => __awaiter(this, void 0, void 0, function* () {
-        config_1.default.mongo.uri = "mongodb://localhost/identity-service-dev";
+        if (config_1.default.mongo) {
+            config_1.default.mongo.uri = "mongodb://localhost/identity-service-dev";
+        }
         mongo_service_1.default.removeDbFromCache();
         try {
             db = yield mongo_service_1.default.getDb();
@@ -60,7 +66,9 @@ describe("Mongo service", () => {
         }
     }));
     it("should respond with an error object (for incorrect uri)", () => __awaiter(this, void 0, void 0, function* () {
-        config_1.default.mongo.uri = "mongodb3://localhost/identity-service-dev";
+        if (config_1.default.mongo) {
+            config_1.default.mongo.uri = "mongodb3://localhost/identity-service-dev";
+        }
         mongo_service_1.default.removeDbFromCache();
         try {
             db = yield mongo_service_1.default.getDb();
@@ -71,7 +79,9 @@ describe("Mongo service", () => {
         }
     }));
     it("should respond with an error object (for missing uri)", () => __awaiter(this, void 0, void 0, function* () {
-        config_1.default.mongo.uri = undefined;
+        if (config_1.default.mongo) {
+            config_1.default.mongo.uri = undefined;
+        }
         mongo_service_1.default.removeDbFromCache();
         try {
             db = yield mongo_service_1.default.getDb();
@@ -82,7 +92,9 @@ describe("Mongo service", () => {
         }
     }));
     it("should respond with a cached DB instance (for correct uri)", () => __awaiter(this, void 0, void 0, function* () {
-        config_1.default.mongo.uri = "mongodb://localhost/identity-service-dev";
+        if (config_1.default.mongo) {
+            config_1.default.mongo.uri = "mongodb://localhost/identity-service-dev";
+        }
         mongo_service_1.default.removeDbFromCache();
         try {
             db = yield mongo_service_1.default.getDb();
