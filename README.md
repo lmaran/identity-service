@@ -7,7 +7,8 @@
 npm start
 
 # start browser:
-http://some-app.dev.identity.appstudio.ro:1420
+http://some-app.dev.identity.appstudio.ro:1420 or
+http://cantinas.identity.appstudio.local:1420
 
 # test with wallaby.js
 ctrl-shift-R-R (start)

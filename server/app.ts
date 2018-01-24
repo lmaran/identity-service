@@ -8,6 +8,10 @@ import * as exphbs from "express-handlebars";
 
 const app: express.Application = express();
 
+// https://expressjs.com/en/guide/behind-proxies.html
+app.enable("trust proxy");
+// app.set("trust proxy", "loopback, 123.123.123.123"); // specify a subnet and an address
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true })); // support form-encoded bodies (for the token endpoint)
 
