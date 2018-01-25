@@ -1,0 +1,61 @@
+{{> navbar}}
+
+<div class="container">
+
+    <div class="jumbotron">
+        <h2>Client information:</h2>
+        <ul>
+            {{#each clients as | client clientIndex |}}
+            <li>
+                <b>client_id:</b>
+                <code>{{client.client_id}}</code>
+            </li>
+            <li>
+                <b>client_secret:</b>
+                <code>{{client.client_secret}}</code>
+            </li>
+            <li>
+                <b>scope:</b>
+                <code>{{client.scope}}</code>
+            </li>
+            <li>
+                <b>redirect_uri:</b>
+                <code>{{client.redirect_uris}}</code>
+            </li>
+            {{/each}}
+        </ul>
+        <h2>Other:</h2>
+        <ul>
+            <li>
+                <b>Current host:</b>
+                <code>{{testUrl}}</code>
+            </li>
+        </ul>
+
+        <h2>Remote IP:</h2>
+        <ul>
+            <li>
+                <b>ip["x-forwarded-for"]:</b>
+                <code>{{ip.x-forwarded-for}}</code>
+            </li>
+            <li>
+                <b>ip["req.ip"]:</b>
+                <code>{{ip.req-ip}}</code>
+            </li>
+            <li>
+                <b>ip["req.ips"]:</b>
+                <code>{{ip.req-ips}}</code>
+            </li>
+            <li>
+                <b>ip["req.connection.remoteAddress"]:</b>
+                <code>{{ip.req-connection-remoteAddress}}</code>
+            </li>
+            <li>
+                <b>ip["req.socket.remoteAddress"]:</b>
+                <code>{{ip.req-socket-remoteAddress}}</code>
+            </li>
+        </ul>
+
+    </div>
+
+</div>

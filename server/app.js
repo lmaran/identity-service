@@ -6,6 +6,7 @@ const routes_1 = require("./routes");
 const bodyParser = require("body-parser");
 const exphbs = require("express-handlebars");
 const app = express();
+app.enable("trust proxy");
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.engine(".hbs", exphbs({
