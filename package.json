@@ -37,7 +37,6 @@
         "@types/body-parser": "^1.16.8",
         "@types/chai": "^4.0.4",
         "@types/express": "^4.11.0",
-        "@types/express-serve-static-core": "^4.11.1",
         "@types/js-url": "^1.8.28",
         "@types/lodash": "^4.14.85",
         "@types/mocha": "^2.2.44",
@@ -56,6 +55,6 @@
         "sinon": "^4.1.2",
         "supertest": "^3.0.0",
         "tslint": "^5.8.0",
-        "typescript": "^2.6.1"
+        "typescript": "^2.6.2"
     }
 }
