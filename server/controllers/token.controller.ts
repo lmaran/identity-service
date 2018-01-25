@@ -3,7 +3,8 @@ import * as _ from "lodash";
 import * as querystring from "querystring";
 import * as randomstring from "randomstring";
 import * as jose from "jsrsasign";
-import { codeService, clientService, tokenService } from "../services";
+import { clientService, tokenService } from "../services";
+import { codeData } from "../data";
 
 export const tokenController = {
 
@@ -47,10 +48,10 @@ export const tokenController = {
 
         if (req.body.grant_type === "authorization_code") {
 
-            const code = await codeService.get(req.body.code);
+            const code = await codeData.get(req.body.code);
 
             if (code) {
-                codeService.delete(req.body.code); // don't have to wait to complete
+                codeData.delete(req.body.code); // don't have to wait to complete
 
                 if (code.request.client_id === clientId) {
 
