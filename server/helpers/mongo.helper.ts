@@ -11,8 +11,11 @@ export const mongoHelper = {
                 if (!config.mongo || !config.mongo.uri) {
                     throw new Error("Nu este definit un connection string pentru Mongo.");
                 }
+                if (!config.mongo || !config.mongo.dbName) {
+                    throw new Error("Nu este definit numele bazei de date.");
+                }
                 const client = await MongoClient.connect(config.mongo.uri, config.mongo.options);
-                const db = client.db("identity-service-dev");
+                const db = client.db(config.mongo.dbName);
 
                 theDb = db;
                 return db;

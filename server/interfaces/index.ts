@@ -5,6 +5,7 @@ interface IBlobSecrets {
 
 interface IMongoSecrets {
     uri?: string;
+    dbName?: string;
     options?: object;
 }
 
