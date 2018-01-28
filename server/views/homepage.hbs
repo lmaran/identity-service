@@ -3,32 +3,15 @@
 <div class="container">
 
     <div class="jumbotron">
-        <h2>Client information:</h2>
-        <ul>
-            {{#each clients as | client clientIndex |}}
-            <li>
-                <b>client_id:</b>
-                <code>{{client.client_id}}</code>
-            </li>
-            <li>
-                <b>client_secret:</b>
-                <code>{{client.client_secret}}</code>
-            </li>
-            <li>
-                <b>scope:</b>
-                <code>{{client.scope}}</code>
-            </li>
-            <li>
-                <b>redirect_uri:</b>
-                <code>{{client.redirect_uris}}</code>
-            </li>
-            {{/each}}
-        </ul>
         <h2>Other:</h2>
         <ul>
             <li>
                 <b>Current host:</b>
                 <code>{{testUrl}}</code>
+            </li>
+            <li>
+                <b>User agent:</b>
+                <code>{{ip.user-agent}}</code>
             </li>
         </ul>
 

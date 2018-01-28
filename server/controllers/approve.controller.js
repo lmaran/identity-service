@@ -27,8 +27,14 @@ exports.approveController = {
         }
         if (req.body.approve) {
             if (query.response_type === "code") {
+                const tenantCode = req.tenantCode;
+                if (!tenantCode) {
+                    console.log("Missing tenant");
+                    res.render("error", { error: "Missing tenant" });
+                    return;
+                }
                 const code = randomstring.generate(8);
-                const user = yield services_1.userService.getUserByEmail(req.body.email);
+                const user = yield services_1.userService.getUserByEmail(req.body.email, tenantCode);
                 console.log(user);
                 if (!user) {
                     urlParsed = helpers_1.urlHelper.buildUrl(query.redirect_uri, {
@@ -50,7 +56,7 @@ exports.approveController = {
                     return;
                 }
                 const scopes = getScopesFromForm(req.body);
-                const client = yield services_1.clientService.getClient(query.client_id);
+                const client = yield services_1.clientService.getByCode(query.client_id, tenantCode);
                 const cscope = client.scope ? client.scope.split(" ") : [];
                 if (_.difference(scopes, cscope).length > 0) {
                     urlParsed = helpers_1.urlHelper.buildUrl(query.redirect_uri, {

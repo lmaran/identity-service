@@ -3,10 +3,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express = require("express");
 const path = require("path");
 const routes_1 = require("./routes");
+const middlewares_1 = require("./middlewares");
 const bodyParser = require("body-parser");
 const exphbs = require("express-handlebars");
 const app = express();
 app.enable("trust proxy");
+app.use(middlewares_1.getTenant);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.engine(".hbs", exphbs({
@@ -28,4 +30,5 @@ app.set("view engine", ".hbs");
 app.set("views", path.join(__dirname, "/views/"));
 app.use("/", express.static("server/views"));
 app.use(routes_1.default);
+app.use(middlewares_1.errorHandler);
 exports.default = app;

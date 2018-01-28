@@ -4,6 +4,7 @@ const config = {
     port: process.env.PORT,
     mongo: {
         uri: process.env.MONGO_URI,
+        dbName: process.env.MONGO_DB_NAME,
     },
     azureBlobStorage: {
         account: process.env.AZURE_BLOB_STORAGE_ACCOUNT,

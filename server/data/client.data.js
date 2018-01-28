@@ -11,12 +11,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const helpers_1 = require("../helpers");
 const collection = "clients";
 exports.clientData = {
-    getAll: () => __awaiter(this, void 0, void 0, function* () {
+    getByCode: (clientId, tenantCode) => __awaiter(this, void 0, void 0, function* () {
         const db = yield helpers_1.mongoHelper.getDb();
-        return yield db.collection(collection).find().toArray();
-    }),
-    getClient: (clientId) => __awaiter(this, void 0, void 0, function* () {
-        const db = yield helpers_1.mongoHelper.getDb();
-        return yield db.collection(collection).findOne({ client_id: clientId });
+        return yield db.collection(collection).findOne({ client_id: clientId, tenantCode });
     }),
 };

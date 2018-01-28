@@ -8,10 +8,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const services_1 = require("../services");
 exports.homepageController = {
     getHomepage: (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const clients = yield services_1.clientService.getAll();
         const testUrl = req.protocol + "://" + req.get("host");
         const ip = {};
         ip["x-forwarded-for"] = req.headers["x-forwarded-for"];
@@ -19,6 +17,7 @@ exports.homepageController = {
         ip["req-ips"] = req.ips;
         ip["req-connection-remoteAddress"] = req.connection && req.connection.remoteAddress;
         ip["req-socket-remoteAddress"] = req.socket && req.socket.remoteAddress;
-        res.render("homepage", { clients, testUrl, ip });
+        ip["user-agent"] = req.headers["user-agent"];
+        res.render("homepage", { testUrl, ip });
     }),
 };

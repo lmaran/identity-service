@@ -13,36 +13,42 @@ const randomstring = require("randomstring");
 const data_1 = require("../data");
 const services_1 = require("../services");
 const helpers_1 = require("../helpers");
+const application_error_1 = require("../errors/application.error");
 exports.authorizeController = {
-    getAuthorize: (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const reqClientId = req.query.client_id;
-        const reqRedirectUri = req.query.redirect_uri;
-        const reqScopes = req.query.scope ? req.query.scope.split(" ") : null;
-        const client = yield services_1.clientService.getClient(reqClientId);
-        const accRedirectUris = client.redirect_uris;
-        const accScopes = client.scope ? client.scope.split(" ") : [];
-        if (!client) {
-            console.log("Unknown client %s", reqClientId);
-            res.render("error", { error: "Unknown client" });
-            return;
-        }
-        else if (!_.includes(accRedirectUris, reqRedirectUri)) {
-            console.log("Mismatched redirect URI, expected %s got %s", accRedirectUris, reqRedirectUri);
-            res.render("error", { error: "Invalid redirect URI" });
-            return;
-        }
-        else {
-            if (_.difference(reqScopes, accScopes).length > 0) {
-                const urlParsed = helpers_1.urlHelper.buildUrl(reqRedirectUri, {
-                    error: "invalid_scope",
-                }, null);
-                res.redirect(urlParsed);
+    getAuthorize: (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+        try {
+            const reqClientId = req.query.client_id;
+            const reqRedirectUri = req.query.redirect_uri;
+            const reqScopes = req.query.scope ? req.query.scope.split(" ") : null;
+            const tenantCode = req.tenantCode;
+            if (!tenantCode) {
+                throw new application_error_1.ApplicationError("Missing tenant", 400);
+            }
+            const client = yield services_1.clientService.getByCode(reqClientId, tenantCode);
+            const accRedirectUris = client.redirect_uris;
+            const accScopes = client.scope ? client.scope.split(" ") : [];
+            if (!client) {
+                throw new application_error_1.ApplicationError(`Unknown client: ${reqClientId}`, 400);
+            }
+            else if (!_.includes(accRedirectUris, reqRedirectUri)) {
+                throw new application_error_1.ApplicationError(`Invalid redirect URI`, 400);
+            }
+            else {
+                if (_.difference(reqScopes, accScopes).length > 0) {
+                    const urlParsed = helpers_1.urlHelper.buildUrl(reqRedirectUri, {
+                        error: "invalid_scope",
+                    }, null);
+                    res.redirect(urlParsed);
+                    return;
+                }
+                const requestId = randomstring.generate(8);
+                data_1.requestData.create({ requestId, query: req.query });
+                res.render("approve", { client, requestId, scopes: reqScopes, tenantCode });
                 return;
             }
-            const requestId = randomstring.generate(8);
-            data_1.requestData.create({ requestId, query: req.query });
-            res.render("approve", { client, requestId, scopes: reqScopes });
-            return;
+        }
+        catch (err) {
+            next(err);
         }
     }),
 };

@@ -14,12 +14,12 @@ exports.userService = {
         const users = yield data_1.userData.getAll();
         return (users);
     }),
-    getUser: (userName) => __awaiter(this, void 0, void 0, function* () {
-        const user = yield data_1.userData.getUser(userName);
+    getUser: (userName, tenantCode) => __awaiter(this, void 0, void 0, function* () {
+        const user = yield data_1.userData.getUser(userName, tenantCode);
         return (user);
     }),
-    getUserByEmail: (email) => __awaiter(this, void 0, void 0, function* () {
-        const user = yield data_1.userData.getUserByEmail(email);
+    getUserByEmail: (email, tenantCode) => __awaiter(this, void 0, void 0, function* () {
+        const user = yield data_1.userData.getUserByEmail(email, tenantCode);
         return (user);
     }),
 };

@@ -20,12 +20,12 @@ exports.userData = {
         id = helpers_1.mongoHelper.normalizedId(id);
         return yield db.collection(collection).findOne({ _id: id });
     }),
-    getUser: (userName) => __awaiter(this, void 0, void 0, function* () {
+    getUser: (userName, tenantCode) => __awaiter(this, void 0, void 0, function* () {
         const db = yield helpers_1.mongoHelper.getDb();
-        return yield db.collection(collection).findOne({ userId: userName });
+        return yield db.collection(collection).findOne({ userId: userName, tenantCode });
     }),
-    getUserByEmail: (email) => __awaiter(this, void 0, void 0, function* () {
+    getUserByEmail: (email, tenantCode) => __awaiter(this, void 0, void 0, function* () {
         const db = yield helpers_1.mongoHelper.getDb();
-        return yield db.collection(collection).findOne({ email });
+        return yield db.collection(collection).findOne({ email, tenantCode });
     }),
 };

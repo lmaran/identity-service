@@ -8,10 +8,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const data_1 = require("../data");
-exports.clientService = {
-    getByCode: (clientCode, tenantCode) => __awaiter(this, void 0, void 0, function* () {
-        const client = yield data_1.clientData.getByCode(clientCode, tenantCode);
-        return (client);
+const helpers_1 = require("../helpers");
+const collection = "tenants";
+exports.clientData = {
+    getByCode: (tenantCode) => __awaiter(this, void 0, void 0, function* () {
+        const db = yield helpers_1.mongoHelper.getDb();
+        return yield db.collection(collection).findOne({ tenantCode });
     }),
 };
