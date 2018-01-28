@@ -13,8 +13,8 @@ export const clientService = {
     //     return(client);
     // },
 
-    getClient: async (id: string): Promise<IClient> => {
-        const client: IClient = await clientData.getClient(id);
+    getClient: async (id: string, tenantCode: string): Promise<IClient> => {
+        const client: IClient = await clientData.getClient(id, tenantCode);
         return(client);
     },
 

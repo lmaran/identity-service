@@ -13,13 +13,13 @@ export const userService = {
     //     return(user);
     // },
 
-    getUser: async (userName: string): Promise<IUser> => {
-        const user: IUser = await userData.getUser(userName);
+    getUser: async (userName: string, tenantCode: string): Promise<IUser> => {
+        const user: IUser = await userData.getUser(userName, tenantCode);
         return(user);
     },
 
-    getUserByEmail: async (email: string): Promise<IUser> => {
-        const user: IUser = await userData.getUserByEmail(email);
+    getUserByEmail: async (email: string, tenantCode: string): Promise<IUser> => {
+        const user: IUser = await userData.getUserByEmail(email, tenantCode);
         return(user);
     },
 

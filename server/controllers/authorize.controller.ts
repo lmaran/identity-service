@@ -14,7 +14,14 @@ export const authorizeController = {
         const reqRedirectUri: string = req.query.redirect_uri;
         const reqScopes = req.query.scope ? req.query.scope.split(" ") : null;
 
-        const client: IClient = await clientService.getClient(reqClientId);
+        const tenantCode = req.tenantCode;
+        if (!tenantCode) {
+            console.log("Missing tenant");
+            res.render("error", { error: "Missing tenant" });
+            return;
+        }
+
+        const client: IClient = await clientService.getClient(reqClientId, tenantCode);
 
         // accepted values
         const accRedirectUris: string[] = client.redirect_uris;
@@ -42,7 +49,7 @@ export const authorizeController = {
             const requestId = randomstring.generate(8);
             requestData.create({requestId, query: req.query}); // don't have to wait to complete
 
-            res.render("approve", { client, requestId, scopes: reqScopes });
+            res.render("approve", { client, requestId, scopes: reqScopes, tenantCode });
             return;
         }
 

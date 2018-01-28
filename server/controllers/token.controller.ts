@@ -13,6 +13,14 @@ export const tokenController = {
         const auth = req.headers.authorization;
         let clientId;
         let clientSecret;
+
+        const tenantCode = req.tenantCode;
+        if (!tenantCode) {
+            console.log("Missing tenant");
+            res.render("error", { error: "Missing tenant" });
+            return;
+        }
+
         if (auth) {
             // check the auth header
             const clientCredentials = decodeClientCredentials(auth);
@@ -33,7 +41,7 @@ export const tokenController = {
             clientSecret = req.body.client_secret;
         }
 
-        const client = await clientService.getClient(clientId);
+        const client = await clientService.getClient(clientId, tenantCode);
         if (!client) {
             console.log("Unknown client %s", clientId);
             res.status(401).json({ error: "invalid_client" });
@@ -161,6 +169,13 @@ export const tokenController = {
         let clientId;
         let clientSecret;
 
+        const tenantCode = req.tenantCode;
+        if (!tenantCode) {
+            console.log("Missing tenant");
+            res.render("error", { error: "Missing tenant" });
+            return;
+        }
+
         if (auth) {
             // check the auth header
             const clientCredentials = decodeClientCredentials(auth);
@@ -181,7 +196,7 @@ export const tokenController = {
             clientSecret = req.body.client_secret;
         }
 
-        const client = await clientService.getClient(clientId);
+        const client = await clientService.getClient(clientId, tenantCode);
         if (!client) {
             console.log("Unknown client %s", clientId);
             res.status(401).json({ error: "invalid_client" });

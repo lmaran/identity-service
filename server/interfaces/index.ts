@@ -25,6 +25,7 @@ export interface IClient {
     client_secret: string;
     redirect_uris: string[];
     scope: string;
+    tenantCode: string;
 }
 
 export interface IUser {

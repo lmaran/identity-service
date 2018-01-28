@@ -27,11 +27,19 @@ export const approveController = {
 
         if (req.body.approve) {
             if (query.response_type === "code") {
+
+                const tenantCode = req.tenantCode;
+                if (!tenantCode) {
+                    console.log("Missing tenant");
+                    res.render("error", { error: "Missing tenant" });
+                    return;
+                }
+
                 // user approved access
                 const code = randomstring.generate(8);
 
                 // const user = await userService.getUser(req.body.user);
-                const user = await userService.getUserByEmail(req.body.email);
+                const user = await userService.getUserByEmail(req.body.email, tenantCode);
 
                 console.log(user);
 
@@ -63,7 +71,7 @@ export const approveController = {
 
                 const scopes = getScopesFromForm(req.body);
 
-                const client = await clientService.getClient(query.client_id);
+                const client = await clientService.getClient(query.client_id, tenantCode);
                 const cscope = client.scope ? client.scope.split(" ") : [];
                 // _.difference([2, 1], [2, 3]); => [1]
                 if (_.difference(scopes, cscope).length > 0) {

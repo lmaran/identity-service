@@ -15,13 +15,13 @@ export const userData = {
         return await db.collection(collection).findOne({ _id: id });
     },
 
-    getUser: async (userName: string) => {
+    getUser: async (userName: string, tenantCode: string) => {
         const db = await mongoHelper.getDb();
-        return await db.collection(collection).findOne({ userId: userName });
+        return await db.collection(collection).findOne({ userId: userName, tenantCode });
     },
 
-    getUserByEmail: async (email: string) => {
+    getUserByEmail: async (email: string, tenantCode: string) => {
         const db = await mongoHelper.getDb();
-        return await db.collection(collection).findOne({ email });
+        return await db.collection(collection).findOne({ email, tenantCode });
     },
 };

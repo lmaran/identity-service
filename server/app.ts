@@ -1,6 +1,7 @@
 import * as express from "express";
 import * as path from "path";
 import allRoutes from "./routes";
+import { getTenant } from "./middlewares";
 
 import * as url from "url";
 import * as bodyParser from "body-parser";
@@ -12,6 +13,7 @@ const app: express.Application = express();
 app.enable("trust proxy");
 // app.set("trust proxy", "loopback, 123.123.123.123"); // specify a subnet and an address
 
+app.use(getTenant); // adds req.tokenCode property
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true })); // support form-encoded bodies (for the token endpoint)
 

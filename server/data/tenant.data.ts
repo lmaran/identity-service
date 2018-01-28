@@ -1,6 +1,6 @@
 import { mongoHelper } from "../helpers";
 
-const collection = "clients";
+const collection = "tenants";
 export const clientData = {
 
     getAll: async () => {
@@ -15,10 +15,10 @@ export const clientData = {
     //     return await db.collection(collection).findOne({ _id: id });
     // },
 
-    getClient: async (clientId: string, tenantCode: string) => {
+    getTenant: async (tenantCode: string) => {
         // return _.find(clients, client => client.client_id === clientId);
         const db = await mongoHelper.getDb();
-        return await db.collection(collection).findOne({ client_id: clientId, tenantCode });
+        return await db.collection(collection).findOne({ tenantCode });
     },
 
 };

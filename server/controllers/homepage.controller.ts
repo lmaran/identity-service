@@ -16,6 +16,7 @@ export const homepageController = {
         ip["req-ips"] = req.ips; // https://expressjs.com/en/api.html#req.ips
         ip["req-connection-remoteAddress"] = req.connection && req.connection.remoteAddress;
         ip["req-socket-remoteAddress"] = req.socket && req.socket.remoteAddress;
+        ip["user-agent"] = req.headers["user-agent"];
 
         res.render("homepage", { clients, testUrl, ip });
     },
