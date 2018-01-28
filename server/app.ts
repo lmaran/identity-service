@@ -1,7 +1,7 @@
 import * as express from "express";
 import * as path from "path";
 import allRoutes from "./routes";
-import { getTenant } from "./middlewares";
+import { getTenant, errorHandler } from "./middlewares";
 
 import * as url from "url";
 import * as bodyParser from "body-parser";
@@ -43,5 +43,6 @@ app.set("views", path.join(__dirname, "/views/"));
 app.use("/", express.static("server/views"));
 
 app.use(allRoutes);
+app.use(errorHandler);
 
 export default app;

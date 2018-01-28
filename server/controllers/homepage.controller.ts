@@ -1,12 +1,9 @@
 import { Request, Response } from "express";
-import { clientService } from "../services";
 
 export const homepageController = {
 
     // GET
     getHomepage: async (req: Request, res: Response) => {
-        const clients = await clientService.getAll();
-
         const testUrl = req.protocol + "://" + req.get("host");
 
         // https://stackoverflow.com/a/10849772
@@ -18,7 +15,7 @@ export const homepageController = {
         ip["req-socket-remoteAddress"] = req.socket && req.socket.remoteAddress;
         ip["user-agent"] = req.headers["user-agent"];
 
-        res.render("homepage", { clients, testUrl, ip });
+        res.render("homepage", { testUrl, ip });
     },
 
 };
