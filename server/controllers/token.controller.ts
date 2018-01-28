@@ -41,7 +41,7 @@ export const tokenController = {
             clientSecret = req.body.client_secret;
         }
 
-        const client = await clientService.getClient(clientId, tenantCode);
+        const client = await clientService.getByCode(clientId, tenantCode);
         if (!client) {
             console.log("Unknown client %s", clientId);
             res.status(401).json({ error: "invalid_client" });
@@ -196,7 +196,7 @@ export const tokenController = {
             clientSecret = req.body.client_secret;
         }
 
-        const client = await clientService.getClient(clientId, tenantCode);
+        const client = await clientService.getByCode(clientId, tenantCode);
         if (!client) {
             console.log("Unknown client %s", clientId);
             res.status(401).json({ error: "invalid_client" });

@@ -21,7 +21,7 @@ export const authorizeController = {
             return;
         }
 
-        const client: IClient = await clientService.getClient(reqClientId, tenantCode);
+        const client: IClient = await clientService.getByCode(reqClientId, tenantCode);
 
         // accepted values
         const accRedirectUris: string[] = client.redirect_uris;

@@ -3,18 +3,8 @@ import { IClient } from "@interfaces";
 
 export const clientService = {
 
-    getAll: async (): Promise<IClient[]> => {
-        const clients = await clientData.getAll();
-        return(clients);
-    },
-
-    // getById: async (id: string) => {
-    //     const client = await clientDal.getById(id);
-    //     return(client);
-    // },
-
-    getClient: async (id: string, tenantCode: string): Promise<IClient> => {
-        const client: IClient = await clientData.getClient(id, tenantCode);
+    getByCode: async (clientCode: string, tenantCode: string): Promise<IClient> => {
+        const client: IClient = await clientData.getByCode(clientCode, tenantCode);
         return(client);
     },
 

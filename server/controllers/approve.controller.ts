@@ -71,7 +71,7 @@ export const approveController = {
 
                 const scopes = getScopesFromForm(req.body);
 
-                const client = await clientService.getClient(query.client_id, tenantCode);
+                const client = await clientService.getByCode(query.client_id, tenantCode);
                 const cscope = client.scope ? client.scope.split(" ") : [];
                 // _.difference([2, 1], [2, 3]); => [1]
                 if (_.difference(scopes, cscope).length > 0) {
