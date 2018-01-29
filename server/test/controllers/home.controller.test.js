@@ -12,17 +12,19 @@ const sinon = require("sinon");
 const controllers_1 = require("../../controllers");
 let req;
 let res;
+let next;
 describe("home Controller", () => {
     beforeEach(() => {
         req = {};
         res = {
             send: sinon.spy(),
         };
+        next = () => undefined;
     });
     describe("getHomePage", () => {
         it("should successful retrieve", () => __awaiter(this, void 0, void 0, function* () {
             const expectedData = [{ name: "aaa" }];
-            yield controllers_1.homeController.getHomePage(req, res);
+            yield controllers_1.homeController.getHomePage(req, res, next);
             sinon.assert.calledWith(res.send, "Hello Identity Service for noApp (noEnv)");
         }));
     });

@@ -12,17 +12,19 @@ const sinon = require("sinon");
 const controllers_1 = require("../../controllers");
 let req;
 let res;
+let next;
 describe("contact Controller", () => {
     beforeEach(() => {
         req = {};
         res = {
             send: sinon.spy(),
         };
+        next = () => undefined;
     });
     describe("getContactPage", () => {
         it("should successful retrieve", () => __awaiter(this, void 0, void 0, function* () {
             const expectedData = [{ name: "aaa" }];
-            yield controllers_1.contactController.getContactPage(req, res);
+            yield controllers_1.contactController.getContactPage(req, res, next);
             sinon.assert.calledWith(res.send, "Contact page for Identity Service");
         }));
     });

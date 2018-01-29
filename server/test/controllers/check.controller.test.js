@@ -12,6 +12,7 @@ const sinon = require("sinon");
 const controllers_1 = require("../../controllers");
 let req;
 let res;
+let next;
 describe("check Controller", () => {
     beforeEach(() => {
         req = {};
@@ -19,10 +20,11 @@ describe("check Controller", () => {
             send: sinon.spy(),
             json: sinon.spy(),
         };
+        next = () => undefined;
     });
     describe("getCheckPage", () => {
         it("should send json on successful retrieve", () => __awaiter(this, void 0, void 0, function* () {
-            yield controllers_1.checkController.getCheckPage(req, res);
+            yield controllers_1.checkController.getCheckPage(req, res, next);
             sinon.assert.calledWith(res.send, "identity-service-" + (process.env.DEPLOYMENT_SLOT || "noslot") + "-" + process.env.NODE_ENV);
         }));
     });

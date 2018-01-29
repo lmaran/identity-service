@@ -13,7 +13,7 @@ const randomstring = require("randomstring");
 const data_1 = require("../data");
 const services_1 = require("../services");
 const helpers_1 = require("../helpers");
-const application_error_1 = require("../errors/application.error");
+const err = require("../errors");
 exports.authorizeController = {
     getAuthorize: (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         try {
@@ -22,16 +22,16 @@ exports.authorizeController = {
             const reqScopes = req.query.scope ? req.query.scope.split(" ") : null;
             const tenantCode = req.tenantCode;
             if (!tenantCode) {
-                throw new application_error_1.ApplicationError("Missing tenant", 400);
+                throw new err.BadRequestError("Missing tenant");
             }
             const client = yield services_1.clientService.getByCode(reqClientId, tenantCode);
             const accRedirectUris = client.redirect_uris;
             const accScopes = client.scope ? client.scope.split(" ") : [];
             if (!client) {
-                throw new application_error_1.ApplicationError(`Unknown client: ${reqClientId}`, 400);
+                throw new err.ValidationError(`Unknown client: ${reqClientId}`);
             }
             else if (!_.includes(accRedirectUris, reqRedirectUri)) {
-                throw new application_error_1.ApplicationError(`Invalid redirect URI`, 400);
+                throw new err.ValidationError(`Invalid redirect URI`);
             }
             else {
                 if (_.difference(reqScopes, accScopes).length > 0) {

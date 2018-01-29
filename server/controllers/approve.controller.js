@@ -14,79 +14,82 @@ const crypto = require("crypto");
 const data_1 = require("../data");
 const services_1 = require("../services");
 const helpers_1 = require("../helpers");
+const err = require("../errors");
 exports.approveController = {
-    approve: (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const requestId = req.body.requestId;
-        const request = yield data_1.requestData.get(requestId);
-        const query = request.query;
-        data_1.requestData.delete(requestId);
-        let urlParsed;
-        if (!query) {
-            res.render("error", { error: "No matching authorization request" });
-            return;
-        }
-        if (req.body.approve) {
-            if (query.response_type === "code") {
-                const tenantCode = req.tenantCode;
-                if (!tenantCode) {
-                    console.log("Missing tenant");
-                    res.render("error", { error: "Missing tenant" });
-                    return;
-                }
-                const code = randomstring.generate(8);
-                const user = yield services_1.userService.getUserByEmail(req.body.email, tenantCode);
-                console.log(user);
-                if (!user) {
+    approve: (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+        try {
+            const requestId = req.body.requestId;
+            const request = yield data_1.requestData.get(requestId);
+            const query = request.query;
+            data_1.requestData.delete(requestId);
+            let urlParsed;
+            if (!query) {
+                throw new err.ValidationError("No matching authorization request");
+            }
+            if (req.body.approve) {
+                if (query.response_type === "code") {
+                    const tenantCode = req.tenantCode;
+                    if (!tenantCode) {
+                        throw new err.BadRequestError("Missing tenant");
+                    }
+                    const code = randomstring.generate(8);
+                    const user = yield services_1.userService.getUserByEmail(req.body.email, tenantCode);
+                    console.log(user);
+                    if (!user) {
+                        urlParsed = helpers_1.urlHelper.buildUrl(query.redirect_uri, {
+                            error: "user not found",
+                        }, null);
+                        res.redirect(urlParsed);
+                        return;
+                    }
+                    const persistedPassword = {
+                        salt: user.salt,
+                        hashedPassword: user.hashedPassword,
+                    };
+                    const pswMatch = helpers_1.passwordHelper.passwordMatch(persistedPassword, req.body.password);
+                    if (!pswMatch) {
+                        urlParsed = helpers_1.urlHelper.buildUrl(query.redirect_uri, {
+                            error: "incorrect password",
+                        }, null);
+                        res.redirect(urlParsed);
+                        return;
+                    }
+                    const scopes = getScopesFromForm(req.body);
+                    const client = yield services_1.clientService.getByCode(query.client_id, tenantCode);
+                    const cscope = client.scope ? client.scope.split(" ") : [];
+                    if (_.difference(scopes, cscope).length > 0) {
+                        urlParsed = helpers_1.urlHelper.buildUrl(query.redirect_uri, {
+                            error: "invalid_scope",
+                        }, null);
+                        res.redirect(urlParsed);
+                        return;
+                    }
+                    data_1.codeData.create({ code, request: query, scope: scopes, user });
                     urlParsed = helpers_1.urlHelper.buildUrl(query.redirect_uri, {
-                        error: "user not found",
+                        code,
+                        state: query.state,
                     }, null);
                     res.redirect(urlParsed);
                     return;
                 }
-                const persistedPassword = {
-                    salt: user.salt,
-                    hashedPassword: user.hashedPassword,
-                };
-                const pswMatch = helpers_1.passwordHelper.passwordMatch(persistedPassword, req.body.password);
-                if (!pswMatch) {
+                else {
                     urlParsed = helpers_1.urlHelper.buildUrl(query.redirect_uri, {
-                        error: "incorrect password",
+                        error: "unsupported_response_type",
                     }, null);
                     res.redirect(urlParsed);
                     return;
                 }
-                const scopes = getScopesFromForm(req.body);
-                const client = yield services_1.clientService.getByCode(query.client_id, tenantCode);
-                const cscope = client.scope ? client.scope.split(" ") : [];
-                if (_.difference(scopes, cscope).length > 0) {
-                    urlParsed = helpers_1.urlHelper.buildUrl(query.redirect_uri, {
-                        error: "invalid_scope",
-                    }, null);
-                    res.redirect(urlParsed);
-                    return;
-                }
-                data_1.codeData.create({ code, request: query, scope: scopes, user });
-                urlParsed = helpers_1.urlHelper.buildUrl(query.redirect_uri, {
-                    code,
-                    state: query.state,
-                }, null);
-                res.redirect(urlParsed);
-                return;
             }
             else {
                 urlParsed = helpers_1.urlHelper.buildUrl(query.redirect_uri, {
-                    error: "unsupported_response_type",
+                    error: "access_denied",
                 }, null);
                 res.redirect(urlParsed);
                 return;
             }
         }
-        else {
-            urlParsed = helpers_1.urlHelper.buildUrl(query.redirect_uri, {
-                error: "access_denied",
-            }, null);
-            res.redirect(urlParsed);
-            return;
+        catch (err) {
+            next(err);
         }
     }),
 };

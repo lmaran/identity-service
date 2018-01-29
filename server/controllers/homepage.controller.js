@@ -9,15 +9,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.homepageController = {
-    getHomepage: (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const testUrl = req.protocol + "://" + req.get("host");
-        const ip = {};
-        ip["x-forwarded-for"] = req.headers["x-forwarded-for"];
-        ip["req-ip"] = req.ip;
-        ip["req-ips"] = req.ips;
-        ip["req-connection-remoteAddress"] = req.connection && req.connection.remoteAddress;
-        ip["req-socket-remoteAddress"] = req.socket && req.socket.remoteAddress;
-        ip["user-agent"] = req.headers["user-agent"];
-        res.render("homepage", { testUrl, ip });
+    getHomepage: (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+        try {
+            const testUrl = req.protocol + "://" + req.get("host");
+            const ip = {};
+            ip["x-forwarded-for"] = req.headers["x-forwarded-for"];
+            ip["req-ip"] = req.ip;
+            ip["req-ips"] = req.ips;
+            ip["req-connection-remoteAddress"] = req.connection && req.connection.remoteAddress;
+            ip["req-socket-remoteAddress"] = req.socket && req.socket.remoteAddress;
+            ip["user-agent"] = req.headers["user-agent"];
+            res.render("homepage", { testUrl, ip });
+        }
+        catch (err) {
+            next(err);
+        }
     }),
 };

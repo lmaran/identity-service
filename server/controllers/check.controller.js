@@ -9,7 +9,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.checkController = {
-    getCheckPage: (req, res) => __awaiter(this, void 0, void 0, function* () {
-        res.send("identity-service-" + (process.env.DEPLOYMENT_SLOT || "noslot") + "-" + process.env.NODE_ENV);
+    getCheckPage: (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+        try {
+            res.send("identity-service-" + (process.env.DEPLOYMENT_SLOT || "noslot") + "-" + process.env.NODE_ENV);
+        }
+        catch (err) {
+            next(err);
+        }
     }),
 };
