@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import * as _ from "lodash";
+// import * as err from "../errors";
 
 export const userinfoController = {
 
@@ -15,6 +16,7 @@ export const userinfoController = {
             if (!user) {
                 res.status(404).end();
                 return;
+                // throw new err.NotFoundError("User not found");
             }
 
             const out = {};

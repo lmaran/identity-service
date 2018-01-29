@@ -5,7 +5,7 @@ import { IClient } from "@interfaces";
 import { requestData } from "../data";
 import { clientService } from "../services";
 import { urlHelper } from "../helpers";
-import { ApplicationError } from "../errors/application.error";
+import * as err from "../errors";
 
 export const authorizeController = {
 
@@ -20,7 +20,7 @@ export const authorizeController = {
             const tenantCode = req.tenantCode;
 
             if (!tenantCode) {
-                throw new ApplicationError("Missing tenant", 400);
+                throw new err.BadRequestError("Missing tenant");
             }
 
             const client: IClient = await clientService.getByCode(reqClientId, tenantCode);
@@ -30,12 +30,12 @@ export const authorizeController = {
             const accScopes = client.scope ? client.scope.split(" ") : [];
 
             if (!client) {
-                throw new ApplicationError(`Unknown client: ${reqClientId}`, 400);
+                throw new err.ValidationError(`Unknown client: ${reqClientId}`);
             } else if (!_.includes(accRedirectUris, reqRedirectUri)) {
                 // console.log("Mismatched redirect URI, expected %s got %s", accRedirectUris, reqRedirectUri);
                 // res.render("error", { error: "Invalid redirect URI" });
                 // return;
-                throw new ApplicationError(`Invalid redirect URI`, 400);
+                throw new err.ValidationError(`Invalid redirect URI`);
             } else {
                 // _.difference([2, 1], [2, 3]); => [1]
                 if (_.difference(reqScopes, accScopes).length > 0) {

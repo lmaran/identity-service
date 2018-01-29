@@ -7,6 +7,7 @@ import { IClient, IUser, IPersistedPassword } from "@interfaces";
 import { requestData, codeData } from "../data";
 import { clientService, userService } from "../services";
 import { urlHelper, passwordHelper } from "../helpers";
+import * as err from "../errors";
 
 export const approveController = {
 
@@ -21,9 +22,10 @@ export const approveController = {
             let urlParsed;
 
             if (!query) {
-                // there was no matching saved request, this is an error
-                res.render("error", { error: "No matching authorization request" });
-                return;
+                // // there was no matching saved request, this is an error
+                // res.render("error", { error: "No matching authorization request" });
+                // return;
+                throw new err.ValidationError("No matching authorization request");
             }
 
             if (req.body.approve) {
@@ -31,9 +33,10 @@ export const approveController = {
 
                     const tenantCode = req.tenantCode;
                     if (!tenantCode) {
-                        console.log("Missing tenant");
-                        res.render("error", { error: "Missing tenant" });
-                        return;
+                        // console.log("Missing tenant");
+                        // res.render("error", { error: "Missing tenant" });
+                        // return;
+                        throw new err.BadRequestError("Missing tenant");
                     }
 
                     // user approved access
