@@ -6,5 +6,6 @@ const config = {
         uri: "mongodb://localhost",
         dbName: "identity-service-dev",
     },
+    rollbarToken: "<RollbarToken>",
 };
 exports.default = config;

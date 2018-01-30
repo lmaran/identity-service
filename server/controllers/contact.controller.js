@@ -11,7 +11,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.contactController = {
     getContactPage: (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         try {
-            res.send("Contact page for Identity Service");
+            throw new Error("test1");
         }
         catch (err) {
             next(err);

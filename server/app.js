@@ -30,5 +30,5 @@ app.set("view engine", ".hbs");
 app.set("views", path.join(__dirname, "/views/"));
 app.use("/", express.static("server/views"));
 app.use(routes_1.default);
-app.use(middlewares_1.errorHandler);
+app.use(middlewares_1.errorLogHandler);
 exports.default = app;
