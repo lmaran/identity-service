@@ -1,3 +1,4 @@
 export * from "./token.middleware";
 export * from "./tenant.middleware";
-export * from "./errorHandler.middleware";
+export * from "./errorLogHandler.middleware";
+// export * from "./httpLogHandler.middleware";

@@ -15,6 +15,7 @@ const config: IEnvConfig = {
         key: process.env.AZURE_BLOB_STORAGE_COOL_ACCESS_KEY,
     },
     authRootUrl: process.env.AUTH_ROOT_URL,
+    rollbarToken: process.env.ROLLBAR_TOKEN,
 };
 
 export default config;

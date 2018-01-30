@@ -4,7 +4,8 @@ export const contactController = {
 
     getContactPage: async (req: Request, res: Response, next: NextFunction) => {
         try {
-            res.send("Contact page for Identity Service");
+            throw new Error("test1");
+            // res.send("Contact page for Identity Service");
         } catch (err) {
             next(err);
         }

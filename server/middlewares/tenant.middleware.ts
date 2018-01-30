@@ -1,7 +1,7 @@
 import * as _ from "lodash";
 import { tokenService } from "../services";
 
-export const getTenant = (req, res, next) => {
+export const getTenant = async (req, res, next) => {
     // Host: "http://cantinas.dev.identity.appstudio.ro/"
     // => subdomains = ["identity", "dev", "cantinas"]
     // => tenantCode = "cantinas"
