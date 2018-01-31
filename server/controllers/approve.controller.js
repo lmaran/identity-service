@@ -34,7 +34,6 @@ exports.approveController = {
                     }
                     const code = randomstring.generate(8);
                     const user = yield services_1.userService.getUserByEmail(req.body.email, tenantCode);
-                    console.log(user);
                     if (!user) {
                         urlParsed = helpers_1.urlHelper.buildUrl(query.redirect_uri, {
                             error: "user not found",

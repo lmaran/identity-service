@@ -19,14 +19,12 @@ exports.authorizeController = {
         try {
             const reqClientId = req.query.client_id;
             const reqRedirectUri = req.query.redirect_uri;
-            const reqScopes = req.query.scope ? req.query.scope.split(" ") : null;
             const tenantCode = req.tenantCode;
             if (!tenantCode) {
                 throw new err.BadRequestError("Missing tenant");
             }
             const client = yield services_1.clientService.getByCode(reqClientId, tenantCode);
             const accRedirectUris = client.redirect_uris;
-            const accScopes = client.scope ? client.scope.split(" ") : [];
             if (!client) {
                 throw new err.ValidationError(`Unknown client: ${reqClientId}`);
             }
@@ -34,6 +32,8 @@ exports.authorizeController = {
                 throw new err.ValidationError(`Invalid redirect URI`);
             }
             else {
+                const reqScopes = req.query.scope ? req.query.scope.split(" ") : null;
+                const accScopes = client.scope ? client.scope.split(" ") : [];
                 if (_.difference(reqScopes, accScopes).length > 0) {
                     const urlParsed = helpers_1.urlHelper.buildUrl(reqRedirectUri, {
                         error: "invalid_scope",
