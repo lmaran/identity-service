@@ -11,6 +11,8 @@
 
     // all these errors are finally caught by an errorHandler middleware
 
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error
+    // https://stackoverflow.com/a/32749533
     export class ApplicationError extends Error {
     private status: any;
     constructor(message, status) {

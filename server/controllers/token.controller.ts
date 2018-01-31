@@ -5,6 +5,7 @@ import * as randomstring from "randomstring";
 import * as jose from "jsrsasign";
 import { clientService, tokenService } from "../services";
 import { codeData } from "../data";
+import { OAuthTokenError } from "../constants";
 
 export const tokenController = {
 
@@ -34,7 +35,7 @@ export const tokenController = {
                 if (clientId) {
                     // if we've already seen the client's credentials in the authorization header, this is an error
                     console.log("Client attempted to authenticate with multiple methods");
-                    res.status(401).json({ error: "invalid_client" });
+                    res.status(401).json({ error: OAuthTokenError.INVALID_CLIENT });
                     return;
                 }
 
@@ -45,13 +46,13 @@ export const tokenController = {
             const client = await clientService.getByCode(clientId, tenantCode);
             if (!client) {
                 console.log("Unknown client %s", clientId);
-                res.status(401).json({ error: "invalid_client" });
+                res.status(401).json({ error: OAuthTokenError.INVALID_CLIENT });
                 return;
             }
 
             if (client.client_secret !== clientSecret) {
                 console.log("Mismatched client secret, expected %s got %s", client.client_secret, clientSecret);
-                res.status(401).json({ error: "invalid_client" });
+                res.status(401).json({ error: OAuthTokenError.INVALID_CLIENT });
                 return;
             }
 
@@ -160,7 +161,7 @@ export const tokenController = {
                 }
             } else {
                 console.log("Unknown grant type %s", req.body.grant_type);
-                res.status(400).json({ error: "unsupported_grant_type" });
+                res.status(400).json({ error: OAuthTokenError.UNSUPPORTED_GRANT_TYPE });
             }
         } catch (err) {
             next(err);
@@ -192,7 +193,7 @@ export const tokenController = {
                 if (clientId) {
                     // if we've already seen the client's credentials in the authorization header, this is an error
                     console.log("Client attempted to authenticate with multiple methods");
-                    res.status(401).json({ error: "invalid_client" });
+                    res.status(401).json({ error: OAuthTokenError.INVALID_CLIENT });
                     return;
                 }
 
@@ -203,13 +204,13 @@ export const tokenController = {
             const client = await clientService.getByCode(clientId, tenantCode);
             if (!client) {
                 console.log("Unknown client %s", clientId);
-                res.status(401).json({ error: "invalid_client" });
+                res.status(401).json({ error: OAuthTokenError.INVALID_CLIENT });
                 return;
             }
 
             if (client.client_secret !== clientSecret) {
                 console.log("Mismatched client secret, expected %s got %s", client.client_secret, clientSecret);
-                res.status(401).json({ error: "invalid_client" });
+                res.status(401).json({ error: OAuthTokenError.INVALID_CLIENT });
                 return;
             }
 

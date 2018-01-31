@@ -8,6 +8,7 @@ import { requestData, codeData } from "../data";
 import { clientService, userService } from "../services";
 import { urlHelper, passwordHelper } from "../helpers";
 import * as err from "../errors";
+import { OAuthAuthorizationError } from "../constants";
 
 export const approveController = {
 
@@ -42,11 +43,7 @@ export const approveController = {
                     // user approved access
                     const code = randomstring.generate(8);
 
-                    // const user = await userService.getUser(req.body.user);
                     const user = await userService.getUserByEmail(req.body.email, tenantCode);
-
-                    console.log(user);
-
                     if (!user) {
                         // client asked for a scope it couldn't have
                         urlParsed = urlHelper.buildUrl(query.redirect_uri, {
@@ -81,7 +78,7 @@ export const approveController = {
                     if (_.difference(scopes, cscope).length > 0) {
                         // client asked for a scope it couldn't have
                         urlParsed = urlHelper.buildUrl(query.redirect_uri, {
-                            error: "invalid_scope",
+                            error: OAuthAuthorizationError.INVALID_SCOPE,
                         }, null);
                         res.redirect(urlParsed);
                         return;
@@ -99,7 +96,7 @@ export const approveController = {
                 } else {
                     // we got a response type we don't understand
                     urlParsed = urlHelper.buildUrl(query.redirect_uri, {
-                        error: "unsupported_response_type",
+                        error: OAuthAuthorizationError.UNSUPPORTED_RESPONSE_TYPE,
                     }, null);
                     res.redirect(urlParsed);
                     return;
@@ -107,7 +104,7 @@ export const approveController = {
             } else {
                 // user denied access
                 urlParsed = urlHelper.buildUrl(query.redirect_uri, {
-                    error: "access_denied",
+                    error: OAuthAuthorizationError.ACCESS_DENIED,
                 }, null);
                 res.redirect(urlParsed);
                 return;
