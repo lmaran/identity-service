@@ -28,24 +28,22 @@ exports.authorizeController = {
             if (!client) {
                 throw new err.ValidationError(`Unknown client: ${reqClientId}`);
             }
-            else if (!_.includes(accRedirectUris, reqRedirectUri)) {
+            if (!_.includes(accRedirectUris, reqRedirectUri)) {
                 throw new err.ValidationError(`Invalid redirect URI`);
             }
-            else {
-                const reqScopes = req.query.scope ? req.query.scope.split(" ") : null;
-                const accScopes = client.scope ? client.scope.split(" ") : [];
-                if (_.difference(reqScopes, accScopes).length > 0) {
-                    const urlParsed = helpers_1.urlHelper.buildUrl(reqRedirectUri, {
-                        error: "invalid_scope",
-                    }, null);
-                    res.redirect(urlParsed);
-                    return;
-                }
-                const requestId = randomstring.generate(8);
-                data_1.requestData.create({ requestId, query: req.query });
-                res.render("approve", { client, requestId, scopes: reqScopes, tenantCode });
+            const reqScopes = req.query.scope ? req.query.scope.split(" ") : null;
+            const accScopes = client.scope ? client.scope.split(" ") : [];
+            if (_.difference(reqScopes, accScopes).length > 0) {
+                const urlParsed = helpers_1.urlHelper.buildUrl(reqRedirectUri, {
+                    error: "invalid_scope",
+                }, null);
+                res.redirect(urlParsed);
                 return;
             }
+            const requestId = randomstring.generate(8);
+            data_1.requestData.create({ requestId, query: req.query });
+            res.render("approve", { client, requestId, scopes: reqScopes, tenantCode });
+            return;
         }
         catch (err) {
             next(err);
