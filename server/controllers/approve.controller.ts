@@ -29,79 +29,7 @@ export const approveController = {
                 throw new err.ValidationError("No matching authorization request");
             }
 
-            if (req.body.approve) {
-                if (query.response_type === "code") {
-
-                    const tenantCode = req.tenantCode;
-                    if (!tenantCode) {
-                        // console.log("Missing tenant");
-                        // res.render("error", { error: "Missing tenant" });
-                        // return;
-                        throw new err.BadRequestError("Missing tenant");
-                    }
-
-                    // user approved access
-                    const code = randomstring.generate(8);
-
-                    const user = await userService.getUserByEmail(req.body.email, tenantCode);
-                    if (!user) {
-                        // client asked for a scope it couldn't have
-                        urlParsed = urlHelper.buildUrl(query.redirect_uri, {
-                            error: "user not found",
-                        }, null);
-                        res.redirect(urlParsed);
-                        return;
-                    }
-
-                    const persistedPassword = {
-                        salt: user.salt,
-                        hashedPassword: user.hashedPassword,
-                    };
-
-                    const pswMatch = passwordHelper.passwordMatch(persistedPassword, req.body.password);
-                    // const isPswCorrect = pswMatch(req.body.password, user.hashedPassword, user.salt);
-
-                    if (!pswMatch) {
-                        // client asked for a scope it couldn't have
-                        urlParsed = urlHelper.buildUrl(query.redirect_uri, {
-                            error: "incorrect password",
-                        }, null);
-                        res.redirect(urlParsed);
-                        return;
-                    }
-
-                    const scopes = getScopesFromForm(req.body);
-
-                    const client = await clientService.getByCode(query.client_id, tenantCode);
-                    const cscope = client.scope ? client.scope.split(" ") : [];
-                    // _.difference([2, 1], [2, 3]); => [1]
-                    if (_.difference(scopes, cscope).length > 0) {
-                        // client asked for a scope it couldn't have
-                        urlParsed = urlHelper.buildUrl(query.redirect_uri, {
-                            error: OAuthAuthorizationError.INVALID_SCOPE,
-                        }, null);
-                        res.redirect(urlParsed);
-                        return;
-                    }
-
-                    // save the code and request for later
-                    codeData.create({ code, request: query, scope: scopes, user }); // don't have to wait to complete
-
-                    urlParsed = urlHelper.buildUrl(query.redirect_uri, {
-                        code,
-                        state: query.state,
-                    }, null);
-                    res.redirect(urlParsed);
-                    return;
-                } else {
-                    // we got a response type we don't understand
-                    urlParsed = urlHelper.buildUrl(query.redirect_uri, {
-                        error: OAuthAuthorizationError.UNSUPPORTED_RESPONSE_TYPE,
-                    }, null);
-                    res.redirect(urlParsed);
-                    return;
-                }
-            } else {
+            if (!req.body.approve) {
                 // user denied access
                 urlParsed = urlHelper.buildUrl(query.redirect_uri, {
                     error: OAuthAuthorizationError.ACCESS_DENIED,
@@ -109,10 +37,80 @@ export const approveController = {
                 res.redirect(urlParsed);
                 return;
             }
+
+            if (query.response_type !== "code") {
+                // we got a response type we don't understand
+                urlParsed = urlHelper.buildUrl(query.redirect_uri, {
+                    error: OAuthAuthorizationError.UNSUPPORTED_RESPONSE_TYPE,
+                }, null);
+                res.redirect(urlParsed);
+                return;
+            }
+
+            const tenantCode = req.tenantCode;
+            if (!tenantCode) {
+                // console.log("Missing tenant");
+                // res.render("error", { error: "Missing tenant" });
+                // return;
+                throw new err.BadRequestError("Missing tenant");
+            }
+
+            // user approved access
+            const code = randomstring.generate(8);
+
+            const user = await userService.getUserByEmail(req.body.email, tenantCode);
+            if (!user) {
+                urlParsed = urlHelper.buildUrl(query.redirect_uri, {
+                    error: "user not found",
+                }, null);
+                res.redirect(urlParsed);
+                return;
+            }
+
+            const persistedPassword = {
+                salt: user.salt,
+                hashedPassword: user.hashedPassword,
+            };
+
+            const pswMatch = passwordHelper.passwordMatch(persistedPassword, req.body.password);
+            // const isPswCorrect = pswMatch(req.body.password, user.hashedPassword, user.salt);
+
+            if (!pswMatch) {
+                urlParsed = urlHelper.buildUrl(query.redirect_uri, {
+                    error: "incorrect password",
+                }, null);
+                res.redirect(urlParsed);
+                return;
+            }
+
+            const scopes = getScopesFromForm(req.body);
+
+            const client = await clientService.getByCode(query.client_id, tenantCode);
+            const cscope = client.scope ? client.scope.split(" ") : [];
+            // _.difference([2, 1], [2, 3]); => [1]
+            if (_.difference(scopes, cscope).length > 0) {
+                // client asked for a scope it couldn't have
+                urlParsed = urlHelper.buildUrl(query.redirect_uri, {
+                    error: OAuthAuthorizationError.INVALID_SCOPE,
+                }, null);
+                res.redirect(urlParsed);
+                return;
+            }
+
+            // save the code and request for later
+            codeData.create({ code, request: query, scope: scopes, user }); // don't have to wait to complete
+
+            urlParsed = urlHelper.buildUrl(query.redirect_uri, {
+                code,
+                state: query.state,
+            }, null);
+            res.redirect(urlParsed);
+            return;
+
         } catch (err) {
-            next(err);
-        }
-    },
+        next(err);
+    }
+},
 
 };
 
