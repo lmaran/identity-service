@@ -31,6 +31,8 @@
 // }
 
 import { ApplicationError } from "./application.error";
+import { ReturnAs } from "../constants";
+import { IErrorOptions } from "@interfaces";
 
 // https://www.quora.com/Which-HTTP-code-is-best-suited-for-validation-errors-400-or-422
 // ex: http:localhost:8080/getDetails?user_id=12345
@@ -39,21 +41,23 @@ import { ApplicationError } from "./application.error";
 // ex: you do not provide the user_id
 export class BadRequestError extends ApplicationError {
     constructor(message) {
-        super(message || "Sintaxa gresita.", 400);
+        super(400, message || "Sintaxa gresita.");
     }
 }
 
 // Use 422 (Unprocessable Entity) if the query is well formatted but semantically incorrect
 // ex: you provide the user_id but it's not valid i.e a -43.67
 export class ValidationError extends ApplicationError {
-    constructor(message) {
-        super(message || "Resursa negasita.", 422);
+//    constructor(message);
+
+    constructor(message, errorOptions?: IErrorOptions) {
+        super(400, message || "Eroare de validare.", errorOptions);
     }
 }
 
-// Use 400 (NotFound) if the resource you address in URL is not found
+// Use 404 (NotFound) if the resource you address in URL is not found
 export class NotFoundError extends ApplicationError {
     constructor(message) {
-        super(message || "Resursa negasita.", 404);
+        super(404, message || "Resursa negasita.");
     }
 }

@@ -27,3 +27,14 @@ export const enum OAuthTokenError {
     UNSUPPORTED_GRANT_TYPE = "unsupported_grant_type",
     INVALID_SCOPE = "invalid_scope",
 }
+
+export const enum AppError {
+    INVALID_REQUEST = "invalid_request",
+
+}
+
+export const enum ReturnAs {
+    RENDER = "render",
+    JSON = "json",
+    REDIRECT = "redirect",
+}

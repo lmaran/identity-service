@@ -2,7 +2,7 @@ import * as express from "express";
 import * as path from "path";
 import * as favicon from "serve-favicon";
 import allRoutes from "./routes";
-import { getTenant, errorLogHandler } from "./middlewares";
+import { getTenant, errorLogHandler, catch404 } from "./middlewares";
 
 import * as url from "url";
 import * as bodyParser from "body-parser";
@@ -17,7 +17,7 @@ app.enable("trust proxy"); // allow express to set req.ip
 // view engine setup
 app.set("view engine", ".hbs");
 app.set("views", path.join(__dirname, "/views"));
-app.engine(".hbs", exphbs({
+app.engine(".hbs", exphbs ({
     defaultLayout: "main",
     extname: ".hbs",
     layoutsDir: path.join(__dirname, "/views/layouts/"),
@@ -27,7 +27,7 @@ app.engine(".hbs", exphbs({
     // http://stackoverflow.com/a/25307270, http://stackoverflow.com/a/21740214
     helpers: {
         // tslint:disable-next-line:object-literal-shorthand
-        section: function (this: any, name, options) {
+        section: function(this: any, name, options) {
             if (!this._sections) { this._sections = {}; }
             this._sections[name] = options.fn(this);
             return null;
@@ -45,24 +45,10 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(getTenant); // adds req.tokenCode property
 
 app.use(allRoutes);
-// app.use(errorLogHandler);
 
 // catch 404 and forward to error handler
-app.use((req, res, next) => {
-    const err: any = new Error("Not Found");
-    err.status = 404;
-    next(err);
-});
+app.use(catch404);
 
-// error handler
-app.use((err, req, res, next) => {
-    // set locals, only providing error in development
-    res.locals.message = err.message;
-    res.locals.error = req.app.get("env") === "development" ? err : {};
-
-    // render the error page
-    res.status(err.status || 500);
-    res.render("error");
-});
+app.use(errorLogHandler);
 
 export default app;

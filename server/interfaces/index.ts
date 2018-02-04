@@ -54,3 +54,9 @@ export interface IPersistedPassword {
     salt: string;
     hashedPassword: string;
 }
+
+export interface IErrorOptions {
+    developerMessage?: string;
+    returnAs?: any;
+    redirectUri?: string;
+}

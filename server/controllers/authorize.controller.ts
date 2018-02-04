@@ -6,7 +6,7 @@ import { requestData } from "../data";
 import { clientService } from "../services";
 import { urlHelper } from "../helpers";
 import * as err from "../errors";
-import { OAuthAuthorizationError } from "../constants";
+import { OAuthAuthorizationError, ReturnAs } from "../constants";
 
 export const authorizeController = {
 
@@ -38,14 +38,20 @@ export const authorizeController = {
             if (!client) {
                 // console.log('Unknown client %s', req.query.client_id);
                 // res.render('error', {error: 'Unknown client'});
-                throw new err.ValidationError(`Unknown client: ${reqClientId}`);
+                throw new err.ValidationError(`Unknown client`, {
+                    developerMessage: `Unknown client ${req.query.client_id}`,
+                    returnAs: ReturnAs.RENDER,
+                });
             }
 
             if (!_.includes(accRedirectUris, reqRedirectUri)) {
                 // console.log("Mismatched redirect URI, expected %s got %s", accRedirectUris, reqRedirectUri);
                 // res.render("error", { error: "Invalid redirect URI" });
                 // return;
-                throw new err.ValidationError(`Invalid redirect URI`);
+                throw new err.ValidationError(`Invalid redirect URI`, {
+                    developerMessage: `Mismatched redirect URI, expected ${accRedirectUris} got ${reqRedirectUri}`,
+                    returnAs: ReturnAs.RENDER,
+                });
             }
 
             // If the resource owner denies the access request or if the request
@@ -59,11 +65,16 @@ export const authorizeController = {
             // _.difference([2, 1], [2, 3]); => [1]
             if (_.difference(reqScopes, accScopes).length > 0) {
                 // client asked for a scope it couldn't have
-                const urlParsed = urlHelper.buildUrl(reqRedirectUri, {
-                    error: OAuthAuthorizationError.INVALID_SCOPE,
-                }, null);
-                res.redirect(urlParsed);
-                return;
+                // const urlParsed = urlHelper.buildUrl(reqRedirectUri, {
+                //     error: OAuthAuthorizationError.INVALID_SCOPE,
+                // }, null);
+                // res.redirect(urlParsed);
+                // return;
+                throw new err.ValidationError(OAuthAuthorizationError.INVALID_SCOPE, {
+                    developerMessage: `client asked for a scope it couldn't have`,
+                    returnAs: ReturnAs.REDIRECT,
+                    redirectUri: reqRedirectUri,
+                });
             }
 
             const requestId = randomstring.generate(8);

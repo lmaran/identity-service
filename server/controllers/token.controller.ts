@@ -5,7 +5,8 @@ import * as randomstring from "randomstring";
 import * as jose from "jsrsasign";
 import { clientService, tokenService } from "../services";
 import { codeData } from "../data";
-import { OAuthTokenError } from "../constants";
+import * as err from "../errors";
+import { OAuthTokenError, ReturnAs } from "../constants";
 
 export const tokenController = {
 
@@ -18,9 +19,13 @@ export const tokenController = {
 
             const tenantCode = req.tenantCode;
             if (!tenantCode) {
-                console.log("Missing tenant");
-                res.render("error", { error: "Missing tenant" });
-                return;
+                // console.log("Missing tenant");
+                // res.render("error", { error: "Missing tenant" });
+                // return;
+                throw new err.ValidationError("Missing tenant", {
+                    developerMessage: `There was no tenant code`,
+                    returnAs: ReturnAs.RENDER,
+                });
             }
 
             if (auth) {
@@ -130,12 +135,12 @@ export const tokenController = {
                         return;
                     } else {
                         console.log("Client mismatch, expected %s got %s", code.request.client_id, clientId);
-                        res.status(400).json({ error: "invalid_grant" });
+                        res.status(400).json({ error: OAuthTokenError.INVALID_GRANT });
                         return;
                     }
                 } else {
                     console.log("Unknown code, %s", req.body.code);
-                    res.status(400).json({ error: "invalid_grant" });
+                    res.status(400).json({ error: OAuthTokenError.INVALID_GRANT });
                     return;
                 }
             } else if (req.body.grant_type === "refresh_token") {
@@ -145,7 +150,7 @@ export const tokenController = {
                     if (token.client_id !== clientId) {
                         const count = await tokenService.deleteRefreshToken(req.body.refresh_token);
 
-                        res.status(400).json({ error: "invalid_grant" });
+                        res.status(400).json({ error: OAuthTokenError.INVALID_GRANT });
                         return;
                     }
                     const access_token = randomstring.generate();
@@ -156,7 +161,7 @@ export const tokenController = {
                     return;
                 } else {
                     console.log("No matching token was found.");
-                    res.status(400).json({ error: "invalid_grant" });
+                    res.status(400).json({ error: OAuthTokenError.INVALID_GRANT });
                     return;
                 }
             } else {

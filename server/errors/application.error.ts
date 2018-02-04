@@ -13,17 +13,23 @@
 
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error
     // https://stackoverflow.com/a/32749533
-    export class ApplicationError extends Error {
-    private status: any;
-    constructor(message, status) {
-        super();
+    // https://www.loggly.com/blog/node-js-error-handling/
 
-        Error.captureStackTrace(this, this.constructor);
+import { IErrorOptions } from "@interfaces";
 
+export class ApplicationError extends Error {
+    public requestId?: string;
+    public status: any;
+    public errorOptions?: IErrorOptions;
+
+    constructor(status: number, message: string, errorOptions?: IErrorOptions) {
+        super(message || "Something went wrong. Please try again.");
         this.name = this.constructor.name;
 
-        this.message = message || "Something went wrong. Please try again.";
-
         this.status = status || 500;
+        this.errorOptions = errorOptions;
+
+        // Capture the current stack trace and store it in the property "this.stack".
+        Error.captureStackTrace(this, this.constructor);
     }
 }

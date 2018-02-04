@@ -8,7 +8,7 @@ import { requestData, codeData } from "../data";
 import { clientService, userService } from "../services";
 import { urlHelper, passwordHelper } from "../helpers";
 import * as err from "../errors";
-import { OAuthAuthorizationError } from "../constants";
+import { OAuthAuthorizationError, ReturnAs } from "../constants";
 
 export const approveController = {
 
@@ -26,25 +26,38 @@ export const approveController = {
                 // // there was no matching saved request, this is an error
                 // res.render("error", { error: "No matching authorization request" });
                 // return;
-                throw new err.ValidationError("No matching authorization request");
+                throw new err.ValidationError("No matching authorization request", {
+                    developerMessage: `There was no matching saved request`,
+                    returnAs: ReturnAs.RENDER,
+                });
             }
 
             if (!req.body.approve) {
                 // user denied access
-                urlParsed = urlHelper.buildUrl(query.redirect_uri, {
-                    error: OAuthAuthorizationError.ACCESS_DENIED,
-                }, null);
-                res.redirect(urlParsed);
-                return;
+                // urlParsed = urlHelper.buildUrl(query.redirect_uri, {
+                //     error: OAuthAuthorizationError.ACCESS_DENIED,
+                // }, null);
+                // res.redirect(urlParsed);
+                // return;
+                throw new err.ValidationError(OAuthAuthorizationError.ACCESS_DENIED, {
+                    developerMessage: `"req.body.approve" is falsy`,
+                    returnAs: ReturnAs.REDIRECT,
+                    redirectUri: query.redirect_uri,
+                });
             }
 
             if (query.response_type !== "code") {
-                // we got a response type we don't understand
-                urlParsed = urlHelper.buildUrl(query.redirect_uri, {
-                    error: OAuthAuthorizationError.UNSUPPORTED_RESPONSE_TYPE,
-                }, null);
-                res.redirect(urlParsed);
-                return;
+                // // we got a response type we don't understand
+                // urlParsed = urlHelper.buildUrl(query.redirect_uri, {
+                //     error: OAuthAuthorizationError.UNSUPPORTED_RESPONSE_TYPE,
+                // }, null);
+                // res.redirect(urlParsed);
+                // return;
+                throw new err.ValidationError(OAuthAuthorizationError.UNSUPPORTED_RESPONSE_TYPE, {
+                    developerMessage: `query.response_type !== "code"`,
+                    returnAs: ReturnAs.REDIRECT,
+                    redirectUri: query.redirect_uri,
+                });
             }
 
             const tenantCode = req.tenantCode;
@@ -52,7 +65,10 @@ export const approveController = {
                 // console.log("Missing tenant");
                 // res.render("error", { error: "Missing tenant" });
                 // return;
-                throw new err.BadRequestError("Missing tenant");
+                throw new err.ValidationError("Missing tenant", {
+                    developerMessage: `There was no tenant code`,
+                    returnAs: ReturnAs.RENDER,
+                });
             }
 
             // user approved access
@@ -60,11 +76,16 @@ export const approveController = {
 
             const user = await userService.getUserByEmail(req.body.email, tenantCode);
             if (!user) {
-                urlParsed = urlHelper.buildUrl(query.redirect_uri, {
-                    error: "user not found",
-                }, null);
-                res.redirect(urlParsed);
-                return;
+                // urlParsed = urlHelper.buildUrl(query.redirect_uri, {
+                //     error: "user not found",
+                // }, null);
+                // res.redirect(urlParsed);
+                // return;
+                throw new err.ValidationError(`User not found`, {
+                    developerMessage: `user is falsy`,
+                    returnAs: ReturnAs.REDIRECT,
+                    redirectUri: query.redirect_uri,
+                });
             }
 
             const persistedPassword = {
@@ -76,11 +97,16 @@ export const approveController = {
             // const isPswCorrect = pswMatch(req.body.password, user.hashedPassword, user.salt);
 
             if (!pswMatch) {
-                urlParsed = urlHelper.buildUrl(query.redirect_uri, {
-                    error: "incorrect password",
-                }, null);
-                res.redirect(urlParsed);
-                return;
+                // urlParsed = urlHelper.buildUrl(query.redirect_uri, {
+                //     error: "incorrect password",
+                // }, null);
+                // res.redirect(urlParsed);
+                // return;
+                throw new err.ValidationError(`Incorrect password`, {
+                    developerMessage: `Passwords not match`,
+                    returnAs: ReturnAs.REDIRECT,
+                    redirectUri: query.redirect_uri,
+                });
             }
 
             const scopes = getScopesFromForm(req.body);
@@ -89,12 +115,17 @@ export const approveController = {
             const cscope = client.scope ? client.scope.split(" ") : [];
             // _.difference([2, 1], [2, 3]); => [1]
             if (_.difference(scopes, cscope).length > 0) {
-                // client asked for a scope it couldn't have
-                urlParsed = urlHelper.buildUrl(query.redirect_uri, {
-                    error: OAuthAuthorizationError.INVALID_SCOPE,
-                }, null);
-                res.redirect(urlParsed);
-                return;
+                // // client asked for a scope it couldn't have
+                // urlParsed = urlHelper.buildUrl(query.redirect_uri, {
+                //     error: OAuthAuthorizationError.INVALID_SCOPE,
+                // }, null);
+                // res.redirect(urlParsed);
+                // return;
+                throw new err.ValidationError(OAuthAuthorizationError.INVALID_SCOPE, {
+                    developerMessage: `Client asked for a scope it couldn't have`,
+                    returnAs: ReturnAs.REDIRECT,
+                    redirectUri: query.redirect_uri,
+                });
             }
 
             // save the code and request for later
