@@ -12,8 +12,8 @@ httpServer.on("close", onClose);
 httpServer.on("listening", onListening);
 
 function onError(error: any) {
-    console.log(error.syscall);
-    console.log(error.message);
+    // console.log(error.syscall);
+    // console.log(error.message);
     if (error.syscall !== "listen") {
         throw error;
     }
@@ -41,5 +41,3 @@ function onListening() {
 function onClose() {
     console.log("was closed");
 }
-
-// export default httpServer;
