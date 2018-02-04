@@ -12,7 +12,6 @@ const _ = require("lodash");
 const randomstring = require("randomstring");
 const data_1 = require("../data");
 const services_1 = require("../services");
-const helpers_1 = require("../helpers");
 const err = require("../errors");
 exports.authorizeController = {
     getAuthorize: (req, res, next) => __awaiter(this, void 0, void 0, function* () {
@@ -26,19 +25,25 @@ exports.authorizeController = {
             const client = yield services_1.clientService.getByCode(reqClientId, tenantCode);
             const accRedirectUris = client.redirect_uris;
             if (!client) {
-                throw new err.ValidationError(`Unknown client: ${reqClientId}`);
+                throw new err.ValidationError(`Unknown client`, {
+                    developerMessage: `Unknown client ${req.query.client_id}`,
+                    returnAs: "render",
+                });
             }
             if (!_.includes(accRedirectUris, reqRedirectUri)) {
-                throw new err.ValidationError(`Invalid redirect URI`);
+                throw new err.ValidationError(`Invalid redirect URI`, {
+                    developerMessage: `Mismatched redirect URI, expected ${accRedirectUris} got ${reqRedirectUri}`,
+                    returnAs: "render",
+                });
             }
             const reqScopes = req.query.scope ? req.query.scope.split(" ") : null;
             const accScopes = client.scope ? client.scope.split(" ") : [];
             if (_.difference(reqScopes, accScopes).length > 0) {
-                const urlParsed = helpers_1.urlHelper.buildUrl(reqRedirectUri, {
-                    error: "invalid_scope",
-                }, null);
-                res.redirect(urlParsed);
-                return;
+                throw new err.ValidationError("invalid_scope", {
+                    developerMessage: `client asked for a scope it couldn't have`,
+                    returnAs: "redirect",
+                    redirectUri: reqRedirectUri,
+                });
             }
             const requestId = randomstring.generate(8);
             data_1.requestData.create({ requestId, query: req.query });

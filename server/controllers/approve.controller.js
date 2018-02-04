@@ -24,34 +24,40 @@ exports.approveController = {
             data_1.requestData.delete(requestId);
             let urlParsed;
             if (!query) {
-                throw new err.ValidationError("No matching authorization request");
+                throw new err.ValidationError("No matching authorization request", {
+                    developerMessage: `There was no matching saved request`,
+                    returnAs: "render",
+                });
             }
             if (!req.body.approve) {
-                urlParsed = helpers_1.urlHelper.buildUrl(query.redirect_uri, {
-                    error: "access_denied",
-                }, null);
-                res.redirect(urlParsed);
-                return;
+                throw new err.ValidationError("access_denied", {
+                    developerMessage: `"req.body.approve" is falsy`,
+                    returnAs: "redirect",
+                    redirectUri: query.redirect_uri,
+                });
             }
             if (query.response_type !== "code") {
-                urlParsed = helpers_1.urlHelper.buildUrl(query.redirect_uri, {
-                    error: "unsupported_response_type",
-                }, null);
-                res.redirect(urlParsed);
-                return;
+                throw new err.ValidationError("unsupported_response_type", {
+                    developerMessage: `query.response_type !== "code"`,
+                    returnAs: "redirect",
+                    redirectUri: query.redirect_uri,
+                });
             }
             const tenantCode = req.tenantCode;
             if (!tenantCode) {
-                throw new err.BadRequestError("Missing tenant");
+                throw new err.ValidationError("Missing tenant", {
+                    developerMessage: `There was no tenant code`,
+                    returnAs: "render",
+                });
             }
             const code = randomstring.generate(8);
             const user = yield services_1.userService.getUserByEmail(req.body.email, tenantCode);
             if (!user) {
-                urlParsed = helpers_1.urlHelper.buildUrl(query.redirect_uri, {
-                    error: "user not found",
-                }, null);
-                res.redirect(urlParsed);
-                return;
+                throw new err.ValidationError(`User not found`, {
+                    developerMessage: `user is falsy`,
+                    returnAs: "redirect",
+                    redirectUri: query.redirect_uri,
+                });
             }
             const persistedPassword = {
                 salt: user.salt,
@@ -59,21 +65,21 @@ exports.approveController = {
             };
             const pswMatch = helpers_1.passwordHelper.passwordMatch(persistedPassword, req.body.password);
             if (!pswMatch) {
-                urlParsed = helpers_1.urlHelper.buildUrl(query.redirect_uri, {
-                    error: "incorrect password",
-                }, null);
-                res.redirect(urlParsed);
-                return;
+                throw new err.ValidationError(`Incorrect password`, {
+                    developerMessage: `Passwords not match`,
+                    returnAs: "redirect",
+                    redirectUri: query.redirect_uri,
+                });
             }
             const scopes = getScopesFromForm(req.body);
             const client = yield services_1.clientService.getByCode(query.client_id, tenantCode);
             const cscope = client.scope ? client.scope.split(" ") : [];
             if (_.difference(scopes, cscope).length > 0) {
-                urlParsed = helpers_1.urlHelper.buildUrl(query.redirect_uri, {
-                    error: "invalid_scope",
-                }, null);
-                res.redirect(urlParsed);
-                return;
+                throw new err.ValidationError("invalid_scope", {
+                    developerMessage: `Client asked for a scope it couldn't have`,
+                    returnAs: "redirect",
+                    redirectUri: query.redirect_uri,
+                });
             }
             data_1.codeData.create({ code, request: query, scope: scopes, user });
             urlParsed = helpers_1.urlHelper.buildUrl(query.redirect_uri, {

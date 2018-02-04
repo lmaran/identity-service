@@ -14,6 +14,7 @@ const randomstring = require("randomstring");
 const jose = require("jsrsasign");
 const services_1 = require("../services");
 const data_1 = require("../data");
+const err = require("../errors");
 exports.tokenController = {
     getToken: (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         try {
@@ -22,9 +23,10 @@ exports.tokenController = {
             let clientSecret;
             const tenantCode = req.tenantCode;
             if (!tenantCode) {
-                console.log("Missing tenant");
-                res.render("error", { error: "Missing tenant" });
-                return;
+                throw new err.ValidationError("Missing tenant", {
+                    developerMessage: `There was no tenant code`,
+                    returnAs: "render",
+                });
             }
             if (auth) {
                 const clientCredentials = decodeClientCredentials(auth);

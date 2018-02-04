@@ -32,15 +32,6 @@ app.use(favicon(path.join(__dirname, "public", "favicon.ico")));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(middlewares_1.getTenant);
 app.use(routes_1.default);
-app.use((req, res, next) => {
-    const err = new Error("Not Found");
-    err.status = 404;
-    next(err);
-});
-app.use((err, req, res, next) => {
-    res.locals.message = err.message;
-    res.locals.error = req.app.get("env") === "development" ? err : {};
-    res.status(err.status || 500);
-    res.render("error");
-});
+app.use(middlewares_1.catch404);
+app.use(middlewares_1.errorLogHandler);
 exports.default = app;
