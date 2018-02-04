@@ -10,8 +10,6 @@ httpServer.on("error", onError);
 httpServer.on("close", onClose);
 httpServer.on("listening", onListening);
 function onError(error) {
-    console.log(error.syscall);
-    console.log(error.message);
     if (error.syscall !== "listen") {
         throw error;
     }
