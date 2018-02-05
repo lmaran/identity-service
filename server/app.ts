@@ -2,7 +2,7 @@ import * as express from "express";
 import * as path from "path";
 import * as favicon from "serve-favicon";
 import allRoutes from "./routes";
-import { getTenant, errorLogHandler, catch404 } from "./middlewares";
+import { setContext, errorLogHandler, catch404 } from "./middlewares";
 
 import * as url from "url";
 import * as bodyParser from "body-parser";
@@ -42,7 +42,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // app.use("/", express.static("server/views"));
 
-app.use(getTenant); // adds req.tokenCode property
+app.use(setContext); // adds requestId, tokenCode and other properties to the request object
 
 app.use(allRoutes);
 

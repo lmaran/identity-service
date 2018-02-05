@@ -4,6 +4,7 @@ import { tokenService } from "../services";
 import { IContext } from "@interfaces";
 import { isContext } from "vm";
 import * as randomstring from "randomstring";
+import { urlHelper } from "../helpers";
 
 export const setContext = async (req: Request, res: Response, next: NextFunction) => {
 
@@ -11,16 +12,7 @@ export const setContext = async (req: Request, res: Response, next: NextFunction
     req.ctx.requestId = randomstring.generate(8);
 
     // 2. set tenantCode
-
-    // Host: "http://cantinas.dev.identity.appstudio.ro/"
-    // => subdomains = ["identity", "dev", "cantinas"]
-    // => tenantCode = "cantinas"
-    const subdomains = req.subdomains;
-    let tenantCode;
-    if (subdomains && subdomains.length > 0 ) {
-        tenantCode = _.last(subdomains);
-    }
-    req.ctx.tenantCode = tenantCode;
+    req.ctx.tenantCode = urlHelper.getTenantCode(req.subdomains);
 
     next();
 };
