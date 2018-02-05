@@ -43,7 +43,7 @@ exports.approveController = {
                     redirectUri: query.redirect_uri,
                 });
             }
-            const tenantCode = req.tenantCode;
+            const tenantCode = req.ctx.tenantCode;
             if (!tenantCode) {
                 throw new err.ValidationError("Missing tenant", {
                     developerMessage: `There was no tenant code`,

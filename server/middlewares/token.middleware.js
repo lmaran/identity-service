@@ -29,12 +29,12 @@ exports.getAccessToken = (req, res, next) => __awaiter(this, void 0, void 0, fun
     else {
         console.log("No matching token was found.");
     }
-    req.access_token = token;
+    req.ctx.accessToken = token;
     next();
     return;
 });
 exports.requireAccessToken = (req, res, next) => {
-    if (req.access_token) {
+    if (req.ctx.accessToken) {
         next();
     }
     else {

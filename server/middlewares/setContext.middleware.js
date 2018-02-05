@@ -9,7 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const _ = require("lodash");
-exports.getTenant = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+const randomstring = require("randomstring");
+exports.setContext = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+    req.ctx.requestId = randomstring.generate(8);
     const subdomains = req.subdomains;
     let tenantCode;
     if (subdomains && subdomains.length > 0) {

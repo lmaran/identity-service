@@ -12,17 +12,17 @@ const _ = require("lodash");
 exports.userinfoController = {
     getUserinfo: (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         try {
-            if (!_.includes(req.access_token.scope, "openid")) {
+            if (!_.includes(req.ctx.accessToken.scope, "openid")) {
                 res.status(403).end();
                 return;
             }
-            const user = req.access_token.user;
+            const user = req.ctx.accessToken.user;
             if (!user) {
                 res.status(404).end();
                 return;
             }
             const out = {};
-            _.each(req.access_token.scope, scope => {
+            _.each(req.ctx.accessToken.scope, scope => {
                 if (scope === "openid") {
                     _.each(["sub"], claim => {
                         if (user[claim]) {

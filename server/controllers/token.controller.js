@@ -21,7 +21,7 @@ exports.tokenController = {
             const auth = req.headers.authorization;
             let clientId;
             let clientSecret;
-            const tenantCode = req.tenantCode;
+            const tenantCode = req.ctx.tenantCode;
             if (!tenantCode) {
                 throw new err.ValidationError("Missing tenant", {
                     developerMessage: `There was no tenant code`,
@@ -139,7 +139,7 @@ exports.tokenController = {
             const auth = req.headers.authorization;
             let clientId;
             let clientSecret;
-            const tenantCode = req.tenantCode;
+            const tenantCode = req.ctx.tenantCode;
             if (!tenantCode) {
                 console.log("Missing tenant");
                 res.render("error", { error: "Missing tenant" });
