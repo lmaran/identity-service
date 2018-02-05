@@ -21,14 +21,14 @@ export const getAccessToken = async (req, res, next) => {
     } else {
         console.log("No matching token was found.");
     }
-    req.access_token = token;
+    req.ctx.accessToken = token;
     next();
     return;
 
 };
 
 export const requireAccessToken = (req, res, next) => {
-    if (req.access_token) {
+    if (req.ctx.accessToken) {
         next();
     } else {
         res.status(401).end();

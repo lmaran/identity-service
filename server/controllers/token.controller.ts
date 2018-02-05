@@ -17,7 +17,7 @@ export const tokenController = {
             let clientId;
             let clientSecret;
 
-            const tenantCode = req.tenantCode;
+            const tenantCode = req.ctx.tenantCode;
             if (!tenantCode) {
                 // console.log("Missing tenant");
                 // res.render("error", { error: "Missing tenant" });
@@ -179,7 +179,7 @@ export const tokenController = {
             let clientId;
             let clientSecret;
 
-            const tenantCode = req.tenantCode;
+            const tenantCode = req.ctx.tenantCode;
             if (!tenantCode) {
                 console.log("Missing tenant");
                 res.render("error", { error: "Missing tenant" });

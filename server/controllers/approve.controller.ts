@@ -60,7 +60,7 @@ export const approveController = {
                 });
             }
 
-            const tenantCode = req.tenantCode;
+            const tenantCode = req.ctx.tenantCode;
             if (!tenantCode) {
                 // console.log("Missing tenant");
                 // res.render("error", { error: "Missing tenant" });

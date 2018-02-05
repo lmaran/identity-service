@@ -60,3 +60,9 @@ export interface IErrorOptions {
     returnAs?: any;
     redirectUri?: string;
 }
+
+export interface IContext {
+    accessToken?: any;
+    tenantCode?: string;
+    requestId?: string;
+}

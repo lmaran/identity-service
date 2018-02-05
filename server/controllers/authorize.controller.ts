@@ -16,7 +16,7 @@ export const authorizeController = {
             const reqClientId: string = req.query.client_id;
             const reqRedirectUri: string = req.query.redirect_uri;
 
-            const tenantCode = req.tenantCode;
+            const tenantCode = req.ctx.tenantCode;
 
             if (!tenantCode) {
                 throw new err.BadRequestError("Missing tenant");

@@ -7,12 +7,12 @@ export const userinfoController = {
     // GET, POST
     getUserinfo: async (req: Request, res: Response, next: NextFunction) => {
         try {
-            if (!_.includes(req.access_token.scope, "openid")) {
+            if (!_.includes(req.ctx.accessToken.scope, "openid")) {
                 res.status(403).end();
                 return;
             }
 
-            const user = req.access_token.user;
+            const user = req.ctx.accessToken.user;
             if (!user) {
                 res.status(404).end();
                 return;
@@ -20,7 +20,7 @@ export const userinfoController = {
             }
 
             const out = {};
-            _.each(req.access_token.scope, scope => {
+            _.each(req.ctx.accessToken.scope, scope => {
                 if (scope === "openid") {
                     _.each(["sub"], claim => {
                         if (user[claim]) {
