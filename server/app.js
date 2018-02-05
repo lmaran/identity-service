@@ -30,7 +30,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(favicon(path.join(__dirname, "public", "favicon.ico")));
 app.use(express.static(path.join(__dirname, "public")));
-app.use(middlewares_1.getTenant);
+app.use(middlewares_1.setContext);
 app.use(routes_1.default);
 app.use(middlewares_1.catch404);
 app.use(middlewares_1.errorLogHandler);
