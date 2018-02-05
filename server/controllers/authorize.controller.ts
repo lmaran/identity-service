@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 import * as _ from "lodash";
-import * as randomstring from "randomstring";
 import { IClient } from "@interfaces";
 import { requestData } from "../data";
 import { clientService } from "../services";
@@ -12,17 +11,20 @@ export const authorizeController = {
 
     getAuthorize: async (req: Request, res: Response, next: NextFunction) => {
         try {
-            // requested values
-            const reqClientId: string = req.query.client_id;
-            const reqRedirectUri: string = req.query.redirect_uri;
-
             const tenantCode = req.ctx.tenantCode;
-
             if (!tenantCode) {
-                throw new err.BadRequestError("Missing tenant");
+                throw new err.ValidationError("Missing tenant", {
+                    developerMessage: `There was no tenant code`,
+                    returnAs: ReturnAs.RENDER,
+                });
             }
 
-            const client: IClient = await clientService.getByCode(reqClientId, tenantCode);
+            // requested values
+            const clientId: string = req.query.client_id;
+            const redirectUri: string = req.query.redirect_uri;
+
+
+            const client: IClient = await clientService.getByCode(clientId, tenantCode);
 
             // accepted values
             const accRedirectUris: string[] = client.redirect_uris;
@@ -36,20 +38,15 @@ export const authorizeController = {
             // invalid redirection URI.
 
             if (!client) {
-                // console.log('Unknown client %s', req.query.client_id);
-                // res.render('error', {error: 'Unknown client'});
                 throw new err.ValidationError(`Unknown client`, {
                     developerMessage: `Unknown client ${req.query.client_id}`,
                     returnAs: ReturnAs.RENDER,
                 });
             }
 
-            if (!_.includes(accRedirectUris, reqRedirectUri)) {
-                // console.log("Mismatched redirect URI, expected %s got %s", accRedirectUris, reqRedirectUri);
-                // res.render("error", { error: "Invalid redirect URI" });
-                // return;
+            if (!_.includes(accRedirectUris, redirectUri)) {
                 throw new err.ValidationError(`Invalid redirect URI`, {
-                    developerMessage: `Mismatched redirect URI, expected ${accRedirectUris} got ${reqRedirectUri}`,
+                    developerMessage: `Mismatched redirect URI, expected ${accRedirectUris} got ${redirectUri}`,
                     returnAs: ReturnAs.RENDER,
                 });
             }
@@ -64,23 +61,16 @@ export const authorizeController = {
             const accScopes = client.scope ? client.scope.split(" ") : [];
             // _.difference([2, 1], [2, 3]); => [1]
             if (_.difference(reqScopes, accScopes).length > 0) {
-                // client asked for a scope it couldn't have
-                // const urlParsed = urlHelper.buildUrl(reqRedirectUri, {
-                //     error: OAuthAuthorizationError.INVALID_SCOPE,
-                // }, null);
-                // res.redirect(urlParsed);
-                // return;
                 throw new err.ValidationError(OAuthAuthorizationError.INVALID_SCOPE, {
                     developerMessage: `client asked for a scope it couldn't have`,
                     returnAs: ReturnAs.REDIRECT,
-                    redirectUri: reqRedirectUri,
+                    redirectUri,
                 });
             }
 
-            const requestId = randomstring.generate(8);
-            requestData.create({ requestId, query: req.query }); // don't have to wait to complete
+            requestData.create({ requestId: req.ctx.requestId, query: req.query }); // don't have to wait to complete
 
-            res.render("approve", { client, requestId, scopes: reqScopes, tenantCode });
+            res.render("approve", { client, requestId: req.ctx.requestId, scopes: reqScopes, tenantCode });
             return;
 
         } catch (err) {

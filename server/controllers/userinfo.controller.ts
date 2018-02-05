@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import * as _ from "lodash";
-// import * as err from "../errors";
+import * as err from "../errors";
+// import { OAuthAuthorizationError, ReturnAs } from "../constants";
 
 export const userinfoController = {
 
@@ -8,15 +9,20 @@ export const userinfoController = {
     getUserinfo: async (req: Request, res: Response, next: NextFunction) => {
         try {
             if (!_.includes(req.ctx.accessToken.scope, "openid")) {
-                res.status(403).end();
-                return;
+                // res.status(403).end();
+                // return;
+                throw new err.Forbidden({
+                    developerMessage: `There was no "openid" scope in accessToken`,
+                });
             }
 
             const user = req.ctx.accessToken.user;
             if (!user) {
-                res.status(404).end();
-                return;
-                // throw new err.NotFoundError("User not found");
+                // res.status(404).end();
+                // return;
+                throw new err.NotFound({
+                    developerMessage: `There was no "user" field in accessToken`,
+                });
             }
 
             const out = {};

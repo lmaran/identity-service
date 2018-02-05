@@ -13,23 +13,19 @@ export const tokenController = {
     // POST
     getToken: async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const auth = req.headers.authorization;
-            let clientId;
-            let clientSecret;
-
             const tenantCode = req.ctx.tenantCode;
             if (!tenantCode) {
-                // console.log("Missing tenant");
-                // res.render("error", { error: "Missing tenant" });
-                // return;
                 throw new err.ValidationError("Missing tenant", {
                     developerMessage: `There was no tenant code`,
                     returnAs: ReturnAs.RENDER,
                 });
             }
 
+            const auth = req.headers.authorization;
+            let clientId;
+            let clientSecret;
+
             if (auth) {
-                // check the auth header
                 const clientCredentials = decodeClientCredentials(auth);
                 clientId = clientCredentials.id;
                 clientSecret = clientCredentials.secret;
@@ -39,9 +35,10 @@ export const tokenController = {
             if (req.body.client_id) {
                 if (clientId) {
                     // if we've already seen the client's credentials in the authorization header, this is an error
-                    console.log("Client attempted to authenticate with multiple methods");
-                    res.status(401).json({ error: OAuthTokenError.INVALID_CLIENT });
-                    return;
+                    throw new err.Unauthorized(OAuthTokenError.INVALID_CLIENT, {
+                        developerMessage: `Client attempted to authenticate with multiple methods`,
+                        returnAs: ReturnAs.JSON,
+                    });
                 }
 
                 clientId = req.body.client_id;
@@ -50,120 +47,120 @@ export const tokenController = {
 
             const client = await clientService.getByCode(clientId, tenantCode);
             if (!client) {
-                console.log("Unknown client %s", clientId);
-                res.status(401).json({ error: OAuthTokenError.INVALID_CLIENT });
-                return;
+                throw new err.Unauthorized(OAuthTokenError.INVALID_CLIENT, {
+                    developerMessage: `Client ${clientId} not found for tenant ${tenantCode}`,
+                    returnAs: ReturnAs.JSON,
+                });
             }
 
             if (client.client_secret !== clientSecret) {
-                console.log("Mismatched client secret, expected %s got %s", client.client_secret, clientSecret);
-                res.status(401).json({ error: OAuthTokenError.INVALID_CLIENT });
-                return;
+                throw new err.Unauthorized(OAuthTokenError.INVALID_CLIENT, {
+                    developerMessage: `Mismatched client secret, expected ${client.client_secret} got ${clientSecret}`,
+                    returnAs: ReturnAs.JSON,
+                });
             }
 
             if (req.body.grant_type === "authorization_code") {
 
                 const code = await codeData.get(req.body.code);
 
-                if (code) {
-                    codeData.delete(req.body.code); // don't have to wait to complete
-
-                    if (code.request.client_id === clientId) {
-
-                        const header = { typ: "JWT", alg: rsaKey.alg, kid: rsaKey.kid };
-
-                        // var payload = {
-                        // 	iss: 'http://localhost:9001/',
-                        // 	sub: code.user ? code.user.sub : null,
-                        // 	aud: 'http://localhost:9002/',
-                        // 	iat: Math.floor(Date.now() / 1000),
-                        // 	exp: Math.floor(Date.now() / 1000) + (5 * 60),
-                        // 	jti: randomstring.generate(8)
-                        // };
-                        // console.log(payload);
-                        // var stringHeader = JSON.stringify(header);
-                        // var stringPayload = JSON.stringify(payload);
-                        // //var encodedHeader = base64url.encode(JSON.stringify(header));
-                        // //var encodedPayload = base64url.encode(JSON.stringify(payload));
-                        // //var access_token = encodedHeader + '.' + encodedPayload + '.';
-                        // //var access_token = jose.jws.JWS.sign('HS256', stringHeader, stringPayload, new Buffer(sharedTokenSecret).toString('hex'));
-                        // var privateKey = jose.KEYUTIL.getKey(rsaKey);
-                        // var access_token = jose.jws.JWS.sign(rsaKey.alg, stringHeader, stringPayload, privateKey);
-
-                        const access_token = randomstring.generate();
-                        const refresh_token = randomstring.generate();
-
-                        tokenService.createToken({ access_token, client_id: clientId, scope: code.scope, user: code.user });
-                        tokenService.createToken({ refresh_token, client_id: clientId, scope: code.scope, user: code.user });
-
-                        console.log("Issuing access token %s", access_token);
-                        console.log("with scope %s", code.scope);
-
-                        let cscope;
-                        if (code.scope) {
-                            cscope = code.scope.join(" ");
-                        }
-
-                        const token_response: any = { access_token, refresh_token, token_type: "Bearer", scope: cscope };
-
-                        if (_.includes(code.scope, "openid")) {
-                            const ipayload: any = {
-                                iss: "http://localhost:1420/",
-                                sub: code.user.sub,
-                                aud: client.client_id,
-                                iat: Math.floor(Date.now() / 1000),
-                                exp: Math.floor(Date.now() / 1000) + (5 * 60),
-                            };
-                            if (code.request.nonce) {
-                                ipayload.nonce = code.request.nonce;
-                            }
-
-                            const istringHeader = JSON.stringify(header);
-                            const istringPayload = JSON.stringify(ipayload);
-                            const privateKey = jose.KEYUTIL.getKey(rsaKey);
-                            const id_token = jose.jws.JWS.sign(rsaKey.alg, istringHeader, istringPayload, privateKey);
-
-                            console.log("Issuing ID token %s", id_token);
-
-                            token_response.id_token = id_token;
-
-                        }
-
-                        res.status(200).json(token_response);
-                        console.log("Issued tokens for code %s", req.body.code);
-
-                        return;
-                    } else {
-                        console.log("Client mismatch, expected %s got %s", code.request.client_id, clientId);
-                        res.status(400).json({ error: OAuthTokenError.INVALID_GRANT });
-                        return;
-                    }
-                } else {
-                    console.log("Unknown code, %s", req.body.code);
-                    res.status(400).json({ error: OAuthTokenError.INVALID_GRANT });
-                    return;
+                if (!code) {
+                    // console.log("Unknown code, %s", req.body.code);
+                    // res.status(400).json({ error: OAuthTokenError.INVALID_GRANT });
+                    // return;
+                    throw new err.BadRequest(OAuthTokenError.INVALID_GRANT, {
+                        developerMessage: `Unknown code: ${req.body.code}`,
+                        returnAs: ReturnAs.JSON,
+                    });
                 }
+                codeData.delete(req.body.code); // don't have to wait to complete
+
+                if (code.request.client_id !== clientId) {
+                    // console.log("Client mismatch, expected %s got %s", code.request.client_id, clientId);
+                    // res.status(400).json({ error: OAuthTokenError.INVALID_GRANT });
+                    // return;
+                    throw new err.BadRequest(OAuthTokenError.INVALID_GRANT, {
+                        developerMessage: `Client mismatch, expected ${code.request.client_id} got ${clientId}`,
+                        returnAs: ReturnAs.JSON,
+                    });
+                }
+
+                const header = { typ: "JWT", alg: rsaKey.alg, kid: rsaKey.kid };
+
+                const access_token = randomstring.generate();
+                const refresh_token = randomstring.generate();
+
+                tokenService.createToken({ access_token, client_id: clientId, scope: code.scope, user: code.user });
+                tokenService.createToken({ refresh_token, client_id: clientId, scope: code.scope, user: code.user });
+
+                console.log("Issuing access token %s", access_token);
+                console.log("with scope %s", code.scope);
+
+                let cscope;
+                if (code.scope) {
+                    cscope = code.scope.join(" ");
+                }
+
+                const token_response: any = { access_token, refresh_token, token_type: "Bearer", scope: cscope };
+
+                if (_.includes(code.scope, "openid")) {
+                    const ipayload: any = {
+                        iss: "http://localhost:1420/",
+                        sub: code.user.sub,
+                        aud: client.client_id,
+                        iat: Math.floor(Date.now() / 1000),
+                        exp: Math.floor(Date.now() / 1000) + (5 * 60),
+                    };
+                    if (code.request.nonce) {
+                        ipayload.nonce = code.request.nonce;
+                    }
+
+                    const istringHeader = JSON.stringify(header);
+                    const istringPayload = JSON.stringify(ipayload);
+                    const privateKey = jose.KEYUTIL.getKey(rsaKey);
+                    const id_token = jose.jws.JWS.sign(rsaKey.alg, istringHeader, istringPayload, privateKey);
+
+                    console.log("Issuing ID token %s", id_token);
+
+                    token_response.id_token = id_token;
+
+                }
+
+                res.status(200).json(token_response);
+                console.log("Issued tokens for code %s", req.body.code);
+
+                return;
+
             } else if (req.body.grant_type === "refresh_token") {
                 const token = await tokenService.getRefreshToken(req.body.refresh_token);
-                if (token) {
-                    console.log("We found a matching refresh token: %s", req.body.refresh_token);
-                    if (token.client_id !== clientId) {
-                        const count = await tokenService.deleteRefreshToken(req.body.refresh_token);
-
-                        res.status(400).json({ error: OAuthTokenError.INVALID_GRANT });
-                        return;
-                    }
-                    const access_token = randomstring.generate();
-                    tokenService.createToken({ access_token, client_id: clientId });
-
-                    const token_response = { access_token, token_type: "Bearer", refresh_token: token.refresh_token };
-                    res.status(200).json(token_response);
-                    return;
-                } else {
-                    console.log("No matching token was found.");
-                    res.status(400).json({ error: OAuthTokenError.INVALID_GRANT });
-                    return;
+                if (!token) {
+                    // console.log("No matching token was found.");
+                    // res.status(400).json({ error: OAuthTokenError.INVALID_GRANT });
+                    // return;
+                    throw new err.BadRequest(OAuthTokenError.INVALID_GRANT, {
+                        developerMessage: `No matching token was found for this refresh token: ${req.body.refresh_token}`,
+                        returnAs: ReturnAs.JSON,
+                    });
                 }
+
+                console.log("We found a matching refresh token: %s", req.body.refresh_token);
+                if (token.client_id !== clientId) {
+                    tokenService.deleteRefreshToken(req.body.refresh_token);
+
+                    // res.status(400).json({ error: OAuthTokenError.INVALID_GRANT });
+                    // return;
+                    throw new err.BadRequest(OAuthTokenError.INVALID_GRANT, {
+                        developerMessage: `No matching clientId: expected ${token.client_id} got ${clientId}`,
+                        returnAs: ReturnAs.JSON,
+                    });
+                }
+                const access_token = randomstring.generate();
+                tokenService.createToken({ access_token, client_id: clientId });
+
+                const token_response = { access_token, token_type: "Bearer", refresh_token: token.refresh_token };
+                res.status(200).json(token_response);
+                return;
+
             } else {
                 console.log("Unknown grant type %s", req.body.grant_type);
                 res.status(400).json({ error: OAuthTokenError.UNSUPPORTED_GRANT_TYPE });

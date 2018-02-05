@@ -39,25 +39,35 @@ import { IErrorOptions } from "@interfaces";
 
 // Use 400 (BadRequest) if the query is syntactically incorrect
 // ex: you do not provide the user_id
-export class BadRequestError extends ApplicationError {
-    constructor(message) {
-        super(400, message || "Sintaxa gresita.");
+export class BadRequest extends ApplicationError {
+    constructor(message, errorOptions?: IErrorOptions) {
+        super(400, message, errorOptions);
     }
 }
 
 // Use 422 (Unprocessable Entity) if the query is well formatted but semantically incorrect
 // ex: you provide the user_id but it's not valid i.e a -43.67
 export class ValidationError extends ApplicationError {
-//    constructor(message);
-
     constructor(message, errorOptions?: IErrorOptions) {
-        super(400, message || "Eroare de validare.", errorOptions);
+        super(400, message, errorOptions);
+    }
+}
+
+export class Unauthorized extends ApplicationError {
+    constructor(message, errorOptions?: IErrorOptions) {
+        super(401, message, errorOptions);
+    }
+}
+
+export class Forbidden extends ApplicationError {
+    constructor(errorOptions?: IErrorOptions) {
+        super(403, "Forbidden", errorOptions);
     }
 }
 
 // Use 404 (NotFound) if the resource you address in URL is not found
-export class NotFoundError extends ApplicationError {
-    constructor(message) {
-        super(404, message || "Resursa negasita.");
+export class NotFound extends ApplicationError {
+    constructor(errorOptions?: IErrorOptions) {
+        super(404, "Not Found", errorOptions);
     }
 }
