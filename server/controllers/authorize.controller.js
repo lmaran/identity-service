@@ -9,20 +9,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const _ = require("lodash");
-const randomstring = require("randomstring");
 const data_1 = require("../data");
 const services_1 = require("../services");
 const err = require("../errors");
 exports.authorizeController = {
     getAuthorize: (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         try {
-            const reqClientId = req.query.client_id;
-            const reqRedirectUri = req.query.redirect_uri;
             const tenantCode = req.ctx.tenantCode;
             if (!tenantCode) {
-                throw new err.BadRequestError("Missing tenant");
+                throw new err.ValidationError("Missing tenant", {
+                    developerMessage: `There was no tenant code`,
+                    returnAs: "render",
+                });
             }
-            const client = yield services_1.clientService.getByCode(reqClientId, tenantCode);
+            const clientId = req.query.client_id;
+            const redirectUri = req.query.redirect_uri;
+            const client = yield services_1.clientService.getByCode(clientId, tenantCode);
             const accRedirectUris = client.redirect_uris;
             if (!client) {
                 throw new err.ValidationError(`Unknown client`, {
@@ -30,9 +32,9 @@ exports.authorizeController = {
                     returnAs: "render",
                 });
             }
-            if (!_.includes(accRedirectUris, reqRedirectUri)) {
+            if (!_.includes(accRedirectUris, redirectUri)) {
                 throw new err.ValidationError(`Invalid redirect URI`, {
-                    developerMessage: `Mismatched redirect URI, expected ${accRedirectUris} got ${reqRedirectUri}`,
+                    developerMessage: `Mismatched redirect URI, expected ${accRedirectUris} got ${redirectUri}`,
                     returnAs: "render",
                 });
             }
@@ -42,12 +44,11 @@ exports.authorizeController = {
                 throw new err.ValidationError("invalid_scope", {
                     developerMessage: `client asked for a scope it couldn't have`,
                     returnAs: "redirect",
-                    redirectUri: reqRedirectUri,
+                    redirectUri,
                 });
             }
-            const requestId = randomstring.generate(8);
-            data_1.requestData.create({ requestId, query: req.query });
-            res.render("approve", { client, requestId, scopes: reqScopes, tenantCode });
+            data_1.requestData.create({ requestId: req.ctx.requestId, query: req.query });
+            res.render("approve", { client, requestId: req.ctx.requestId, scopes: reqScopes, tenantCode });
             return;
         }
         catch (err) {

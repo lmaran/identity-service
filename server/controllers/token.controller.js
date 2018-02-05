@@ -18,9 +18,6 @@ const err = require("../errors");
 exports.tokenController = {
     getToken: (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         try {
-            const auth = req.headers.authorization;
-            let clientId;
-            let clientSecret;
             const tenantCode = req.ctx.tenantCode;
             if (!tenantCode) {
                 throw new err.ValidationError("Missing tenant", {
@@ -28,6 +25,9 @@ exports.tokenController = {
                     returnAs: "render",
                 });
             }
+            const auth = req.headers.authorization;
+            let clientId;
+            let clientSecret;
             if (auth) {
                 const clientCredentials = decodeClientCredentials(auth);
                 clientId = clientCredentials.id;
@@ -35,95 +35,97 @@ exports.tokenController = {
             }
             if (req.body.client_id) {
                 if (clientId) {
-                    console.log("Client attempted to authenticate with multiple methods");
-                    res.status(401).json({ error: "invalid_client" });
-                    return;
+                    throw new err.Unauthorized("invalid_client", {
+                        developerMessage: `Client attempted to authenticate with multiple methods`,
+                        returnAs: "json",
+                    });
                 }
                 clientId = req.body.client_id;
                 clientSecret = req.body.client_secret;
             }
             const client = yield services_1.clientService.getByCode(clientId, tenantCode);
             if (!client) {
-                console.log("Unknown client %s", clientId);
-                res.status(401).json({ error: "invalid_client" });
-                return;
+                throw new err.Unauthorized("invalid_client", {
+                    developerMessage: `Client ${clientId} not found for tenant ${tenantCode}`,
+                    returnAs: "json",
+                });
             }
             if (client.client_secret !== clientSecret) {
-                console.log("Mismatched client secret, expected %s got %s", client.client_secret, clientSecret);
-                res.status(401).json({ error: "invalid_client" });
-                return;
+                throw new err.Unauthorized("invalid_client", {
+                    developerMessage: `Mismatched client secret, expected ${client.client_secret} got ${clientSecret}`,
+                    returnAs: "json",
+                });
             }
             if (req.body.grant_type === "authorization_code") {
                 const code = yield data_1.codeData.get(req.body.code);
-                if (code) {
-                    data_1.codeData.delete(req.body.code);
-                    if (code.request.client_id === clientId) {
-                        const header = { typ: "JWT", alg: rsaKey.alg, kid: rsaKey.kid };
-                        const access_token = randomstring.generate();
-                        const refresh_token = randomstring.generate();
-                        services_1.tokenService.createToken({ access_token, client_id: clientId, scope: code.scope, user: code.user });
-                        services_1.tokenService.createToken({ refresh_token, client_id: clientId, scope: code.scope, user: code.user });
-                        console.log("Issuing access token %s", access_token);
-                        console.log("with scope %s", code.scope);
-                        let cscope;
-                        if (code.scope) {
-                            cscope = code.scope.join(" ");
-                        }
-                        const token_response = { access_token, refresh_token, token_type: "Bearer", scope: cscope };
-                        if (_.includes(code.scope, "openid")) {
-                            const ipayload = {
-                                iss: "http://localhost:1420/",
-                                sub: code.user.sub,
-                                aud: client.client_id,
-                                iat: Math.floor(Date.now() / 1000),
-                                exp: Math.floor(Date.now() / 1000) + (5 * 60),
-                            };
-                            if (code.request.nonce) {
-                                ipayload.nonce = code.request.nonce;
-                            }
-                            const istringHeader = JSON.stringify(header);
-                            const istringPayload = JSON.stringify(ipayload);
-                            const privateKey = jose.KEYUTIL.getKey(rsaKey);
-                            const id_token = jose.jws.JWS.sign(rsaKey.alg, istringHeader, istringPayload, privateKey);
-                            console.log("Issuing ID token %s", id_token);
-                            token_response.id_token = id_token;
-                        }
-                        res.status(200).json(token_response);
-                        console.log("Issued tokens for code %s", req.body.code);
-                        return;
-                    }
-                    else {
-                        console.log("Client mismatch, expected %s got %s", code.request.client_id, clientId);
-                        res.status(400).json({ error: "invalid_grant" });
-                        return;
-                    }
+                if (!code) {
+                    throw new err.BadRequest("invalid_grant", {
+                        developerMessage: `Unknown code: ${req.body.code}`,
+                        returnAs: "json",
+                    });
                 }
-                else {
-                    console.log("Unknown code, %s", req.body.code);
-                    res.status(400).json({ error: "invalid_grant" });
-                    return;
+                data_1.codeData.delete(req.body.code);
+                if (code.request.client_id !== clientId) {
+                    throw new err.BadRequest("invalid_grant", {
+                        developerMessage: `Client mismatch, expected ${code.request.client_id} got ${clientId}`,
+                        returnAs: "json",
+                    });
                 }
+                const header = { typ: "JWT", alg: rsaKey.alg, kid: rsaKey.kid };
+                const access_token = randomstring.generate();
+                const refresh_token = randomstring.generate();
+                services_1.tokenService.createToken({ access_token, client_id: clientId, scope: code.scope, user: code.user });
+                services_1.tokenService.createToken({ refresh_token, client_id: clientId, scope: code.scope, user: code.user });
+                console.log("Issuing access token %s", access_token);
+                console.log("with scope %s", code.scope);
+                let cscope;
+                if (code.scope) {
+                    cscope = code.scope.join(" ");
+                }
+                const token_response = { access_token, refresh_token, token_type: "Bearer", scope: cscope };
+                if (_.includes(code.scope, "openid")) {
+                    const ipayload = {
+                        iss: "http://localhost:1420/",
+                        sub: code.user.sub,
+                        aud: client.client_id,
+                        iat: Math.floor(Date.now() / 1000),
+                        exp: Math.floor(Date.now() / 1000) + (5 * 60),
+                    };
+                    if (code.request.nonce) {
+                        ipayload.nonce = code.request.nonce;
+                    }
+                    const istringHeader = JSON.stringify(header);
+                    const istringPayload = JSON.stringify(ipayload);
+                    const privateKey = jose.KEYUTIL.getKey(rsaKey);
+                    const id_token = jose.jws.JWS.sign(rsaKey.alg, istringHeader, istringPayload, privateKey);
+                    console.log("Issuing ID token %s", id_token);
+                    token_response.id_token = id_token;
+                }
+                res.status(200).json(token_response);
+                console.log("Issued tokens for code %s", req.body.code);
+                return;
             }
             else if (req.body.grant_type === "refresh_token") {
                 const token = yield services_1.tokenService.getRefreshToken(req.body.refresh_token);
-                if (token) {
-                    console.log("We found a matching refresh token: %s", req.body.refresh_token);
-                    if (token.client_id !== clientId) {
-                        const count = yield services_1.tokenService.deleteRefreshToken(req.body.refresh_token);
-                        res.status(400).json({ error: "invalid_grant" });
-                        return;
-                    }
-                    const access_token = randomstring.generate();
-                    services_1.tokenService.createToken({ access_token, client_id: clientId });
-                    const token_response = { access_token, token_type: "Bearer", refresh_token: token.refresh_token };
-                    res.status(200).json(token_response);
-                    return;
+                if (!token) {
+                    throw new err.BadRequest("invalid_grant", {
+                        developerMessage: `No matching token was found for this refresh token: ${req.body.refresh_token}`,
+                        returnAs: "json",
+                    });
                 }
-                else {
-                    console.log("No matching token was found.");
-                    res.status(400).json({ error: "invalid_grant" });
-                    return;
+                console.log("We found a matching refresh token: %s", req.body.refresh_token);
+                if (token.client_id !== clientId) {
+                    services_1.tokenService.deleteRefreshToken(req.body.refresh_token);
+                    throw new err.BadRequest("invalid_grant", {
+                        developerMessage: `No matching clientId: expected ${token.client_id} got ${clientId}`,
+                        returnAs: "json",
+                    });
                 }
+                const access_token = randomstring.generate();
+                services_1.tokenService.createToken({ access_token, client_id: clientId });
+                const token_response = { access_token, token_type: "Bearer", refresh_token: token.refresh_token };
+                res.status(200).json(token_response);
+                return;
             }
             else {
                 console.log("Unknown grant type %s", req.body.grant_type);

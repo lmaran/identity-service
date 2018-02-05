@@ -4,7 +4,6 @@ function __export(m) {
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./token.middleware"));
-__export(require("./tenant.middleware"));
 __export(require("./errorLogHandler.middleware"));
 __export(require("./catch404.middleware"));
 __export(require("./setContext.middleware"));

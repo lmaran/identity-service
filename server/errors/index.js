@@ -1,21 +1,33 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const application_error_1 = require("./application.error");
-class BadRequestError extends application_error_1.ApplicationError {
-    constructor(message) {
-        super(400, message || "Sintaxa gresita.");
+class BadRequest extends application_error_1.ApplicationError {
+    constructor(message, errorOptions) {
+        super(400, message, errorOptions);
     }
 }
-exports.BadRequestError = BadRequestError;
+exports.BadRequest = BadRequest;
 class ValidationError extends application_error_1.ApplicationError {
     constructor(message, errorOptions) {
-        super(400, message || "Eroare de validare.", errorOptions);
+        super(400, message, errorOptions);
     }
 }
 exports.ValidationError = ValidationError;
-class NotFoundError extends application_error_1.ApplicationError {
-    constructor(message) {
-        super(404, message || "Resursa negasita.");
+class Unauthorized extends application_error_1.ApplicationError {
+    constructor(message, errorOptions) {
+        super(401, message, errorOptions);
     }
 }
-exports.NotFoundError = NotFoundError;
+exports.Unauthorized = Unauthorized;
+class Forbidden extends application_error_1.ApplicationError {
+    constructor(errorOptions) {
+        super(403, "Forbidden", errorOptions);
+    }
+}
+exports.Forbidden = Forbidden;
+class NotFound extends application_error_1.ApplicationError {
+    constructor(errorOptions) {
+        super(404, "Not Found", errorOptions);
+    }
+}
+exports.NotFound = NotFound;

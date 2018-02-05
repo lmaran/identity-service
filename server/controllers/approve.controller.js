@@ -10,7 +10,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const _ = require("lodash");
 const randomstring = require("randomstring");
-const crypto = require("crypto");
 const data_1 = require("../data");
 const services_1 = require("../services");
 const helpers_1 = require("../helpers");
@@ -18,6 +17,13 @@ const err = require("../errors");
 exports.approveController = {
     approve: (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         try {
+            const tenantCode = req.ctx.tenantCode;
+            if (!tenantCode) {
+                throw new err.ValidationError("Missing tenant", {
+                    developerMessage: `There was no tenant code`,
+                    returnAs: "render",
+                });
+            }
             const requestId = req.body.requestId;
             const request = yield data_1.requestData.get(requestId);
             const query = request.query;
@@ -31,30 +37,23 @@ exports.approveController = {
             }
             if (!req.body.approve) {
                 throw new err.ValidationError("access_denied", {
-                    developerMessage: `"req.body.approve" is falsy`,
+                    developerMessage: `User denied access`,
                     returnAs: "redirect",
                     redirectUri: query.redirect_uri,
                 });
             }
             if (query.response_type !== "code") {
                 throw new err.ValidationError("unsupported_response_type", {
-                    developerMessage: `query.response_type !== "code"`,
+                    developerMessage: `We got a response type we don't understand (response_type !== "code")`,
                     returnAs: "redirect",
                     redirectUri: query.redirect_uri,
-                });
-            }
-            const tenantCode = req.ctx.tenantCode;
-            if (!tenantCode) {
-                throw new err.ValidationError("Missing tenant", {
-                    developerMessage: `There was no tenant code`,
-                    returnAs: "render",
                 });
             }
             const code = randomstring.generate(8);
             const user = yield services_1.userService.getUserByEmail(req.body.email, tenantCode);
             if (!user) {
                 throw new err.ValidationError(`User not found`, {
-                    developerMessage: `user is falsy`,
+                    developerMessage: `User ${req.body.email} not found for tenant ${tenantCode}`,
                     returnAs: "redirect",
                     redirectUri: query.redirect_uri,
                 });
@@ -71,12 +70,13 @@ exports.approveController = {
                     redirectUri: query.redirect_uri,
                 });
             }
-            const scopes = getScopesFromForm(req.body);
             const client = yield services_1.clientService.getByCode(query.client_id, tenantCode);
             const cscope = client.scope ? client.scope.split(" ") : [];
-            if (_.difference(scopes, cscope).length > 0) {
+            const scopes = getScopesFromForm(req.body);
+            const exceededScopes = _.difference(scopes, cscope);
+            if (exceededScopes.length > 0) {
                 throw new err.ValidationError("invalid_scope", {
-                    developerMessage: `Client asked for a scope it couldn't have`,
+                    developerMessage: `Client asked for a scope it couldn't have: ${exceededScopes.join(", ")}`,
                     returnAs: "redirect",
                     redirectUri: query.redirect_uri,
                 });
@@ -97,14 +97,4 @@ exports.approveController = {
 const getScopesFromForm = body => {
     return _.filter(_.keys(body), s => _.startsWith(s, "scope_"))
         .map(s => s.slice("scope_".length));
-};
-const encryptPassword2 = (password, salt) => {
-    const newSalt = new Buffer(salt, "base64");
-    const iterations = 10000;
-    const keylen = 64;
-    const digest = "sha1";
-    return crypto.pbkdf2Sync(password, newSalt, iterations, keylen, digest).toString("base64");
-};
-const isPasswordCorrect2 = (plainText, hashedPassword, salt) => {
-    return encryptPassword2(plainText, salt) === hashedPassword;
 };

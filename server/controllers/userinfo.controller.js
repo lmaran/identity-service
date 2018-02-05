@@ -9,17 +9,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const _ = require("lodash");
+const err = require("../errors");
 exports.userinfoController = {
     getUserinfo: (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         try {
             if (!_.includes(req.ctx.accessToken.scope, "openid")) {
-                res.status(403).end();
-                return;
+                throw new err.Forbidden({
+                    developerMessage: `There was no "openid" scope in accessToken`,
+                });
             }
             const user = req.ctx.accessToken.user;
             if (!user) {
-                res.status(404).end();
-                return;
+                throw new err.NotFound({
+                    developerMessage: `There was no "user" field in accessToken`,
+                });
             }
             const out = {};
             _.each(req.ctx.accessToken.scope, scope => {
