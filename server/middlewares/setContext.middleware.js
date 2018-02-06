@@ -8,10 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const randomstring = require("randomstring");
-const helpers_1 = require("../helpers");
 exports.setContext = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
-    req.ctx.requestId = randomstring.generate(8);
-    req.ctx.tenantCode = helpers_1.urlHelper.getTenantCode(req.subdomains);
+    req.ctx = {};
     next();
 });
