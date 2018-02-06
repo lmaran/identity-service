@@ -11,10 +11,10 @@ export const setContext = async (req: Request, res: Response, next: NextFunction
     req.ctx = {};
 
     // 1. set requestId
-    // req.ctx.requestId = randomstring.generate(8);
+    req.ctx.requestId = randomstring.generate(8);
 
     // // 2. set tenantCode
-    // req.ctx.tenantCode = urlHelper.getTenantCode(req.subdomains);
+    req.ctx.tenantCode = urlHelper.getTenantCode(req.subdomains);
 
     next();
 };
