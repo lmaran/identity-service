@@ -19,10 +19,9 @@ exports.approveController = {
         try {
             const tenantCode = req.ctx.tenantCode;
             if (!tenantCode) {
-                throw new err.ValidationError("Missing tenant", {
-                    developerMessage: `There was no tenant code`,
-                    returnAs: "render",
-                });
+                throw new err.ValidationError("Missing tenant")
+                    .withDeveloperMessage("There was no tenant code")
+                    .withReturnAs("render");
             }
             const requestId = req.body.requestId;
             const request = yield data_1.requestData.get(requestId);
@@ -30,33 +29,29 @@ exports.approveController = {
             data_1.requestData.delete(requestId);
             let urlParsed;
             if (!query) {
-                throw new err.ValidationError("No matching authorization request", {
-                    developerMessage: `There was no matching saved request`,
-                    returnAs: "render",
-                });
+                throw new err.ValidationError("No matching authorization request")
+                    .withDeveloperMessage("There was no matching saved request")
+                    .withReturnAs("render");
             }
             if (!req.body.approve) {
-                throw new err.ValidationError("access_denied", {
-                    developerMessage: `User denied access`,
-                    returnAs: "redirect",
-                    redirectUri: query.redirect_uri,
-                });
+                throw new err.ValidationError("access_denied")
+                    .withDeveloperMessage("User denied access")
+                    .withReturnAs("redirect")
+                    .withRedirectUri(query.redirect_uri);
             }
             if (query.response_type !== "code") {
-                throw new err.ValidationError("unsupported_response_type", {
-                    developerMessage: `We got a response type we don't understand (response_type !== "code")`,
-                    returnAs: "redirect",
-                    redirectUri: query.redirect_uri,
-                });
+                throw new err.ValidationError("unsupported_response_type")
+                    .withDeveloperMessage("We got a response type we don't understand (response_type !== 'code')")
+                    .withReturnAs("redirect")
+                    .withRedirectUri(query.redirect_uri);
             }
             const code = randomstring.generate(8);
             const user = yield services_1.userService.getUserByEmail(req.body.email, tenantCode);
             if (!user) {
-                throw new err.ValidationError(`User not found`, {
-                    developerMessage: `User ${req.body.email} not found for tenant ${tenantCode}`,
-                    returnAs: "redirect",
-                    redirectUri: query.redirect_uri,
-                });
+                throw new err.ValidationError("User not found")
+                    .withDeveloperMessage(`User ${req.body.email} not found for tenant ${tenantCode}`)
+                    .withReturnAs("redirect")
+                    .withRedirectUri(query.redirect_uri);
             }
             const persistedPassword = {
                 salt: user.salt,
@@ -64,22 +59,20 @@ exports.approveController = {
             };
             const pswMatch = helpers_1.passwordHelper.passwordMatch(persistedPassword, req.body.password);
             if (!pswMatch) {
-                throw new err.ValidationError(`Incorrect password`, {
-                    developerMessage: `Passwords not match`,
-                    returnAs: "redirect",
-                    redirectUri: query.redirect_uri,
-                });
+                throw new err.ValidationError("Incorrect password")
+                    .withDeveloperMessage("Passwords not match")
+                    .withReturnAs("redirect")
+                    .withRedirectUri(query.redirect_uri);
             }
             const client = yield services_1.clientService.getByCode(query.client_id, tenantCode);
             const cscope = client.scope ? client.scope.split(" ") : [];
             const scopes = getScopesFromForm(req.body);
             const exceededScopes = _.difference(scopes, cscope);
             if (exceededScopes.length > 0) {
-                throw new err.ValidationError("invalid_scope", {
-                    developerMessage: `Client asked for a scope it couldn't have: ${exceededScopes.join(", ")}`,
-                    returnAs: "redirect",
-                    redirectUri: query.redirect_uri,
-                });
+                throw new err.ValidationError("invalid_scope")
+                    .withDeveloperMessage(`Client asked for a scope it couldn't have: ${exceededScopes.join(", ")}`)
+                    .withReturnAs("redirect")
+                    .withRedirectUri(query.redirect_uri);
             }
             data_1.codeData.create({ code, request: query, scope: scopes, user });
             urlParsed = helpers_1.urlHelper.buildUrl(query.redirect_uri, {

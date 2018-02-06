@@ -20,10 +20,9 @@ exports.tokenController = {
         try {
             const tenantCode = req.ctx.tenantCode;
             if (!tenantCode) {
-                throw new err.ValidationError("Missing tenant", {
-                    developerMessage: `There was no tenant code`,
-                    returnAs: "render",
-                });
+                throw new err.ValidationError("Missing tenant")
+                    .withDeveloperMessage("There was no tenant code")
+                    .withReturnAs("render");
             }
             const auth = req.headers.authorization;
             let clientId;
@@ -35,41 +34,36 @@ exports.tokenController = {
             }
             if (req.body.client_id) {
                 if (clientId) {
-                    throw new err.Unauthorized("invalid_client", {
-                        developerMessage: `Client attempted to authenticate with multiple methods`,
-                        returnAs: "json",
-                    });
+                    throw new err.Unauthorized("invalid_client")
+                        .withDeveloperMessage("Client attempted to authenticate with multiple methods")
+                        .withReturnAs("json");
                 }
                 clientId = req.body.client_id;
                 clientSecret = req.body.client_secret;
             }
             const client = yield services_1.clientService.getByCode(clientId, tenantCode);
             if (!client) {
-                throw new err.Unauthorized("invalid_client", {
-                    developerMessage: `Client ${clientId} not found for tenant ${tenantCode}`,
-                    returnAs: "json",
-                });
+                throw new err.Unauthorized("invalid_client")
+                    .withDeveloperMessage(`Client ${clientId} not found for tenant ${tenantCode}`)
+                    .withReturnAs("json");
             }
             if (client.client_secret !== clientSecret) {
-                throw new err.Unauthorized("invalid_client", {
-                    developerMessage: `Mismatched client secret, expected ${client.client_secret} got ${clientSecret}`,
-                    returnAs: "json",
-                });
+                throw new err.Unauthorized("invalid_client")
+                    .withDeveloperMessage(`Mismatched client secret, expected ${client.client_secret} got ${clientSecret}`)
+                    .withReturnAs("json");
             }
             if (req.body.grant_type === "authorization_code") {
                 const code = yield data_1.codeData.get(req.body.code);
                 if (!code) {
-                    throw new err.BadRequest("invalid_grant", {
-                        developerMessage: `Unknown code: ${req.body.code}`,
-                        returnAs: "json",
-                    });
+                    throw new err.BadRequest("invalid_grant")
+                        .withDeveloperMessage(`Unknown code: ${req.body.code}`)
+                        .withReturnAs("json");
                 }
                 data_1.codeData.delete(req.body.code);
                 if (code.request.client_id !== clientId) {
-                    throw new err.BadRequest("invalid_grant", {
-                        developerMessage: `Client mismatch, expected ${code.request.client_id} got ${clientId}`,
-                        returnAs: "json",
-                    });
+                    throw new err.BadRequest("invalid_grant")
+                        .withDeveloperMessage(`Client mismatch, expected ${code.request.client_id} got ${clientId}`)
+                        .withReturnAs("json");
                 }
                 const header = { typ: "JWT", alg: rsaKey.alg, kid: rsaKey.kid };
                 const access_token = randomstring.generate();
@@ -108,18 +102,16 @@ exports.tokenController = {
             else if (req.body.grant_type === "refresh_token") {
                 const token = yield services_1.tokenService.getRefreshToken(req.body.refresh_token);
                 if (!token) {
-                    throw new err.BadRequest("invalid_grant", {
-                        developerMessage: `No matching token was found for this refresh token: ${req.body.refresh_token}`,
-                        returnAs: "json",
-                    });
+                    throw new err.BadRequest("invalid_grant")
+                        .withDeveloperMessage(`No matching token was found for this refresh token: ${req.body.refresh_token}`)
+                        .withReturnAs("json");
                 }
                 console.log("We found a matching refresh token: %s", req.body.refresh_token);
                 if (token.client_id !== clientId) {
                     services_1.tokenService.deleteRefreshToken(req.body.refresh_token);
-                    throw new err.BadRequest("invalid_grant", {
-                        developerMessage: `No matching clientId: expected ${token.client_id} got ${clientId}`,
-                        returnAs: "json",
-                    });
+                    throw new err.BadRequest("invalid_grant")
+                        .withDeveloperMessage(`No matching clientId: expected ${token.client_id} got ${clientId}`)
+                        .withReturnAs("json");
                 }
                 const access_token = randomstring.generate();
                 services_1.tokenService.createToken({ access_token, client_id: clientId });
@@ -128,8 +120,9 @@ exports.tokenController = {
                 return;
             }
             else {
-                console.log("Unknown grant type %s", req.body.grant_type);
-                res.status(400).json({ error: "unsupported_grant_type" });
+                throw new err.BadRequest("unsupported_grant_type")
+                    .withDeveloperMessage(`Unknown grant type ${req.body.grant_type}`)
+                    .withReturnAs("json");
             }
         }
         catch (err) {
@@ -143,9 +136,9 @@ exports.tokenController = {
             let clientSecret;
             const tenantCode = req.ctx.tenantCode;
             if (!tenantCode) {
-                console.log("Missing tenant");
-                res.render("error", { error: "Missing tenant" });
-                return;
+                throw new err.ValidationError("Missing tenant")
+                    .withDeveloperMessage("There was no tenant code")
+                    .withReturnAs("render");
             }
             if (auth) {
                 const clientCredentials = decodeClientCredentials(auth);
@@ -154,23 +147,23 @@ exports.tokenController = {
             }
             if (req.body.client_id) {
                 if (clientId) {
-                    console.log("Client attempted to authenticate with multiple methods");
-                    res.status(401).json({ error: "invalid_client" });
-                    return;
+                    throw new err.Unauthorized("invalid_client")
+                        .withDeveloperMessage("Client attempted to authenticate with multiple methods")
+                        .withReturnAs("json");
                 }
                 clientId = req.body.client_id;
                 clientSecret = req.body.client_secret;
             }
             const client = yield services_1.clientService.getByCode(clientId, tenantCode);
             if (!client) {
-                console.log("Unknown client %s", clientId);
-                res.status(401).json({ error: "invalid_client" });
-                return;
+                throw new err.Unauthorized("invalid_client")
+                    .withDeveloperMessage(`Client ${clientId} not found for tenant ${tenantCode}`)
+                    .withReturnAs("json");
             }
             if (client.client_secret !== clientSecret) {
-                console.log("Mismatched client secret, expected %s got %s", client.client_secret, clientSecret);
-                res.status(401).json({ error: "invalid_client" });
-                return;
+                throw new err.Unauthorized("invalid_client")
+                    .withDeveloperMessage(`Mismatched client secret, expected ${client.client_secret} got ${clientSecret}`)
+                    .withReturnAs("json");
             }
             const inToken = req.body.token;
             const count = yield services_1.tokenService.deleteAccessToken(inToken, clientId);

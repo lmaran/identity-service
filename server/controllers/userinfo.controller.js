@@ -14,15 +14,11 @@ exports.userinfoController = {
     getUserinfo: (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         try {
             if (!_.includes(req.ctx.accessToken.scope, "openid")) {
-                throw new err.Forbidden({
-                    developerMessage: `There was no "openid" scope in accessToken`,
-                });
+                throw new err.Forbidden().withDeveloperMessage("There was no 'openid' scope in accessToken");
             }
             const user = req.ctx.accessToken.user;
             if (!user) {
-                throw new err.NotFound({
-                    developerMessage: `There was no "user" field in accessToken`,
-                });
+                throw new err.NotFound().withDeveloperMessage("There was no 'user' field in accessToken");
             }
             const out = {};
             _.each(req.ctx.accessToken.scope, scope => {

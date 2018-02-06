@@ -17,35 +17,31 @@ exports.authorizeController = {
         try {
             const tenantCode = req.ctx.tenantCode;
             if (!tenantCode) {
-                throw new err.ValidationError("Missing tenant", {
-                    developerMessage: `There was no tenant code`,
-                    returnAs: "render",
-                });
+                throw new err.ValidationError("Missing tenant")
+                    .withDeveloperMessage("There was no tenant code")
+                    .withReturnAs("render");
             }
             const clientId = req.query.client_id;
             const redirectUri = req.query.redirect_uri;
             const client = yield services_1.clientService.getByCode(clientId, tenantCode);
             const accRedirectUris = client.redirect_uris;
             if (!client) {
-                throw new err.ValidationError(`Unknown client`, {
-                    developerMessage: `Unknown client ${req.query.client_id}`,
-                    returnAs: "render",
-                });
+                throw new err.ValidationError("Unknown client")
+                    .withDeveloperMessage(`Unknown client ${req.query.client_id}`)
+                    .withReturnAs("render");
             }
-            if (!_.includes(accRedirectUris, redirectUri)) {
-                throw new err.ValidationError(`Invalid redirect URI`, {
-                    developerMessage: `Mismatched redirect URI, expected ${accRedirectUris} got ${redirectUri}`,
-                    returnAs: "render",
-                });
+            if (!_.includes(accRedirectUris, redirectUri.toString())) {
+                throw new err.ValidationError("Invalid redirect URI")
+                    .withDeveloperMessage(`Mismatched redirect URI, expected ${accRedirectUris} got ${redirectUri}`)
+                    .withReturnAs("render");
             }
             const reqScopes = req.query.scope ? req.query.scope.split(" ") : null;
             const accScopes = client.scope ? client.scope.split(" ") : [];
             if (_.difference(reqScopes, accScopes).length > 0) {
-                throw new err.ValidationError("invalid_scope", {
-                    developerMessage: `client asked for a scope it couldn't have`,
-                    returnAs: "redirect",
-                    redirectUri,
-                });
+                throw new err.ValidationError("invalid_scope")
+                    .withDeveloperMessage("Client asked for a scope it couldn't have")
+                    .withReturnAs("redirect")
+                    .withRedirectUri(redirectUri);
             }
             data_1.requestData.create({ requestId: req.ctx.requestId, query: req.query });
             res.render("approve", { client, requestId: req.ctx.requestId, scopes: reqScopes, tenantCode });
