@@ -15,21 +15,51 @@
     // https://stackoverflow.com/a/32749533
     // https://www.loggly.com/blog/node-js-error-handling/
 
-import { IErrorOptions } from "@interfaces";
+// import { IErrorOptions } from "@interfaces";
+import { ReturnType } from "../constants";
 
 export class ApplicationError extends Error {
-    public requestId?: string;
-    public status: any;
-    public errorOptions?: IErrorOptions;
+    // instance fields with default values
+    private _status: number = 500;
+    private _developerMessage?: string | undefined;
+    private _returnAs: ReturnType = ReturnType.JSON;
+    private _redirectUri?: URL | undefined;
 
-    constructor(status: number, message: string, errorOptions?: IErrorOptions) {
-        super(message || "Something went wrong. Please try again.");
+    constructor(status: number, message: string) {
+        super(message);
         this.name = this.constructor.name;
-
-        this.status = status || 500;
-        this.errorOptions = errorOptions;
+        this._status = status;
 
         // Capture the current stack trace and store it in the property "this.stack".
         Error.captureStackTrace(this, this.constructor);
+    }
+
+    // getters, setters and chaining methods
+    get status() { return this._status; }
+    set status(status: number) { this._status = status; }
+    public withStatus(status: number) {
+        this._status = status;
+        return this;
+    }
+
+    get developerMessage() { return this._developerMessage; }
+    set developerMessage(developerMessage: string | undefined) { this._developerMessage = developerMessage; }
+    public withDeveloperMessage(developerMessage: string) {
+        this._developerMessage = developerMessage;
+        return this;
+    }
+
+    get returnAs() { return this._returnAs; }
+    set returnAs(returnAs: ReturnType) { this._returnAs = returnAs; }
+    public withReturnAs(returnAs: ReturnType) {
+        this._returnAs = returnAs;
+        return this;
+    }
+
+    get redirectUri() { return this._redirectUri; }
+    set redirectUri(redirectUri: URL | undefined) { this._redirectUri = redirectUri; }
+    public withRedirectUri(uri: URL) {
+        this._redirectUri = uri;
+        return this;
     }
 }

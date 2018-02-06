@@ -60,7 +60,7 @@
 //     res.render("error");
 // });
 
-import { ReturnAs, OAuthAuthorizationError } from "../constants";
+import { ReturnType, OAuthAuthorizationError } from "../constants";
 import { ApplicationError } from "../errors/application.error";
 import { urlHelper } from "../helpers";
 import config from "../config";
@@ -69,13 +69,13 @@ import { EnvironmentType } from "../constants";
 export const errorHandler = (err: ApplicationError, req, res, next) => {
 
     // 1. format the error
-    err.requestId = req.requestId;
+    // err.requestId = req.requestId;
 
     // 2. log the error (all details)
     console.log(err.message);
 
-    if (err.errorOptions && err.errorOptions.returnAs === ReturnAs.REDIRECT) {
-        const urlParsed = urlHelper.buildUrl(err.errorOptions.redirectUri, {
+    if (err.returnAs === ReturnType.REDIRECT) {
+        const urlParsed = urlHelper.buildUrl(err.redirectUri, {
             error: err.message,
         }, null);
         return res.redirect(urlParsed);
@@ -93,9 +93,9 @@ export const errorHandler = (err: ApplicationError, req, res, next) => {
         error: {
             // code: err.code,
             message: err.message,
-            details: (config.env === EnvironmentType.DEVELOPMENT && err.errorOptions) ? err.errorOptions.developerMessage : null,
+            details: (config.env === EnvironmentType.DEVELOPMENT) ? err.developerMessage : null,
             stack: (config.env === EnvironmentType.DEVELOPMENT) ? err.stack : null,
-            requestId: err.requestId,
+            requestId: req.requestId,
             // helpUrl: "http://.../err.helpUrl",
             // validationErrors: err.validationErrors
         },
@@ -103,7 +103,7 @@ export const errorHandler = (err: ApplicationError, req, res, next) => {
 
     res.status(err.status || 500);
 
-    if (err.errorOptions && err.errorOptions.returnAs === ReturnAs.RENDER) {
+    if (err.returnAs === ReturnType.RENDER) {
         return res.status(err.status).render("error", { error: err.message });
     } else { // err.returnAs === returnType.JSON
         return res.status(err.status).json(err);

@@ -1,3 +1,5 @@
+import { ReturnType } from "../constants";
+
 interface IBlobSecrets {
     account?: string;
     key?: string;
@@ -55,11 +57,12 @@ export interface IPersistedPassword {
     hashedPassword: string;
 }
 
-export interface IErrorOptions {
-    developerMessage?: string;
-    returnAs?: any;
-    redirectUri?: string;
-}
+// export interface IErrorOptions {
+//     status: number;
+//     developerMessage?: string;
+//     returnAs?: ReturnType;
+//     redirectUri?: URL;
+// }
 
 export interface IContext {
     accessToken?: any;

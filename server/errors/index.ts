@@ -15,24 +15,9 @@
 
 // all these errors are finally caught by an errorHandler middleware
 
-// export class ApplicationError extends Error {
-//     private status: any;
-//     constructor(message, status) {
-//         super();
-
-//         Error.captureStackTrace(this, this.constructor);
-
-//         this.name = this.constructor.name;
-
-//         this.message = message || "Something went wrong. Please try again.";
-
-//         this.status = status || 500;
-//     }
-// }
-
 import { ApplicationError } from "./application.error";
-import { ReturnAs } from "../constants";
-import { IErrorOptions } from "@interfaces";
+
+export { ApplicationError } from "./application.error";
 
 // https://www.quora.com/Which-HTTP-code-is-best-suited-for-validation-errors-400-or-422
 // ex: http:localhost:8080/getDetails?user_id=12345
@@ -40,34 +25,34 @@ import { IErrorOptions } from "@interfaces";
 // Use 400 (BadRequest) if the query is syntactically incorrect
 // ex: you do not provide the user_id
 export class BadRequest extends ApplicationError {
-    constructor(message, errorOptions?: IErrorOptions) {
-        super(400, message, errorOptions);
+    constructor(message) {
+        super(400, message);
     }
 }
 
 // Use 422 (Unprocessable Entity) if the query is well formatted but semantically incorrect
 // ex: you provide the user_id but it's not valid i.e a -43.67
 export class ValidationError extends ApplicationError {
-    constructor(message, errorOptions?: IErrorOptions) {
-        super(400, message, errorOptions);
+    constructor(message) {
+        super(400, message);
     }
 }
 
 export class Unauthorized extends ApplicationError {
-    constructor(message, errorOptions?: IErrorOptions) {
-        super(401, message, errorOptions);
+    constructor(message) {
+        super(401, message);
     }
 }
 
 export class Forbidden extends ApplicationError {
-    constructor(errorOptions?: IErrorOptions) {
-        super(403, "Forbidden", errorOptions);
+    constructor() {
+        super(403, "Forbidden");
     }
 }
 
 // Use 404 (NotFound) if the resource you address in URL is not found
 export class NotFound extends ApplicationError {
-    constructor(errorOptions?: IErrorOptions) {
-        super(404, "Not Found", errorOptions);
+    constructor() {
+        super(404, "Not Found");
     }
 }

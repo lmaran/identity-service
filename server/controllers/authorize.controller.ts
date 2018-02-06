@@ -5,7 +5,7 @@ import { requestData } from "../data";
 import { clientService } from "../services";
 import { urlHelper } from "../helpers";
 import * as err from "../errors";
-import { OAuthAuthorizationError, ReturnAs } from "../constants";
+import { OAuthAuthorizationError, ReturnType } from "../constants";
 
 export const authorizeController = {
 
@@ -13,16 +13,14 @@ export const authorizeController = {
         try {
             const tenantCode = req.ctx.tenantCode;
             if (!tenantCode) {
-                throw new err.ValidationError("Missing tenant", {
-                    developerMessage: `There was no tenant code`,
-                    returnAs: ReturnAs.RENDER,
-                });
+                throw new err.ValidationError("Missing tenant")
+                    .withDeveloperMessage("There was no tenant code")
+                    .withReturnAs(ReturnType.RENDER);
             }
 
             // requested values
             const clientId: string = req.query.client_id;
-            const redirectUri: string = req.query.redirect_uri;
-
+            const redirectUri: URL = req.query.redirect_uri;
 
             const client: IClient = await clientService.getByCode(clientId, tenantCode);
 
@@ -38,17 +36,15 @@ export const authorizeController = {
             // invalid redirection URI.
 
             if (!client) {
-                throw new err.ValidationError(`Unknown client`, {
-                    developerMessage: `Unknown client ${req.query.client_id}`,
-                    returnAs: ReturnAs.RENDER,
-                });
+                throw new err.ValidationError("Unknown client")
+                    .withDeveloperMessage(`Unknown client ${req.query.client_id}`)
+                    .withReturnAs(ReturnType.RENDER);
             }
 
-            if (!_.includes(accRedirectUris, redirectUri)) {
-                throw new err.ValidationError(`Invalid redirect URI`, {
-                    developerMessage: `Mismatched redirect URI, expected ${accRedirectUris} got ${redirectUri}`,
-                    returnAs: ReturnAs.RENDER,
-                });
+            if (!_.includes(accRedirectUris, redirectUri.toString())) {
+                throw new err.ValidationError("Invalid redirect URI")
+                    .withDeveloperMessage(`Mismatched redirect URI, expected ${accRedirectUris} got ${redirectUri}`)
+                    .withReturnAs(ReturnType.RENDER);
             }
 
             // If the resource owner denies the access request or if the request
@@ -61,11 +57,10 @@ export const authorizeController = {
             const accScopes = client.scope ? client.scope.split(" ") : [];
             // _.difference([2, 1], [2, 3]); => [1]
             if (_.difference(reqScopes, accScopes).length > 0) {
-                throw new err.ValidationError(OAuthAuthorizationError.INVALID_SCOPE, {
-                    developerMessage: `client asked for a scope it couldn't have`,
-                    returnAs: ReturnAs.REDIRECT,
-                    redirectUri,
-                });
+                throw new err.ValidationError(OAuthAuthorizationError.INVALID_SCOPE)
+                    .withDeveloperMessage("Client asked for a scope it couldn't have")
+                    .withReturnAs(ReturnType.REDIRECT)
+                    .withRedirectUri(redirectUri);
             }
 
             requestData.create({ requestId: req.ctx.requestId, query: req.query }); // don't have to wait to complete

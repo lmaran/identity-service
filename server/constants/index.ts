@@ -33,7 +33,7 @@ export const enum AppError {
 
 }
 
-export const enum ReturnAs {
+export const enum ReturnType {
     RENDER = "render",
     JSON = "json",
     REDIRECT = "redirect",

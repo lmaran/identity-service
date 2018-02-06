@@ -6,7 +6,7 @@ import * as jose from "jsrsasign";
 import { clientService, tokenService } from "../services";
 import { codeData } from "../data";
 import * as err from "../errors";
-import { OAuthTokenError, ReturnAs } from "../constants";
+import { OAuthTokenError, ReturnType } from "../constants";
 
 export const tokenController = {
 
@@ -15,10 +15,9 @@ export const tokenController = {
         try {
             const tenantCode = req.ctx.tenantCode;
             if (!tenantCode) {
-                throw new err.ValidationError("Missing tenant", {
-                    developerMessage: `There was no tenant code`,
-                    returnAs: ReturnAs.RENDER,
-                });
+                throw new err.ValidationError("Missing tenant")
+                    .withDeveloperMessage("There was no tenant code")
+                    .withReturnAs(ReturnType.RENDER);
             }
 
             const auth = req.headers.authorization;
@@ -35,10 +34,9 @@ export const tokenController = {
             if (req.body.client_id) {
                 if (clientId) {
                     // if we've already seen the client's credentials in the authorization header, this is an error
-                    throw new err.Unauthorized(OAuthTokenError.INVALID_CLIENT, {
-                        developerMessage: `Client attempted to authenticate with multiple methods`,
-                        returnAs: ReturnAs.JSON,
-                    });
+                    throw new err.Unauthorized(OAuthTokenError.INVALID_CLIENT)
+                        .withDeveloperMessage("Client attempted to authenticate with multiple methods")
+                        .withReturnAs(ReturnType.JSON);
                 }
 
                 clientId = req.body.client_id;
@@ -47,17 +45,15 @@ export const tokenController = {
 
             const client = await clientService.getByCode(clientId, tenantCode);
             if (!client) {
-                throw new err.Unauthorized(OAuthTokenError.INVALID_CLIENT, {
-                    developerMessage: `Client ${clientId} not found for tenant ${tenantCode}`,
-                    returnAs: ReturnAs.JSON,
-                });
+                throw new err.Unauthorized(OAuthTokenError.INVALID_CLIENT)
+                    .withDeveloperMessage(`Client ${clientId} not found for tenant ${tenantCode}`)
+                    .withReturnAs(ReturnType.JSON);
             }
 
             if (client.client_secret !== clientSecret) {
-                throw new err.Unauthorized(OAuthTokenError.INVALID_CLIENT, {
-                    developerMessage: `Mismatched client secret, expected ${client.client_secret} got ${clientSecret}`,
-                    returnAs: ReturnAs.JSON,
-                });
+                throw new err.Unauthorized(OAuthTokenError.INVALID_CLIENT)
+                    .withDeveloperMessage(`Mismatched client secret, expected ${client.client_secret} got ${clientSecret}`)
+                    .withReturnAs(ReturnType.JSON);
             }
 
             if (req.body.grant_type === "authorization_code") {
@@ -68,10 +64,9 @@ export const tokenController = {
                     // console.log("Unknown code, %s", req.body.code);
                     // res.status(400).json({ error: OAuthTokenError.INVALID_GRANT });
                     // return;
-                    throw new err.BadRequest(OAuthTokenError.INVALID_GRANT, {
-                        developerMessage: `Unknown code: ${req.body.code}`,
-                        returnAs: ReturnAs.JSON,
-                    });
+                    throw new err.BadRequest(OAuthTokenError.INVALID_GRANT)
+                        .withDeveloperMessage(`Unknown code: ${req.body.code}`)
+                        .withReturnAs(ReturnType.JSON);
                 }
                 codeData.delete(req.body.code); // don't have to wait to complete
 
@@ -79,10 +74,9 @@ export const tokenController = {
                     // console.log("Client mismatch, expected %s got %s", code.request.client_id, clientId);
                     // res.status(400).json({ error: OAuthTokenError.INVALID_GRANT });
                     // return;
-                    throw new err.BadRequest(OAuthTokenError.INVALID_GRANT, {
-                        developerMessage: `Client mismatch, expected ${code.request.client_id} got ${clientId}`,
-                        returnAs: ReturnAs.JSON,
-                    });
+                    throw new err.BadRequest(OAuthTokenError.INVALID_GRANT)
+                        .withDeveloperMessage(`Client mismatch, expected ${code.request.client_id} got ${clientId}`)
+                        .withReturnAs(ReturnType.JSON);
                 }
 
                 const header = { typ: "JWT", alg: rsaKey.alg, kid: rsaKey.kid };
@@ -137,10 +131,9 @@ export const tokenController = {
                     // console.log("No matching token was found.");
                     // res.status(400).json({ error: OAuthTokenError.INVALID_GRANT });
                     // return;
-                    throw new err.BadRequest(OAuthTokenError.INVALID_GRANT, {
-                        developerMessage: `No matching token was found for this refresh token: ${req.body.refresh_token}`,
-                        returnAs: ReturnAs.JSON,
-                    });
+                    throw new err.BadRequest(OAuthTokenError.INVALID_GRANT)
+                        .withDeveloperMessage(`No matching token was found for this refresh token: ${req.body.refresh_token}`)
+                        .withReturnAs(ReturnType.JSON);
                 }
 
                 console.log("We found a matching refresh token: %s", req.body.refresh_token);
@@ -149,10 +142,9 @@ export const tokenController = {
 
                     // res.status(400).json({ error: OAuthTokenError.INVALID_GRANT });
                     // return;
-                    throw new err.BadRequest(OAuthTokenError.INVALID_GRANT, {
-                        developerMessage: `No matching clientId: expected ${token.client_id} got ${clientId}`,
-                        returnAs: ReturnAs.JSON,
-                    });
+                    throw new err.BadRequest(OAuthTokenError.INVALID_GRANT)
+                        .withDeveloperMessage(`No matching clientId: expected ${token.client_id} got ${clientId}`)
+                        .withReturnAs(ReturnType.JSON);
                 }
                 const access_token = randomstring.generate();
                 tokenService.createToken({ access_token, client_id: clientId });
@@ -162,8 +154,11 @@ export const tokenController = {
                 return;
 
             } else {
-                console.log("Unknown grant type %s", req.body.grant_type);
-                res.status(400).json({ error: OAuthTokenError.UNSUPPORTED_GRANT_TYPE });
+                // console.log("Unknown grant type %s", req.body.grant_type);
+                // res.status(400).json({ error: OAuthTokenError.UNSUPPORTED_GRANT_TYPE });
+                throw new err.BadRequest(OAuthTokenError.UNSUPPORTED_GRANT_TYPE)
+                    .withDeveloperMessage(`Unknown grant type ${req.body.grant_type}`)
+                    .withReturnAs(ReturnType.JSON);
             }
         } catch (err) {
             next(err);
@@ -178,9 +173,9 @@ export const tokenController = {
 
             const tenantCode = req.ctx.tenantCode;
             if (!tenantCode) {
-                console.log("Missing tenant");
-                res.render("error", { error: "Missing tenant" });
-                return;
+                throw new err.ValidationError("Missing tenant")
+                    .withDeveloperMessage("There was no tenant code")
+                    .withReturnAs(ReturnType.RENDER);
             }
 
             if (auth) {
@@ -194,9 +189,12 @@ export const tokenController = {
             if (req.body.client_id) {
                 if (clientId) {
                     // if we've already seen the client's credentials in the authorization header, this is an error
-                    console.log("Client attempted to authenticate with multiple methods");
-                    res.status(401).json({ error: OAuthTokenError.INVALID_CLIENT });
-                    return;
+                    // console.log("Client attempted to authenticate with multiple methods");
+                    // res.status(401).json({ error: OAuthTokenError.INVALID_CLIENT });
+                    // return;
+                    throw new err.Unauthorized(OAuthTokenError.INVALID_CLIENT)
+                        .withDeveloperMessage("Client attempted to authenticate with multiple methods")
+                        .withReturnAs(ReturnType.JSON);
                 }
 
                 clientId = req.body.client_id;
@@ -205,22 +203,28 @@ export const tokenController = {
 
             const client = await clientService.getByCode(clientId, tenantCode);
             if (!client) {
-                console.log("Unknown client %s", clientId);
-                res.status(401).json({ error: OAuthTokenError.INVALID_CLIENT });
-                return;
+                // console.log("Unknown client %s", clientId);
+                // res.status(401).json({ error: OAuthTokenError.INVALID_CLIENT });
+                // return;
+                throw new err.Unauthorized(OAuthTokenError.INVALID_CLIENT)
+                    .withDeveloperMessage(`Client ${clientId} not found for tenant ${tenantCode}`)
+                    .withReturnAs(ReturnType.JSON);
             }
 
             if (client.client_secret !== clientSecret) {
-                console.log("Mismatched client secret, expected %s got %s", client.client_secret, clientSecret);
-                res.status(401).json({ error: OAuthTokenError.INVALID_CLIENT });
-                return;
+                // console.log("Mismatched client secret, expected %s got %s", client.client_secret, clientSecret);
+                // res.status(401).json({ error: OAuthTokenError.INVALID_CLIENT });
+                // return;
+                throw new err.Unauthorized(OAuthTokenError.INVALID_CLIENT)
+                    .withDeveloperMessage(`Mismatched client secret, expected ${client.client_secret} got ${clientSecret}`)
+                    .withReturnAs(ReturnType.JSON);
             }
 
             const inToken = req.body.token;
 
             const count = await tokenService.deleteAccessToken(inToken, clientId);
             console.log("Removed %s tokens", count);
-            res.sendStatus(204);
+            res.sendStatus(204); // No Content
             // return;
         } catch (err) {
             next(err);
