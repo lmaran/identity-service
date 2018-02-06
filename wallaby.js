@@ -2,7 +2,7 @@ module.exports = () => {
     return {
         files: [
             'server/**/*.ts',
-            '!server/**/*.test.ts'
+            '!server/test/**/*.test.ts'
         ],
 
         tests: [

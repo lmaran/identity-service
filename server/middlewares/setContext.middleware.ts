@@ -8,11 +8,13 @@ import { urlHelper } from "../helpers";
 
 export const setContext = async (req: Request, res: Response, next: NextFunction) => {
 
-    // 1. set requestId
-    req.ctx.requestId = randomstring.generate(8);
+    req.ctx = {};
 
-    // 2. set tenantCode
-    req.ctx.tenantCode = urlHelper.getTenantCode(req.subdomains);
+    // 1. set requestId
+    // req.ctx.requestId = randomstring.generate(8);
+
+    // // 2. set tenantCode
+    // req.ctx.tenantCode = urlHelper.getTenantCode(req.subdomains);
 
     next();
 };

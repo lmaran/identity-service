@@ -6,7 +6,8 @@
         "no-console": false,
         "variable-name": {
             "options": [
-                "allow-snake-case"
+                "allow-snake-case",
+                "allow-leading-underscore"
             ]
         },
         "max-line-length":false,

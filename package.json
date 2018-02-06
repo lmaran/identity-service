@@ -20,7 +20,7 @@
         "watch-pub": "cpx \"server/public/**/*.*\" dist/server/public --watch --no-initial --verbose",
         "watch-dist": "nodemon --config nodemon.json",
         "lint": "tslint './server/**/*.ts' -c tslint.json --format stylish --force",
-        "test": "mocha 'dist/**/*.test.js' --exit",
+        "test": "mocha \"dist/**/*.test.js\" --exit",
         "clean": "rimraf dist"
     },
     "dependencies": {
