@@ -1,6 +1,7 @@
 import * as http from "http";
 import config from "./config";
 import app from "./app";
+import logger from "./logger";
 
 // const app = expressApp.getInstance();
 const httpServer: http.Server = http.createServer(app);
@@ -12,8 +13,6 @@ httpServer.on("close", onClose);
 httpServer.on("listening", onListening);
 
 function onError(error: any) {
-    // console.log(error.syscall);
-    // console.log(error.message);
     if (error.syscall !== "listen") {
         throw error;
     }
@@ -21,11 +20,11 @@ function onError(error: any) {
     // handle specific listen errors with friendly messages
     switch (error.code) {
         case "EACCES":
-            console.error(`Port ${config.port} requires elevated privileges`);
+            logger.error(`Port ${config.port} requires elevated privileges`);
             process.exit(1);
             break;
         case "EADDRINUSE":
-            console.error(`Port ${config.port} is already in use`);
+            logger.error(`Port ${config.port} is already in use`);
             process.exit(1);
             break;
         default:
@@ -35,9 +34,9 @@ function onError(error: any) {
 
 function onListening() {
     const addr = httpServer.address();
-    console.log(`Express server listening on port ${addr.port} in ${config.env} mode;`);
+    logger.warn(`Express server listening on port ${addr.port} in ${config.env} mode;`);
 }
 
 function onClose() {
-    console.log("was closed");
+    logger.warn("Express server was closed");
 }
