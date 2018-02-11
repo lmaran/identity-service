@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const http = require("http");
 const config_1 = require("./config");
 const app_1 = require("./app");
+const logger_1 = require("./logger");
 const httpServer = http.createServer(app_1.default);
 httpServer.address();
 httpServer.listen(config_1.default.port);
@@ -15,11 +16,11 @@ function onError(error) {
     }
     switch (error.code) {
         case "EACCES":
-            console.error(`Port ${config_1.default.port} requires elevated privileges`);
+            logger_1.default.error(`Port ${config_1.default.port} requires elevated privileges`);
             process.exit(1);
             break;
         case "EADDRINUSE":
-            console.error(`Port ${config_1.default.port} is already in use`);
+            logger_1.default.error(`Port ${config_1.default.port} is already in use`);
             process.exit(1);
             break;
         default:
@@ -28,8 +29,8 @@ function onError(error) {
 }
 function onListening() {
     const addr = httpServer.address();
-    console.log(`Express server listening on port ${addr.port} in ${config_1.default.env} mode;`);
+    logger_1.default.warn(`Express server listening on port ${addr.port} in ${config_1.default.env} mode;`);
 }
 function onClose() {
-    console.log("was closed");
+    logger_1.default.warn("Express server was closed");
 }

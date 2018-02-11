@@ -33,5 +33,5 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(middlewares_1.setContext);
 app.use(routes_1.default);
 app.use(middlewares_1.catch404);
-app.use(middlewares_1.errorLogHandler);
+app.use(middlewares_1.errorHandler);
 exports.default = app;
