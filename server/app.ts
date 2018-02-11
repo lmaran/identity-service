@@ -2,7 +2,7 @@ import * as express from "express";
 import * as path from "path";
 import * as favicon from "serve-favicon";
 import allRoutes from "./routes";
-import { setContext, errorLogHandler, catch404 } from "./middlewares";
+import { setContext, errorHandler, catch404 } from "./middlewares";
 
 import * as url from "url";
 import * as bodyParser from "body-parser";
@@ -49,6 +49,6 @@ app.use(allRoutes);
 // catch 404 and forward to error handler
 app.use(catch404);
 
-app.use(errorLogHandler);
+app.use(errorHandler);
 
 export default app;

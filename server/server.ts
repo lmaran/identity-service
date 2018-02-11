@@ -34,6 +34,8 @@ function onError(error: any) {
 
 function onListening() {
     const addr = httpServer.address();
+    // logger.error(new Error("This is an error"));
+    // logger.log("verbose", "aaabb");
     logger.warn(`Express server listening on port ${addr.port} in ${config.env} mode;`);
 }
 

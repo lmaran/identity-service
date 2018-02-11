@@ -65,6 +65,7 @@ import { ApplicationError } from "../errors/application.error";
 import { urlHelper } from "../helpers";
 import config from "../config";
 import { EnvironmentType } from "../constants";
+import logger from "../logger";
 
 export const errorHandler = (err: ApplicationError, req, res, next) => {
 
@@ -72,7 +73,7 @@ export const errorHandler = (err: ApplicationError, req, res, next) => {
     // err.requestId = req.requestId;
 
     // 2. log the error (all details)
-    console.log(err.message);
+    // console.log(err.message);
 
     if (err.returnAs === ReturnType.REDIRECT) {
         const urlParsed = urlHelper.buildUrl(err.redirectUri, {
@@ -95,7 +96,7 @@ export const errorHandler = (err: ApplicationError, req, res, next) => {
             message: err.message,
             details: (config.env === EnvironmentType.DEVELOPMENT) ? err.developerMessage : null,
             stack: (config.env === EnvironmentType.DEVELOPMENT) ? err.stack : null,
-            requestId: req.requestId,
+            requestId: req.ctx.requestId,
             // helpUrl: "http://.../err.helpUrl",
             // validationErrors: err.validationErrors
         },
@@ -103,10 +104,24 @@ export const errorHandler = (err: ApplicationError, req, res, next) => {
 
     res.status(err.status || 500);
 
+    const meta = {
+        // request: req,
+        err: {
+            message: err.message,
+            // details: (config.env === EnvironmentType.DEVELOPMENT) ? err.developerMessage : null,
+            stack: (config.env === EnvironmentType.DEVELOPMENT) ? err.stack : null,
+            requestId: req.ctx.requestId,
+        },
+        req: {aa: 11},
+        res: {bb: 22},
+    };
+
+    logger.error(err.message, meta);
+
     if (err.returnAs === ReturnType.RENDER) {
-        return res.status(err.status).render("error", { error: err.message });
+        return res.status(err.status || 500).render("error", { error: err.message });
     } else { // err.returnAs === returnType.JSON
-        return res.status(err.status).json(err);
+        return res.status(err.status || 500).json(err);
     }
     // return res.render("error", { error: err.message });
 };

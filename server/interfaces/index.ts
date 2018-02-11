@@ -21,6 +21,9 @@ export interface IEnvConfig {
     azureBlobStorage?: IBlobSecrets;
     azureBlobStorageCool?: IBlobSecrets;
     authRootUrl?: string;
+    logglyToken?: string;
+    logglySubdomain?: string;
+
 }
 
 export interface IClient {

@@ -1,3 +1,2 @@
-import * as winston from "winston";
-
-export default winston;
+ import logger from "./logger";
+ export default logger;
