@@ -6,6 +6,8 @@ const config = {
         uri: "mongodb://localhost",
         dbName: "identity-service-dev",
     },
-    rollbarToken: "<RollbarToken>",
+    rollbarToken: "<rollbarToken>",
+    logglyToken: "<logglyToken>",
+    logglySubdomain: "<logglySubdomain>",
 };
 exports.default = config;

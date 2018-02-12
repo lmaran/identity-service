@@ -6,5 +6,7 @@ const config = {
         uri: "mongodb://localhost",
         dbName: "identity-service-test",
     },
+    logglyToken: process.env.LOGGLY_TOKEN,
+    logglySubdomain: process.env.LOGGLY_SUBDOMAIN,
 };
 exports.default = config;

@@ -16,5 +16,7 @@ const config = {
     },
     authRootUrl: process.env.AUTH_ROOT_URL,
     rollbarToken: process.env.ROLLBAR_TOKEN,
+    logglyToken: process.env.LOGGLY_TOKEN,
+    logglySubdomain: process.env.LOGGLY_SUBDOMAIN,
 };
 exports.default = config;

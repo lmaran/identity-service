@@ -11,7 +11,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.checkController = {
     getCheckPage: (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         try {
-            throw new Error("bb-test1");
+            res.send("identity-service-" + (process.env.DEPLOYMENT_SLOT || "noslot") + "-" + process.env.NODE_ENV);
         }
         catch (err) {
             next(err);
