@@ -29,8 +29,6 @@ declare global {
 // https://stackoverflow.com/a/43797190
 declare module "winston" {
     export interface Transports {
-        RollbarLogger?: any,
         Rollbar?: any,
-        Papertrail?: any,
     }
  }

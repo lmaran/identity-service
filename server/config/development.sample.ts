@@ -7,7 +7,9 @@ const config: IEnvConfig = {
         dbName: "identity-service-dev",
     },
     // authRootUrl: process.env.AUTH_ROOT_URL || "http://identity-service.ro"
-    rollbarToken: "<RollbarToken>",
+    rollbarToken: "<rollbarToken>",
+    logglyToken: "<logglyToken>",
+    logglySubdomain: "<logglySubdomain>",
 };
 
 export default config;

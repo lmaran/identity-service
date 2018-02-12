@@ -11,7 +11,6 @@ const envConfig: IEnvConfig = require(`./${env}`).default;
 
 const common: IEnvConfig = {
     env,
-    rollbarToken: "c40dd41c292340419923230eed1d0d61",
 };
 
 const config = _.merge(common, envConfig);

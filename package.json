@@ -38,10 +38,7 @@
         "url": "^0.11.0",
         "winston": "^2.4.0",
         "winston-azure-application-insights": "^1.1.1",
-        "winston-loggly": "^1.3.1",
-        "winston-loggly-bulk": "^2.0.2",
-        "winston-rollbar": "^0.2.0",
-        "winston-rollbar2": "^2.1.4"
+        "winston-loggly-bulk": "^2.0.2"
     },
     "devDependencies": {
         "@types/body-parser": "^1.16.8",

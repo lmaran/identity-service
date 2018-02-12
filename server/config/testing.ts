@@ -6,7 +6,8 @@ const config: IEnvConfig = {
         uri: "mongodb://localhost",
         dbName: "identity-service-test",
     },
-    // authRootUrl: process.env.AUTH_ROOT_URL || "http://identity-service.ro"
+    logglyToken: process.env.LOGGLY_TOKEN,
+    logglySubdomain: process.env.LOGGLY_SUBDOMAIN,
 };
 
 export default config;
