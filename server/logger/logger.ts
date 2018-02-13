@@ -3,21 +3,31 @@
 import * as winston from "winston";
 import * as chalk from "chalk";
 import config from "../config";
+import { EnvironmentType } from "../constants";
 
 require("./winston-rollbar.transport"); // init Rollbar transport for Winston
 // require("winston-loggly"); // init Loggly transport for Winston
 require("winston-loggly-bulk");
 
+// const rollbarOptions = {
+//     reportLevel: "warn",  // catches just errors and warnings
+//     rollbarAccessToken: config.rollbarToken,
+//     captureUncaught: true,
+//     captureUnhandledRejections: true,
+//     rollbarConfig: {
+//         environment: config.env,
+//         scrubFields: ["password", "oldPassword", "newPassword", "hashedPassword", "salt"],
+//         // enabled: false // Sets whether reporting of errors to Rollbar is enabled (default true)
+//     },
+// };
+
 const rollbarOptions = {
-    reportLevel: "warn",  // catches just errors and warnings
-    rollbarAccessToken: config.rollbarToken,
+    accessToken: config.rollbarToken,
+    reportLevel: "warning",  // catches just errors and warnings; default: "warning"
+    environment: config.env,
+    scrubFields: ["password", "oldPassword", "newPassword", "hashedPassword", "salt"],
     captureUncaught: true,
     captureUnhandledRejections: true,
-    rollbarConfig: {
-        environment: config.env,
-        scrubFields: ["password", "oldPassword", "newPassword", "hashedPassword", "salt"],
-        // enabled: false // Sets whether reporting of errors to Rollbar is enabled (default true)
-    },
 };
 
 const logglyOptions = {
@@ -38,8 +48,8 @@ const logger = new winston.Logger();
 // Winston && Rollbar: debug > info > warning > error
 // E.g. 'info' level catches also 'warning' or 'error' but not 'debug'
 
-if (config.env === "production" || config.env === "staging" || config.env === "development") {
-    // logger.add(winston.transports.Rollbar, rollbarOptions);
+if (config.env === EnvironmentType.PRODUCTION || config.env !== EnvironmentType.STAGING) {
+    logger.add(winston.transports.Rollbar, rollbarOptions);
     logger.add(winston.transports.Loggly, logglyOptions);
 } else { // development
     logger.add(winston.transports.Console, consoleOptions);

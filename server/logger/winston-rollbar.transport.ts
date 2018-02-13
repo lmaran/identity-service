@@ -17,22 +17,12 @@ const winston2rollbar_levels = {
 
 // tslint:disable-next-line:variable-name
 const Transport = exports.Rollbar = function(options) {
-    options = options || {};
-
-    if (!options.rollbarAccessToken) {
-        throw new Error("winston-transport-rollbar requires a 'rollbarAccessToken' property");
+    if (!options.accessToken) {
+        throw new Error("winston-transport-rollbar requires an 'accessToken' property");
     }
 
-    const opts = { accessToken: options.rollbarAccessToken };
-    if (options.rollbarConfig) {
-        Object.assign(opts, options.rollbarConfig);
-    }
-
-    this.rollbar = new Rollbar(opts);
-
+    this.rollbar = new Rollbar(options);
     this.name = "rollbar";
-    this.level = options.level || "warn";
-    this.silent = options.silent || false; // Disable rollbar reporting
 };
 
 /** extends winston.Transport */
@@ -42,10 +32,6 @@ util.inherits(Transport, winston.Transport);
 winston.transports.Rollbar = Transport;
 
 Transport.prototype.log = function(level, msg, meta, callback) {
-    if (this.silent) {
-        return callback(null, true);
-    }
-
     const lvl = winston2rollbar_levels[level];
     if (!lvl) {
         // Skipping due to no level found.
