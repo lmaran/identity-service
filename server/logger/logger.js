@@ -6,14 +6,12 @@ const config_1 = require("../config");
 require("./winston-rollbar.transport");
 require("winston-loggly-bulk");
 const rollbarOptions = {
-    reportLevel: "warn",
-    rollbarAccessToken: config_1.default.rollbarToken,
+    accessToken: config_1.default.rollbarToken,
+    reportLevel: "warning",
+    environment: config_1.default.env,
+    scrubFields: ["password", "oldPassword", "newPassword", "hashedPassword", "salt"],
     captureUncaught: true,
     captureUnhandledRejections: true,
-    rollbarConfig: {
-        environment: config_1.default.env,
-        scrubFields: ["password", "oldPassword", "newPassword", "hashedPassword", "salt"],
-    },
 };
 const logglyOptions = {
     token: config_1.default.logglyToken,
@@ -26,7 +24,8 @@ const consoleOptions = {
     formatter: formatterFunc,
 };
 const logger = new winston.Logger();
-if (config_1.default.env === "production" || config_1.default.env === "staging" || config_1.default.env === "development") {
+if (config_1.default.env === "production" || config_1.default.env !== "staging") {
+    logger.add(winston.transports.Rollbar, rollbarOptions);
     logger.add(winston.transports.Loggly, logglyOptions);
 }
 else {
