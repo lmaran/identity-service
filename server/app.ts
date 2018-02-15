@@ -2,7 +2,7 @@ import * as express from "express";
 import * as path from "path";
 import * as favicon from "serve-favicon";
 import allRoutes from "./routes";
-import { setContext, errorHandler, catch404 } from "./middlewares";
+import { setContext, errorHandler, httpLogHandler, catch404 } from "./middlewares";
 
 import * as url from "url";
 import * as bodyParser from "body-parser";
@@ -50,5 +50,8 @@ app.use(allRoutes);
 app.use(catch404);
 
 app.use(errorHandler);
+app.use(httpLogHandler);
+
+// "uncaughtException" and "unhandledRejection" are caught in server.ts
 
 export default app;

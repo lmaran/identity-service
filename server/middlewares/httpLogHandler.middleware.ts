@@ -5,8 +5,8 @@
 // Morgan does not let you log req/res body: http://stackoverflow.com/a/30227670
 
 const winston = require("winston"); // for transports.Console
-const config = require("../config/environment");
-const logger = require("./logger");
+const config = require("../config");
+const logger = require("../logger");
 import { getShortReq } from "../helpers";
 
 export const httpLogHandler = (err, req, res, next) => {

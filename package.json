@@ -37,7 +37,6 @@
         "serve-favicon": "^2.4.5",
         "url": "^0.11.0",
         "winston": "^2.4.0",
-        "winston-azure-application-insights": "^1.1.1",
         "winston-loggly-bulk": "^2.0.2"
     },
     "devDependencies": {
