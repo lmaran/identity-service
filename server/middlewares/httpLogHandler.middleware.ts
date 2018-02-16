@@ -4,12 +4,12 @@
 // this middleware act as a replacement for Morgan
 // Morgan does not let you log req/res body: http://stackoverflow.com/a/30227670
 
-const winston = require("winston"); // for transports.Console
-const config = require("../config");
-const logger = require("../logger");
+import config from "../config";
+import logger from "../logger";
 import { getShortReq } from "../helpers";
 
-export const httpLogHandler = (err, req, res, next) => {
+export const httpLogHandler = (req, res, next) => {
+    console.log("Start httpLogHandler...");
     req._startTime = new Date();
 
     // Manage to get information from the response too, just like Connect.logger does:

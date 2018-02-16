@@ -68,60 +68,62 @@ import { EnvironmentType } from "../constants";
 import logger from "../logger";
 
 export const errorHandler = (err: ApplicationError, req, res, next) => {
+    console.log("Start errorHandler...");
+    return next();
 
-    // 1. format the error
-    // err.requestId = req.requestId;
+    // // 1. format the error
+    // // err.requestId = req.requestId;
 
-    // 2. log the error (all details)
-    // console.log(err.message);
+    // // 2. log the error (all details)
+    // // console.log(err.message);
 
-    if (err.returnAs === ReturnType.REDIRECT) {
-        const urlParsed = urlHelper.buildUrl(err.redirectUri, {
-            error: err.message,
-        }, null);
-        return res.redirect(urlParsed);
-    }
-
-    // 4. return the error to the user (without sensitive details)
-
-    // 3. remove sensitive details for non-dev environments
-    // if (config.env === "development") {
-    //     err.stack = null;
-    //     err.details = null;
+    // if (err.returnAs === ReturnType.REDIRECT) {
+    //     const urlParsed = urlHelper.buildUrl(err.redirectUri, {
+    //         error: err.message,
+    //     }, null);
+    //     return res.redirect(urlParsed);
     // }
 
-    const error = {
-        error: {
-            // code: err.code,
-            message: err.message,
-            details: (config.env === EnvironmentType.DEVELOPMENT) ? err.developerMessage : null,
-            stack: (config.env === EnvironmentType.DEVELOPMENT) ? err.stack : null,
-            requestId: req.ctx.requestId,
-            // helpUrl: "http://.../err.helpUrl",
-            // validationErrors: err.validationErrors
-        },
-    };
+    // // 4. return the error to the user (without sensitive details)
 
-    res.status(err.status || 500);
+    // // 3. remove sensitive details for non-dev environments
+    // // if (config.env === "development") {
+    // //     err.stack = null;
+    // //     err.details = null;
+    // // }
 
-    const meta = {
-        // request: req,
-        err: {
-            message: err.message,
-            // details: (config.env === EnvironmentType.DEVELOPMENT) ? err.developerMessage : null,
-            stack: (config.env === EnvironmentType.DEVELOPMENT) ? err.stack : null,
-            requestId: req.ctx.requestId,
-        },
-        req: {aa: 11},
-        res: {bb: 22},
-    };
+    // const error = {
+    //     error: {
+    //         // code: err.code,
+    //         message: err.message,
+    //         details: (config.env === EnvironmentType.DEVELOPMENT) ? err.developerMessage : null,
+    //         stack: (config.env === EnvironmentType.DEVELOPMENT) ? err.stack : null,
+    //         requestId: req.ctx.requestId,
+    //         // helpUrl: "http://.../err.helpUrl",
+    //         // validationErrors: err.validationErrors
+    //     },
+    // };
 
-    logger.error(err.message, meta);
+    // res.status(err.status || 500);
 
-    if (err.returnAs === ReturnType.RENDER) {
-        return res.status(err.status || 500).render("error", { error: err.message });
-    } else { // err.returnAs === returnType.JSON
-        return res.status(err.status || 500).json(err);
-    }
-    // return res.render("error", { error: err.message });
+    // const meta = {
+    //     // request: req,
+    //     err: {
+    //         message: err.message,
+    //         // details: (config.env === EnvironmentType.DEVELOPMENT) ? err.developerMessage : null,
+    //         stack: (config.env === EnvironmentType.DEVELOPMENT) ? err.stack : null,
+    //         requestId: req.ctx.requestId,
+    //     },
+    //     req: {aa: 11},
+    //     res: {bb: 22},
+    // };
+
+    // logger.error(err.message, meta);
+
+    // if (err.returnAs === ReturnType.RENDER) {
+    //     return res.status(err.status || 500).render("error", { error: err.message });
+    // } else { // err.returnAs === returnType.JSON
+    //     return res.status(err.status || 500).json(err);
+    // }
+    // // return res.render("error", { error: err.message });
 };
