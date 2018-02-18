@@ -1,38 +1,83 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const application_error_1 = require("../errors/application.error");
 const helpers_1 = require("../helpers");
-const config_1 = require("../config");
 const logger_1 = require("../logger");
 exports.errorHandler = (err, req, res, next) => {
-    if (err.returnAs === "redirect") {
-        const urlParsed = helpers_1.urlHelper.buildUrl(err.redirectUri, {
-            error: err.message,
-        }, null);
-        return res.redirect(urlParsed);
+    let meta;
+    let returnType;
+    if (err instanceof application_error_1.ApplicationError) {
+        res.status(err.status);
+        meta = {
+            requestId: req.ctx.requestId,
+            developerMessage: err.developerMessage,
+            errorType: err.name,
+            logSource: "errorHandler",
+            stack: err.stack,
+        };
+        logger_1.default.info(err.message, meta);
+        returnType = getReturnType(req, err);
+        if (returnType === "redirect") {
+            const urlParsed = helpers_1.urlHelper.buildUrl(err.redirectUri, {
+                error: err.message,
+            }, null);
+            return res.redirect(urlParsed);
+        }
+        if (returnType === "html") {
+            return res.render("error", { error: err.message });
+        }
+        if (returnType === "json") {
+            return res.json({ error: err.message });
+        }
+        return res.type("txt").send(err.message);
     }
-    const error = {
-        error: {
-            message: err.message,
-            details: (config_1.default.env === "development") ? err.developerMessage : null,
-            stack: (config_1.default.env === "development") ? err.stack : null,
+    if (err instanceof Error) {
+        res.status(500);
+        meta = {
             requestId: req.ctx.requestId,
-        },
+            errorType: err.name,
+            logSource: "errorHandler",
+            stack: err.stack,
+        };
+        logger_1.default.error(err.message, meta);
+        returnType = getReturnType(req);
+        if (returnType === "html") {
+            return res.render("error", { error: err.message });
+        }
+        if (returnType === "json") {
+            return res.json({ error: err.message });
+        }
+        return res.type("txt").send(err.message);
+    }
+    meta = {
+        requestId: req.ctx.requestId,
+        errorType: "UnknownError",
+        logSource: "errorHandler",
     };
-    res.status(err.status || 500);
-    const meta = {
-        err: {
-            message: err.message,
-            stack: (config_1.default.env === "development") ? err.stack : null,
-            requestId: req.ctx.requestId,
-        },
-        req: { aa: 11 },
-        res: { bb: 22 },
-    };
-    logger_1.default.error(err.message, meta);
-    if (err.returnAs === "render") {
-        return res.status(err.status || 500).render("error", { error: err.message });
+    const err2 = { message: err || "Eroare necunoscuta" };
+    logger_1.default.error(err2.message, meta);
+    returnType = getReturnType(req);
+    if (returnType === "html") {
+        return res.render("error", { error: err2.message });
+    }
+    if (returnType === "json") {
+        return res.json({ error: err2.message });
+    }
+    return res.type("txt").send(err.message);
+};
+function getReturnType(req, err) {
+    if (err && err.returnAs) {
+        return err.returnAs;
     }
     else {
-        return res.status(err.status || 500).json(err);
+        if (req.accepts("html")) {
+            return "html";
+        }
+        else if (req.accepts("json")) {
+            return "json";
+        }
+        else {
+            return "text";
+        }
     }
-};
+}

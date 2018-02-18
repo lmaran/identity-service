@@ -1,17 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const winston = require("winston");
-const chalk = require("chalk");
 const config_1 = require("../config");
+const winston_console_formatter_1 = require("./winston-console.formatter");
 require("./winston-rollbar.transport");
-require("winston-loggly-bulk");
+require("./winston-loggly.transport");
 const rollbarOptions = {
     accessToken: config_1.default.rollbarToken,
     reportLevel: "warning",
     environment: config_1.default.env,
     scrubFields: ["password", "oldPassword", "newPassword", "hashedPassword", "salt"],
-    captureUncaught: true,
-    captureUnhandledRejections: true,
 };
 const logglyOptions = {
     token: config_1.default.logglyToken,
@@ -21,51 +19,14 @@ const logglyOptions = {
 };
 const consoleOptions = {
     level: "debug",
-    formatter: formatterFunc,
+    formatter: winston_console_formatter_1.formatterFunc,
 };
 const logger = new winston.Logger();
-if (config_1.default.env === "production" || config_1.default.env !== "staging") {
+if (config_1.default.env === "production" || config_1.default.env === "staging") {
     logger.add(winston.transports.Rollbar, rollbarOptions);
     logger.add(winston.transports.Loggly, logglyOptions);
 }
 else {
     logger.add(winston.transports.Console, consoleOptions);
-}
-function formatterFunc(options) {
-    const meta = options.meta;
-    let msg = "";
-    if (options.level === "info" || options.level === "warn") {
-        if (meta && meta.hasOwnProperty("req")) {
-            msg = msg + meta.req.method + " " + meta.req.url;
-            if (meta.res) {
-                msg = msg + " " + getColorStatus(meta.res.statusCode) + " - " + meta.res.responseTime + " ms ";
-            }
-        }
-        else {
-            msg = msg + (undefined !== options.message ? options.message : "");
-            if (meta && Object.keys(meta).length > 0) {
-                msg = msg + "\n" + JSON.stringify(meta, null, 4);
-            }
-        }
-    }
-    else if (options.level === "error") {
-        if (meta && meta.req) {
-            msg = msg + meta.req.method + " " + meta.req.url;
-        }
-    }
-    return winston.config.colorize(options.level) + " " + msg;
-}
-function getColorStatus(status) {
-    let statusColor = "green";
-    if (status >= 500) {
-        statusColor = "red";
-    }
-    else if (status >= 400) {
-        statusColor = "yellow";
-    }
-    else if (status >= 300) {
-        statusColor = "cyan";
-    }
-    return chalk[statusColor](status);
 }
 exports.default = logger;

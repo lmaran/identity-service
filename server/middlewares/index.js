@@ -7,3 +7,4 @@ __export(require("./token.middleware"));
 __export(require("./errorHandler.middleware"));
 __export(require("./catch404.middleware"));
 __export(require("./setContext.middleware"));
+__export(require("./httpLogHandler.middleware"));

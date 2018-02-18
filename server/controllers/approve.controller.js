@@ -21,7 +21,7 @@ exports.approveController = {
             if (!tenantCode) {
                 throw new err.ValidationError("Missing tenant")
                     .withDeveloperMessage("There was no tenant code")
-                    .withReturnAs("render");
+                    .withReturnAs("html");
             }
             const requestId = req.body.requestId;
             const request = yield data_1.requestData.get(requestId);
@@ -31,7 +31,7 @@ exports.approveController = {
             if (!query) {
                 throw new err.ValidationError("No matching authorization request")
                     .withDeveloperMessage("There was no matching saved request")
-                    .withReturnAs("render");
+                    .withReturnAs("html");
             }
             if (!req.body.approve) {
                 throw new err.ValidationError("access_denied")

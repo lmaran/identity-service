@@ -11,6 +11,7 @@ const winston2rollbar_levels = {
     error: "error",
 };
 const Transport = exports.Rollbar = function (options) {
+    options = options || {};
     if (!options.accessToken) {
         throw new Error("winston-transport-rollbar requires an 'accessToken' property");
     }

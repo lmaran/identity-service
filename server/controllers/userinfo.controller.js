@@ -18,7 +18,7 @@ exports.userinfoController = {
             }
             const user = req.ctx.accessToken.user;
             if (!user) {
-                throw new err.NotFound().withDeveloperMessage("There was no 'user' field in accessToken");
+                throw new err.NotFoundError().withDeveloperMessage("There was no 'user' field in accessToken");
             }
             const out = {};
             _.each(req.ctx.accessToken.scope, scope => {

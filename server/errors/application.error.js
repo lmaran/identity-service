@@ -4,7 +4,6 @@ class ApplicationError extends Error {
     constructor(status, message) {
         super(message);
         this._status = 500;
-        this._returnAs = "json";
         this.name = this.constructor.name;
         this._status = status;
         Error.captureStackTrace(this, this.constructor);

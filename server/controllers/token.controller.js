@@ -22,7 +22,7 @@ exports.tokenController = {
             if (!tenantCode) {
                 throw new err.ValidationError("Missing tenant")
                     .withDeveloperMessage("There was no tenant code")
-                    .withReturnAs("render");
+                    .withReturnAs("html");
             }
             const auth = req.headers.authorization;
             let clientId;
@@ -138,7 +138,7 @@ exports.tokenController = {
             if (!tenantCode) {
                 throw new err.ValidationError("Missing tenant")
                     .withDeveloperMessage("There was no tenant code")
-                    .withReturnAs("render");
+                    .withReturnAs("html");
             }
             if (auth) {
                 const clientCredentials = decodeClientCredentials(auth);
