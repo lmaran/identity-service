@@ -7,123 +7,135 @@
 
 // To catch all errors we can:
 // 1. run each route handler within a try/catch
-    // app.get('/users', async function(req, res, next){
-    //     try {
-    //          res.json(await db.getUsers())
-    //     } catch(err) {
-    //          next(err)
-    //     }
-    // })
+// app.get('/users', async function(req, res, next){
+//     try {
+//          res.json(await db.getUsers())
+//     } catch(err) {
+//          next(err)
+//     }
+// })
 
 // 2. use a wrapper in order to call each event handler
-    // const asyncMiddleware = fn =>
-    //      (req, res, next) => {
-    //          Promise.resolve(fn(req, res, next))
-    //              .catch(err => next(err)) ;
-    //      };
+// const asyncMiddleware = fn =>
+//      (req, res, next) => {
+//          Promise.resolve(fn(req, res, next))
+//              .catch(err => next(err)) ;
+//      };
 
-    // app.get('/users', asyncMiddleware(async function(req, res, next){
-    //      res.json(await db.getUsers())
-    // }))
+// app.get('/users', asyncMiddleware(async function(req, res, next){
+//      res.json(await db.getUsers())
+// }))
 
-// export const errorHandler = (err, req, res, next) => {
-//     // var newReq = reqHelper.getShortReq(req);
-//     // var meta = {req:newReq, err:err};
-
-//     // logger.error('error logger', meta);
-
-//     // if (config.env === 'development') {
-//     //     next(err); // returns errors (and stack trace) in the browser
-//     // } else {
-//     //     next();
-//     // }
-
-//     // if (err.isServer) { // >=500
-//     //     // log the error...
-//     //     // probably you don't want to log unauthorized access
-//     //     // or do you?
-//     // }
-//     // return res.status(err.output.statusCode).json(err.output.payload);
-
-//     console.log(err.message);
-//     res.render("error", { error: err.message });
-// };
-
-// // express-generator error handler
-// app.use((err, req, res, next) => {
-//     // set locals, only providing error in development
-//     res.locals.message = err.message;
-//     res.locals.error = req.app.get("env") === "development" ? err : {};
-
-//     // render the error page
-//     res.status(err.status || 500);
-//     res.render("error");
-// });
-
-import { ReturnType, OAuthAuthorizationError } from "../constants";
+import { Request, Response, NextFunction } from "express";
+import { ReturnType, OAuthAuthorizationError, LogSource } from "../constants";
 import { ApplicationError } from "../errors/application.error";
 import { urlHelper } from "../helpers";
 import config from "../config";
 import { EnvironmentType } from "../constants";
 import logger from "../logger";
+import { PageNotFound, ValidationError } from "../errors";
 
-export const errorHandler = (err: ApplicationError, req, res, next) => {
-    console.log("Start errorHandler...");
-    return next();
+export const errorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
+    let meta: any;
+    let returnType: ReturnType;
 
-    // // 1. format the error
-    // // err.requestId = req.requestId;
+    if (err instanceof ApplicationError) {
+        res.status(err.status);
 
-    // // 2. log the error (all details)
-    // // console.log(err.message);
+        meta = {
+            requestId: req.ctx.requestId,
+            developerMessage: err.developerMessage,
+            errorType: err.name,
+            logSource: LogSource.ERROR_HANDLER,
+            stack: err.stack,
+        };
 
-    // if (err.returnAs === ReturnType.REDIRECT) {
-    //     const urlParsed = urlHelper.buildUrl(err.redirectUri, {
-    //         error: err.message,
-    //     }, null);
-    //     return res.redirect(urlParsed);
-    // }
+        logger.info(err.message, meta);
 
-    // // 4. return the error to the user (without sensitive details)
+        returnType = getReturnType(req, err);
 
-    // // 3. remove sensitive details for non-dev environments
-    // // if (config.env === "development") {
-    // //     err.stack = null;
-    // //     err.details = null;
-    // // }
+        if (returnType === ReturnType.REDIRECT) {
+            const urlParsed = urlHelper.buildUrl(err.redirectUri, {
+                error: err.message,
+            }, null);
+            return res.redirect(urlParsed);
+        }
 
-    // const error = {
-    //     error: {
-    //         // code: err.code,
-    //         message: err.message,
-    //         details: (config.env === EnvironmentType.DEVELOPMENT) ? err.developerMessage : null,
-    //         stack: (config.env === EnvironmentType.DEVELOPMENT) ? err.stack : null,
-    //         requestId: req.ctx.requestId,
-    //         // helpUrl: "http://.../err.helpUrl",
-    //         // validationErrors: err.validationErrors
-    //     },
-    // };
+        if (returnType === ReturnType.HTML) {
+            return res.render("error", { error: err.message });
+        }
 
-    // res.status(err.status || 500);
+        if (returnType === ReturnType.JSON) {
+            return res.json({ error: err.message });
+        }
 
-    // const meta = {
-    //     // request: req,
-    //     err: {
-    //         message: err.message,
-    //         // details: (config.env === EnvironmentType.DEVELOPMENT) ? err.developerMessage : null,
-    //         stack: (config.env === EnvironmentType.DEVELOPMENT) ? err.stack : null,
-    //         requestId: req.ctx.requestId,
-    //     },
-    //     req: {aa: 11},
-    //     res: {bb: 22},
-    // };
+        // default to plain-text
+        return res.type("txt").send(err.message);
 
-    // logger.error(err.message, meta);
+    }
 
-    // if (err.returnAs === ReturnType.RENDER) {
-    //     return res.status(err.status || 500).render("error", { error: err.message });
-    // } else { // err.returnAs === returnType.JSON
-    //     return res.status(err.status || 500).json(err);
-    // }
-    // // return res.render("error", { error: err.message });
+    if (err instanceof Error) {
+        res.status(500);
+
+        meta = {
+            requestId: req.ctx.requestId,
+            errorType: err.name,
+            logSource: LogSource.ERROR_HANDLER,
+            stack: err.stack,
+        };
+
+        logger.error(err.message, meta);
+
+        returnType = getReturnType(req);
+
+        if (returnType === ReturnType.HTML) {
+            return res.render("error", { error: err.message });
+        }
+
+        if (returnType === ReturnType.JSON) {
+            return res.json({ error: err.message });
+        }
+
+        // default to plain-text
+        return res.type("txt").send(err.message);
+
+    }
+
+    // so err is not an Error instance:
+    meta = {
+        requestId: req.ctx.requestId,
+        errorType: "UnknownError",
+        logSource: LogSource.ERROR_HANDLER,
+    };
+
+    const err2 = { message: err || "Eroare necunoscuta"};
+
+    logger.error(err2.message, meta);
+
+    returnType = getReturnType(req);
+
+    if (returnType === ReturnType.HTML) {
+        return res.render("error", { error: err2.message });
+    }
+
+    if (returnType === ReturnType.JSON) {
+        return res.json({ error: err2.message });
+    }
+
+    // default to plain-text
+    return res.type("txt").send(err.message);
 };
+
+function getReturnType(req: Request, err?: ApplicationError): ReturnType {
+    if (err && err.returnAs) {
+        return err.returnAs;
+    } else {
+        if (req.accepts("html")) {
+            return ReturnType.HTML;
+        } else if (req.accepts("json")) {
+            return ReturnType.JSON;
+        } else {
+            return ReturnType.TEXT;
+        }
+    }
+}

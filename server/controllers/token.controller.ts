@@ -17,7 +17,7 @@ export const tokenController = {
             if (!tenantCode) {
                 throw new err.ValidationError("Missing tenant")
                     .withDeveloperMessage("There was no tenant code")
-                    .withReturnAs(ReturnType.RENDER);
+                    .withReturnAs(ReturnType.HTML);
             }
 
             const auth = req.headers.authorization;
@@ -175,7 +175,7 @@ export const tokenController = {
             if (!tenantCode) {
                 throw new err.ValidationError("Missing tenant")
                     .withDeveloperMessage("There was no tenant code")
-                    .withReturnAs(ReturnType.RENDER);
+                    .withReturnAs(ReturnType.HTML);
             }
 
             if (auth) {

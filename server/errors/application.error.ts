@@ -22,10 +22,10 @@ export class ApplicationError extends Error {
     // instance fields with default values
     private _status: number = 500;
     private _developerMessage?: string | undefined;
-    private _returnAs: ReturnType = ReturnType.JSON;
+    private _returnAs: ReturnType | undefined;
     private _redirectUri?: URL | undefined;
 
-    constructor(status: number, message: string) {
+    constructor(status: number, message?: string) {
         super(message);
         this.name = this.constructor.name;
         this._status = status;
@@ -50,7 +50,7 @@ export class ApplicationError extends Error {
     }
 
     get returnAs() { return this._returnAs; }
-    set returnAs(returnAs: ReturnType) { this._returnAs = returnAs; }
+    set returnAs(returnAs: ReturnType | undefined) { this._returnAs = returnAs; }
     public withReturnAs(returnAs: ReturnType) {
         this._returnAs = returnAs;
         return this;

@@ -18,7 +18,7 @@ export const approveController = {
             if (!tenantCode) {
                 throw new err.ValidationError("Missing tenant")
                     .withDeveloperMessage("There was no tenant code")
-                    .withReturnAs(ReturnType.RENDER);
+                    .withReturnAs(ReturnType.HTML);
             }
 
             const requestId = req.body.requestId;
@@ -31,7 +31,7 @@ export const approveController = {
             if (!query) {
                 throw new err.ValidationError("No matching authorization request")
                     .withDeveloperMessage("There was no matching saved request")
-                    .withReturnAs(ReturnType.RENDER);
+                    .withReturnAs(ReturnType.HTML);
             }
 
             if (!req.body.approve) {

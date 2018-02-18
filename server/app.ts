@@ -43,17 +43,16 @@ app.use(express.static(path.join(__dirname, "public")));
 // app.use("/", express.static("server/views"));
 
 app.use(setContext); // adds requestId, tokenCode and other properties to the request object
+
 app.use(httpLogHandler);
 
-// app.use(allRoutes);
+app.use(allRoutes);
 
 // catch 404 and forward to error handler
 app.use(catch404);
-app.use(catch404);
-// console.log("222");
-// app.use(errorHandler);
-// console.log("333");
+
+app.use(errorHandler);
 
 // "uncaughtException" and "unhandledRejection" are caught in server.ts
-app.use(allRoutes);
+
 export default app;

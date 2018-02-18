@@ -18,7 +18,7 @@ export const userinfoController = {
             if (!user) {
                 // res.status(404).end();
                 // return;
-                throw new err.NotFound().withDeveloperMessage("There was no 'user' field in accessToken");
+                throw new err.NotFoundError().withDeveloperMessage("There was no 'user' field in accessToken");
             }
 
             const out = {};

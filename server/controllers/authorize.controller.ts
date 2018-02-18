@@ -15,7 +15,7 @@ export const authorizeController = {
             if (!tenantCode) {
                 throw new err.ValidationError("Missing tenant")
                     .withDeveloperMessage("There was no tenant code")
-                    .withReturnAs(ReturnType.RENDER);
+                    .withReturnAs(ReturnType.HTML);
             }
 
             // requested values
@@ -38,13 +38,13 @@ export const authorizeController = {
             if (!client) {
                 throw new err.ValidationError("Unknown client")
                     .withDeveloperMessage(`Unknown client ${req.query.client_id}`)
-                    .withReturnAs(ReturnType.RENDER);
+                    .withReturnAs(ReturnType.HTML);
             }
 
             if (!_.includes(accRedirectUris, redirectUri.toString())) {
                 throw new err.ValidationError("Invalid redirect URI")
                     .withDeveloperMessage(`Mismatched redirect URI, expected ${accRedirectUris} got ${redirectUri}`)
-                    .withReturnAs(ReturnType.RENDER);
+                    .withReturnAs(ReturnType.HTML);
             }
 
             // If the resource owner denies the access request or if the request

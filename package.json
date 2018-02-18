@@ -31,13 +31,13 @@
         "jsrsasign": "^8.0.4",
         "lodash": "^4.17.4",
         "mongodb": "^3.0.1",
+        "node-loggly-bulk": "^2.2.1",
         "querystring": "^0.2.0",
         "randomstring": "^1.1.5",
         "rollbar": "^2.3.8",
         "serve-favicon": "^2.4.5",
         "url": "^0.11.0",
-        "winston": "^2.4.0",
-        "winston-loggly-bulk": "^2.0.2"
+        "winston": "^2.4.0"
     },
     "devDependencies": {
         "@types/body-parser": "^1.16.8",

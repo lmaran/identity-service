@@ -17,6 +17,7 @@ const winston2rollbar_levels = {
 
 // tslint:disable-next-line:variable-name
 const Transport = exports.Rollbar = function(options) {
+    options = options || {};
     if (!options.accessToken) {
         throw new Error("winston-transport-rollbar requires an 'accessToken' property");
     }
@@ -31,6 +32,13 @@ util.inherits(Transport, winston.Transport);
 /** Define a getter so that `winston.transports.Rollbar` is available and thus backwards compatible. */
 winston.transports.Rollbar = Transport;
 
+// example:
+// log.info(msg, meta) where:
+//     meta = {
+//         request: {},
+//         err: {},
+//         custom: {},
+//     }
 Transport.prototype.log = function(level, msg, meta, callback) {
     const lvl = winston2rollbar_levels[level];
     if (!lvl) {

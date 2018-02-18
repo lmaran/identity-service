@@ -10,11 +10,14 @@ export const getShortReq = (req: Request) => {
     const newReq = {
         headers: req.headers,
         protocol: req.protocol,
-        url: req.originalUrl || req.url,
+        originalUrl: req.originalUrl,
+        url: req.url,
         method: req.method,
         body: req.body,
-        route: req.route,
-        ip: getIp(req),
+        // route: req.route,
+        ctx: req.ctx,
+        // ip: getIp(req),
+        ip: req.ip,
     };
 
     // if (req.user) {
@@ -27,21 +30,6 @@ export const getShortReq = (req: Request) => {
     // }
 
     return newReq;
-};
-
-// https://github.com/expressjs/morgan/blob/master/index.js
-const getIp = (req: Request) => {
-    const ip = req.ip
-        // || req._remoteAddress
-        || (req.connection && req.connection.remoteAddress)
-        || undefined;
-
-    if (ip) {
-        const parts = ip.split(":");
-
-        // IPv6 -> IPv4 ("::ffff:127.0.0.1" -> "127.0.0.1")
-        return parts[parts.length - 1];
-    } else { return ""; }
 };
 
 module.exports.getShortReq = getShortReq;
