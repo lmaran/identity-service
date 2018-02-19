@@ -7,7 +7,6 @@ export const mongoHelper = {
     getDb: async () => {
         try {
             if (!theDb) {
-                // console.log("no db...");
                 if (!config.mongo || !config.mongo.uri) {
                     throw new Error("Nu este definit un connection string pentru Mongo.");
                 }
@@ -23,7 +22,6 @@ export const mongoHelper = {
                 return theDb;
             }
         } catch (error) {
-            console.log("Caught", error.message);
             throw new Error(error);
         }
     },

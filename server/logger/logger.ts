@@ -18,7 +18,7 @@
 
 import * as winston from "winston";
 import config from "../config";
-import { EnvironmentType } from "../constants";
+import { EnvironmentType, LogLevel } from "../constants";
 import { formatterFunc } from "./winston-console.formatter";
 
 require("./winston-rollbar.transport"); // init Rollbar transport for Winston
@@ -26,7 +26,7 @@ require("./winston-loggly.transport");
 
 const rollbarOptions = {
     accessToken: config.rollbarToken,
-    reportLevel: "warning",  // catches just errors and warnings; default: "warning"
+    reportLevel: LogLevel.WARNING,  // catches just errors and warnings; default: "warning"
     environment: config.env,
     scrubFields: ["password", "oldPassword", "newPassword", "hashedPassword", "salt"],
 };
@@ -39,7 +39,7 @@ const logglyOptions = {
 };
 
 const consoleOptions = {
-    level: "debug", // catches all messages
+    level: LogLevel.DEBUG, // catches all messages
     formatter: formatterFunc,
 };
 

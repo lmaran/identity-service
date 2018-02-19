@@ -1,4 +1,5 @@
 import { tokenService } from "../services";
+import logger from "../logger";
 
 export const getAccessToken = async (req, res, next) => {
     // check the auth header first
@@ -13,13 +14,13 @@ export const getAccessToken = async (req, res, next) => {
         inToken = req.query.access_token;
     }
 
-    console.log("Incoming token: %s", inToken);
+    logger.debug("Incoming token: %s", inToken);
 
     const token = await tokenService.getAccessToken(inToken);
     if (token) {
-        console.log("We found a matching token: %s", inToken);
+        logger.debug("We found a matching token: %s", inToken);
     } else {
-        console.log("No matching token was found.");
+        logger.debug("No matching token was found.");
     }
     req.ctx.accessToken = token;
     next();

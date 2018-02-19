@@ -23,7 +23,9 @@ export interface IEnvConfig {
     authRootUrl?: string;
     logglyToken?: string;
     logglySubdomain?: string;
-
+    logLevel?: string;
+    httpRequestLogDetails?: string | number;
+    httpResponseLogDetails?: string | number;
 }
 
 export interface IClient {
@@ -71,4 +73,5 @@ export interface IContext {
     accessToken?: any;
     tenantCode?: string;
     requestId?: string;
+    startTime?: Date;
 }
