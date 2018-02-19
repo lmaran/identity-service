@@ -1,5 +1,5 @@
 import { IEnvConfig } from "@interfaces";
-import { LogLevel, LogDetails } from "../constants";
+import { LogLevel, LogDetail } from "../constants";
 
 const config: IEnvConfig = {
     port: process.env.PORT || 1420,
@@ -14,8 +14,8 @@ const config: IEnvConfig = {
     logLevel: LogLevel.DEBUG,
     httpLogDetails: {
         request: {
-            general: LogDetails.PARTIAL,
-            headers: process.env.HTTP_LOG_DETAILS_REQUEST_HEADERS || LogDetails.EMPTY,
+            general: LogDetail.PARTIAL,
+            headers: process.env.HTTP_LOG_DETAILS_REQUEST_HEADERS || LogDetail.EMPTY,
         },
     },
 };

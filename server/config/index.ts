@@ -1,6 +1,6 @@
 import * as _ from "lodash";
 import * as path from "path";
-import { EnvironmentType, LogDetails } from "../constants";
+import { EnvironmentType, LogDetail } from "../constants";
 import { IEnvConfig } from "@interfaces";
 
 const env: string = (process.env.NODE_ENV || "development").toLowerCase();
@@ -17,14 +17,14 @@ const common: IEnvConfig = {
 
     httpLogDetails: {
         request: {
-            general: process.env.HTTP_LOG_DETAILS_REQUEST_GENERAL || LogDetails.FULL,
-            headers: process.env.HTTP_LOG_DETAILS_REQUEST_HEADERS || LogDetails.PARTIAL,
-            body: process.env.HTTP_LOG_DETAILS_REQUEST_BODY || LogDetails.EMPTY,
+            general: process.env.HTTP_LOG_DETAILS_REQUEST_GENERAL || LogDetail.FULL,
+            headers: process.env.HTTP_LOG_DETAILS_REQUEST_HEADERS || LogDetail.PARTIAL,
+            body: process.env.HTTP_LOG_DETAILS_REQUEST_BODY || LogDetail.EMPTY,
         },
         response: {
-            general: process.env.HTTP_LOG_DETAILS_RESPONSE_GENERAL || LogDetails.EMPTY,
-            headers: process.env.HTTP_LOG_DETAILS_RESPONSE_HEADERS || LogDetails.EMPTY,
-            body: process.env.HTTP_LOG_DETAILS_RESPONSE_BODY || LogDetails.EMPTY,
+            general: process.env.HTTP_LOG_DETAILS_RESPONSE_GENERAL || LogDetail.EMPTY,
+            headers: process.env.HTTP_LOG_DETAILS_RESPONSE_HEADERS || LogDetail.EMPTY,
+            body: process.env.HTTP_LOG_DETAILS_RESPONSE_BODY || LogDetail.EMPTY,
         },
     },
 };

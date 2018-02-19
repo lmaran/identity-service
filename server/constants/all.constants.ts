@@ -68,7 +68,7 @@ export const enum LogLevel {
 //     FULL_HEADER_WITH_BODY = 3,
 // }
 
-export const enum LogDetails {
+export const enum LogDetail {
     EMPTY = "empty",
     PARTIAL = "partial",
     FULL = "full",
