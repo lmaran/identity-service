@@ -1,5 +1,5 @@
 import { IEnvConfig } from "@interfaces";
-import { LogLevel, HttpRequestLogDetails, HttpResponseLogDetails } from "../constants";
+import { LogLevel, LogDetails } from "../constants";
 
 const config: IEnvConfig = {
     port: process.env.PORT || 1420,
@@ -12,8 +12,12 @@ const config: IEnvConfig = {
     logglyToken: "<logglyToken>",
     logglySubdomain: "<logglySubdomain>",
     logLevel: LogLevel.DEBUG,
-    httpRequestLogDetails: HttpRequestLogDetails.URL_ONLY,
-    httpResponseLogDetails: HttpResponseLogDetails.NO_RESPONSE,
+    httpLogDetails: {
+        request: {
+            general: LogDetails.PARTIAL,
+            headers: process.env.HTTP_LOG_DETAILS_REQUEST_HEADERS || LogDetails.EMPTY,
+        },
+    },
 };
 
 export default config;

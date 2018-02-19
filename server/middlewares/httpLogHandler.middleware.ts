@@ -7,7 +7,7 @@
 import config from "../config";
 import logger from "../logger";
 import { getShortReq } from "../helpers";
-import { LogSource, HttpRequestLogDetails as ReqLog, HttpResponseLogDetails as ResLog } from "../constants";
+import { LogSource, LogDetails } from "../constants";
 import { Request, Response, NextFunction } from "express";
 
 export const httpLogHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
@@ -24,8 +24,8 @@ export const httpLogHandler = (err: any, req: Request, res: Response, next: Next
         return next();
     }
 
-    const resLog = config.httpResponseLogDetails || -1;
-    const reqLog = config.httpRequestLogDetails || -1;
+    const reqLog = config.httpLogDetails.request;
+    const resLog = config.httpLogDetails.response;
 
     // const newRec = getShortReq(req);
     const newRec = {
@@ -47,11 +47,12 @@ export const httpLogHandler = (err: any, req: Request, res: Response, next: Next
         logSource: LogSource.HTTP_LOG_HANDLER,
     };
 
-    if (!reqLog || reqLog === ReqLog.NO_REQUEST ) { // NO_REQUEST => skip log
+    if (!reqLog || reqLog.general === LogDetails.EMPTY ) { // NO_REQUEST => skip log
         return next();
     }
 
-    if (reqLog >= ReqLog.URL_ONLY ) {
+    // log request header
+    if (reqLog.general === LogDetails.PARTIAL || reqLog.general === LogDetails.FULL) {
        // add Method and Url to req
        meta.req.method = req.method;
        meta.req.url = req.url; // or req.originalUrl

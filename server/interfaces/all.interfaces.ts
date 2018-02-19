@@ -26,6 +26,8 @@ export interface IEnvConfig {
     logLevel?: string;
     httpRequestLogDetails?: string | number;
     httpResponseLogDetails?: string | number;
+
+    httpLogDetails: IHttpLogDetails;
 }
 
 export interface IClient {
@@ -74,4 +76,15 @@ export interface IContext {
     tenantCode?: string;
     requestId?: string;
     startTime?: Date;
+}
+
+interface ILogDetails {
+    general?: string;
+    headers?: string;
+    body?: string;
+}
+
+export interface IHttpLogDetails {
+    request?: ILogDetails;
+    response?: ILogDetails;
 }
