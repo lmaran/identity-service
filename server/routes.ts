@@ -28,6 +28,7 @@ router.post("/userinfo", getAccessToken, requireAccessToken, userinfoController.
 
 // homepage
 router.get("/homepage", homepageController.getHomepage);
+router.post("/homepage", homepageController.getHomepage);
 
 // home
 router.get("/", homeController.getHomePage);

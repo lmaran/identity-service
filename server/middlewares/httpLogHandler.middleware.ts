@@ -10,7 +10,7 @@ import { getShortReq } from "../helpers";
 import { LogSource, LogDetail } from "../constants";
 import { Request, Response, NextFunction } from "express";
 
-export const httpLogHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
+export const httpLogHandler = (req: Request, res: any, next: NextFunction) => {
 
     // ignore "/check" requests
     if (req.originalUrl === "/check") {
@@ -24,23 +24,14 @@ export const httpLogHandler = (err: any, req: Request, res: Response, next: Next
         return next();
     }
 
-    const reqLog = config.httpLogDetails.request;
-    const resLog = config.httpLogDetails.response;
+    const reqLog = (config.httpLogDetails && config.httpLogDetails.request) || {};
+    const resLog = (config.httpLogDetails && config.httpLogDetails.response) || {};
 
     // const newRec = getShortReq(req);
     const newRec = {
         method: req.method,
         url: req.url,
     };
-
-    // headers: req.headers,
-    // protocol: req.protocol,
-    // // originalUrl: req.originalUrl,
-    // url: req.url,
-    // method: req.method,
-    // body: req.body,
-    // ctx: req.ctx,
-    // ip: req.ip,
 
     const meta: any = {
         req: {},
@@ -51,7 +42,7 @@ export const httpLogHandler = (err: any, req: Request, res: Response, next: Next
         return next();
     }
 
-    // Request General
+    // Set Request General
     if (reqLog.general === LogDetail.PARTIAL) {
         meta.req.method = req.method;
         meta.req.url = req.url; // or req.originalUrl
@@ -62,27 +53,25 @@ export const httpLogHandler = (err: any, req: Request, res: Response, next: Next
         meta.req.ctx = req.ctx;
     }
 
-    // Request Headers
+    // Set Request Headers
     if (reqLog.headers === LogDetail.PARTIAL) {
         meta.req.headers = {};
         meta.req.headers["user-agent"] = req.headers["user-agent"];
-    } else if (reqLog.general === LogDetail.FULL) {
+    } else if (reqLog.headers === LogDetail.FULL) {
         meta.req.headers = req.headers;
     }
 
-    // Request body
-    if (reqLog.body === LogDetail.PARTIAL || reqLog.general === LogDetail.FULL) {
+    // Set Request Body
+    if (reqLog.body === LogDetail.PARTIAL || reqLog.body === LogDetail.FULL) {
         if (req.body) {
             meta.req.body = req.body;
         }
     }
 
-    // Log and exit if we don't want to log the response
-    if (!resLog
-        || !resLog.general || resLog.general === LogDetail.EMPTY
-        || !resLog.headers || resLog.headers === LogDetail.EMPTY
-        || !resLog.body || resLog.body === LogDetail.EMPTY ) {
-        logger.info("http logger", meta);
+    // Log Request and exit (if we don't want to log the response)
+    if (!resLog || allResAreNone(resLog)) {
+        // console.log(meta);
+        // logger.info("http logger", meta);
         return next();
     }
 
@@ -90,7 +79,9 @@ export const httpLogHandler = (err: any, req: Request, res: Response, next: Next
     // https://github.com/bithavoc/express-winston/blob/master/index.js
     // req.ctx.startTime = new Date();
     res.locals.startTime = new Date();
-    const end = res.end;
+
+    // tslint:disable-next-line:prefer-const no-var-keyword
+    var end = res.end;
 
     // https://stackoverflow.com/a/48245389
     // res.end = (chunk?: any, encodingOrCb?: string | Function, cb?: Function): void => {
@@ -107,40 +98,74 @@ export const httpLogHandler = (err: any, req: Request, res: Response, next: Next
     // };
 
     // tslint:disable-next-line:ban-types
-    res.end = (chunk?: any, encoding?: string | Function) => {
-        const newRes: any = {
+    // tslint:disable-next-line:only-arrow-functions
+    res.end = function(chunk, encoding) {
+        console.log("===================111111111111");
+        res.end = end;
+        res.end(chunk, encoding);
+        meta.res = {
             statusCode: res.statusCode,
-            // responseTime: (new Date() as any) - req.ctx.startTime,
+            // // responseTime: (new Date() as any) - req.ctx.startTime,
             responseTime: (new Date() as any) - res.locals.startTime,
         };
 
-        res.end = end;
-        res.end(chunk, encoding as string);
-
-        meta.res = newRes;
-
-        // if (resLog >= ResLog.SIZE_ONLY) {
-        //     // add size and response time
-        // } else if (resLog >= ResLog.FULL_HEADER_NO_BODY) {
-        //     // add header to res
-        // } else { // resLog == ResLog.FULL_HEADER_WITH_BODY
-        //     // add body to res
-        // }
-
-        // ---- Uncomment if you need to log the res.body ----
-
-        if (chunk) {
-            // const isJson = (res._headers && res._headers["content-type"]
-            //     && res._headers['content-type'].indexOf('json') >= 0);
-            const contentType = res.getHeader("content-type");
-            const isJson = typeof contentType === "string" && contentType.indexOf("json") >= 0;
-
-            newRes.body = bodyToString(chunk, isJson);
+        // Set Response Headers
+        if (resLog.general === LogDetail.PARTIAL || resLog.general === LogDetail.FULL) {
+            // add
         }
 
-        logger.info("http logger", meta);
+        if (resLog.headers === LogDetail.PARTIAL || resLog.headers === LogDetail.FULL) {
+            meta.res.headers = res._headers;
+        }
+
+        if (resLog.body === LogDetail.PARTIAL || resLog.body === LogDetail.FULL) {
+            // res.end = end;
+            // res.end(chunk, encoding as string);
+
+            // if (resLog >= ResLog.SIZE_ONLY) {
+            //     // add size and response time
+            // } else if (resLog >= ResLog.FULL_HEADER_NO_BODY) {
+            //     // add header to res
+            // } else { // resLog == ResLog.FULL_HEADER_WITH_BODY
+            //     // add body to res
+            // }
+
+            // ---- Uncomment if you need to log the res.body ----
+
+            if (chunk) {
+                // const isJson = (res._headers && res._headers["content-type"]
+                //     && res._headers['content-type'].indexOf('json') >= 0);
+                const contentType = res.getHeader("content-type");
+                // console.log("CT: " + contentType);
+                // console.log(res._headers);
+                const isJson = typeof contentType === "string" && contentType.indexOf("json") >= 0;
+
+                meta.res.body = bodyToString(chunk, isJson);
+            }
+        }
+
+        // console.log("===================");
+        console.log(meta);
+
+        // const httpHeaders = require("http-headers");
+        // console.log(httpHeaders(res));
+
+        // logger.info("http logger", meta);
+        // return next();
     };
+
+    // console.log("===================");
+    // console.log(123);
+    return next();
 };
+
+function bodyToString(body, isJSON) {
+    const stringBody = body && body.toString();
+    if (isJSON) {
+        return (safeJSONParse(body) || stringBody);
+    }
+    return stringBody;
+}
 
 function safeJSONParse(string) {
     try {
@@ -150,10 +175,8 @@ function safeJSONParse(string) {
     }
 }
 
-function bodyToString(body, isJSON) {
-    const stringBody = body && body.toString();
-    if (isJSON) {
-        return (safeJSONParse(body) || stringBody);
-    }
-    return stringBody;
+function allResAreNone(resLog) {
+    return (!resLog.general || resLog.general === LogDetail.EMPTY)
+    && (!resLog.headers || resLog.headers === LogDetail.EMPTY)
+    && (!resLog.body || resLog.body === LogDetail.EMPTY);
 }

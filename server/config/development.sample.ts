@@ -15,7 +15,13 @@ const config: IEnvConfig = {
     httpLogDetails: {
         request: {
             general: LogDetail.PARTIAL,
-            headers: process.env.HTTP_LOG_DETAILS_REQUEST_HEADERS || LogDetail.EMPTY,
+            headers: LogDetail.EMPTY,
+            body: LogDetail.EMPTY,
+        },
+        response: {
+            general: LogDetail.EMPTY,
+            headers: LogDetail.EMPTY,
+            body: LogDetail.EMPTY,
         },
     },
 };

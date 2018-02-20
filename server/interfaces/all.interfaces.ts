@@ -27,7 +27,7 @@ export interface IEnvConfig {
     httpRequestLogDetails?: string | number;
     httpResponseLogDetails?: string | number;
 
-    httpLogDetails: IHttpLogDetails;
+    httpLogDetails?: IHttpLogDetails;
 }
 
 export interface IClient {
