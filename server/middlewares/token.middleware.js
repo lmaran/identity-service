@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const services_1 = require("../services");
+const logger_1 = require("../logger");
 exports.getAccessToken = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
     const auth = req.headers.authorization;
     let inToken;
@@ -21,13 +22,13 @@ exports.getAccessToken = (req, res, next) => __awaiter(this, void 0, void 0, fun
     else if (req.query && req.query.access_token) {
         inToken = req.query.access_token;
     }
-    console.log("Incoming token: %s", inToken);
+    logger_1.default.debug("Incoming token: %s", inToken);
     const token = yield services_1.tokenService.getAccessToken(inToken);
     if (token) {
-        console.log("We found a matching token: %s", inToken);
+        logger_1.default.debug("We found a matching token: %s", inToken);
     }
     else {
-        console.log("No matching token was found.");
+        logger_1.default.debug("No matching token was found.");
     }
     req.ctx.accessToken = token;
     next();

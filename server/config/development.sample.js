@@ -9,5 +9,18 @@ const config = {
     rollbarToken: "<rollbarToken>",
     logglyToken: "<logglyToken>",
     logglySubdomain: "<logglySubdomain>",
+    logLevel: "debug",
+    httpLogDetails: {
+        request: {
+            general: "partial",
+            headers: "empty",
+            body: "empty",
+        },
+        response: {
+            general: "empty",
+            headers: "empty",
+            body: "empty",
+        },
+    },
 };
 exports.default = config;

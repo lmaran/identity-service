@@ -31,7 +31,6 @@ exports.mongoHelper = {
             }
         }
         catch (error) {
-            console.log("Caught", error.message);
             throw new Error(error);
         }
     }),

@@ -19,7 +19,10 @@ exports.homepageController = {
             ip["req-connection-remoteAddress"] = req.connection && req.connection.remoteAddress;
             ip["req-socket-remoteAddress"] = req.socket && req.socket.remoteAddress;
             ip["user-agent"] = req.headers["user-agent"];
-            res.render("homepage", { testUrl, ip });
+            res.json({
+                aaa: 222,
+                bbb: 333,
+            });
         }
         catch (err) {
             next(err);

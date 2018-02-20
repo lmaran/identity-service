@@ -13,5 +13,6 @@ router.post("/revoke", controllers_1.tokenController.revokeToken);
 router.get("/userinfo", middlewares_1.getAccessToken, middlewares_1.requireAccessToken, controllers_1.userinfoController.getUserinfo);
 router.post("/userinfo", middlewares_1.getAccessToken, middlewares_1.requireAccessToken, controllers_1.userinfoController.getUserinfo);
 router.get("/homepage", controllers_1.homepageController.getHomepage);
+router.post("/homepage", controllers_1.homepageController.getHomepage);
 router.get("/", controllers_1.homeController.getHomePage);
 exports.default = router;
