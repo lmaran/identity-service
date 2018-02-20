@@ -6,12 +6,10 @@
 
 import config from "../config";
 import logger from "../logger";
-import { getShortReq } from "../helpers";
 import { LogSource, LogDetail } from "../constants";
 import { Request, Response, NextFunction } from "express";
 
-export const httpLogHandler = (req: Request, res: any, next: NextFunction) => {
-
+export const httpLogHandler = (req: Request, res: Response, next: NextFunction) => {
     // ignore "/check" requests
     if (req.originalUrl === "/check") {
         return next();
@@ -27,18 +25,12 @@ export const httpLogHandler = (req: Request, res: any, next: NextFunction) => {
     const reqLog = (config.httpLogDetails && config.httpLogDetails.request) || {};
     const resLog = (config.httpLogDetails && config.httpLogDetails.response) || {};
 
-    // const newRec = getShortReq(req);
-    const newRec = {
-        method: req.method,
-        url: req.url,
-    };
-
     const meta: any = {
-        req: {},
         logSource: LogSource.HTTP_LOG_HANDLER,
+        req: {},
     };
 
-    if (!reqLog || reqLog.general === LogDetail.EMPTY) { // NO_REQUEST => skip log
+    if (!reqLog || reqLog.general === LogDetail.NONE) { // NO_REQUEST => skip log
         return next();
     }
 
@@ -62,100 +54,51 @@ export const httpLogHandler = (req: Request, res: any, next: NextFunction) => {
     }
 
     // Set Request Body
-    if (reqLog.body === LogDetail.PARTIAL || reqLog.body === LogDetail.FULL) {
+    // if response in cached by browser (304) => there will be no body (and fewer req. headers)
+    if (reqLog.body) {
         if (req.body) {
             meta.req.body = req.body;
         }
     }
 
-    // Log Request and exit (if we don't want to log the response)
-    if (!resLog || allResAreNone(resLog)) {
-        // console.log(meta);
-        // logger.info("http logger", meta);
+    if (!resLog || !resLog.general) { // NO_RESPONSE => log Request and exit
+        logger.info("http-logger", meta);
         return next();
     }
 
     // Add information from the response too, just like Connect.logger does:
     // https://github.com/bithavoc/express-winston/blob/master/index.js
-    // req.ctx.startTime = new Date();
     res.locals.startTime = new Date();
-
-    // tslint:disable-next-line:prefer-const no-var-keyword
-    var end = res.end;
+    const end = res.end;
 
     // https://stackoverflow.com/a/48245389
-    // res.end = (chunk?: any, encodingOrCb?: string | Function, cb?: Function): void => {
-    //     //
-    // };
-
-    // res.end = (
-    //     chunk?: any,
-    //     // tslint:disable-next-line:ban-types
-    //     encodingOrCb?: string | Function,
-    //     cb?: () => any,
-    // ): void => {
-    //     //
-    // };
-
     // tslint:disable-next-line:ban-types
-    // tslint:disable-next-line:only-arrow-functions
-    res.end = function(chunk, encoding) {
-        console.log("===================111111111111");
+    res.end = (chunk?: any, encoding?: string | Function): void => {
         res.end = end;
-        res.end(chunk, encoding);
+        res.end(chunk, (encoding as string));
+
         meta.res = {
             statusCode: res.statusCode,
-            // // responseTime: (new Date() as any) - req.ctx.startTime,
             responseTime: (new Date() as any) - res.locals.startTime,
         };
 
-        // Set Response Headers
-        if (resLog.general === LogDetail.PARTIAL || resLog.general === LogDetail.FULL) {
-            // add
+        if (resLog.headers) {
+            // there are 2 headers that will not appear here:
+            // 1. Date: "server date"
+            // 2. Connection: "keep-alive"
+            // there is an npm package that extracts these 2 headers too but it doesn't make sens to use it just for that
+            // npm: https://github.com/watson/http-headers
+            meta.res.headers = (res as any)._headers;
         }
 
-        if (resLog.headers === LogDetail.PARTIAL || resLog.headers === LogDetail.FULL) {
-            meta.res.headers = res._headers;
+        if (resLog.body && chunk) {
+            const contentType = res.getHeader("content-type");
+            const isJson = typeof contentType === "string" && contentType.indexOf("json") >= 0;
+            meta.res.body = bodyToString(chunk, isJson);
         }
 
-        if (resLog.body === LogDetail.PARTIAL || resLog.body === LogDetail.FULL) {
-            // res.end = end;
-            // res.end(chunk, encoding as string);
-
-            // if (resLog >= ResLog.SIZE_ONLY) {
-            //     // add size and response time
-            // } else if (resLog >= ResLog.FULL_HEADER_NO_BODY) {
-            //     // add header to res
-            // } else { // resLog == ResLog.FULL_HEADER_WITH_BODY
-            //     // add body to res
-            // }
-
-            // ---- Uncomment if you need to log the res.body ----
-
-            if (chunk) {
-                // const isJson = (res._headers && res._headers["content-type"]
-                //     && res._headers['content-type'].indexOf('json') >= 0);
-                const contentType = res.getHeader("content-type");
-                // console.log("CT: " + contentType);
-                // console.log(res._headers);
-                const isJson = typeof contentType === "string" && contentType.indexOf("json") >= 0;
-
-                meta.res.body = bodyToString(chunk, isJson);
-            }
-        }
-
-        // console.log("===================");
-        console.log(meta);
-
-        // const httpHeaders = require("http-headers");
-        // console.log(httpHeaders(res));
-
-        // logger.info("http logger", meta);
-        // return next();
+        logger.info("http-logger", meta);
     };
-
-    // console.log("===================");
-    // console.log(123);
     return next();
 };
 
@@ -173,10 +116,4 @@ function safeJSONParse(string) {
     } catch (e) {
         return undefined;
     }
-}
-
-function allResAreNone(resLog) {
-    return (!resLog.general || resLog.general === LogDetail.EMPTY)
-    && (!resLog.headers || resLog.headers === LogDetail.EMPTY)
-    && (!resLog.body || resLog.body === LogDetail.EMPTY);
 }

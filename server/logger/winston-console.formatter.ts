@@ -16,17 +16,8 @@ export const formatterFunc = options => {
             }
         }
 
-        // // only for LOG_LEVEL=DEBUG (get full req/res)
-        // if (meta && Object.keys(meta).length > 0) {
-        //     const stack = meta.stack;
-        //     if (stack) { delete meta.stack; }
-        //     msg = msg + "\n" + JSON.stringify(meta, null, 4);
-
-        //     if (stack) {
-        //         msg = msg + "\n" + stack;
-        //     }
-        // }
-
+        // only for LOG_LEVEL=DEBUG (get full req/res)
+        msg = msg + "\n" + JSON.stringify(meta, null, 4);
     } else if (meta.logSource === LogSource.ERROR_HANDLER) {
         msg = msg + (undefined !== message ? message : "");
         if (meta && Object.keys(meta).length > 0) {

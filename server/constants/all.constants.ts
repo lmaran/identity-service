@@ -53,23 +53,8 @@ export const enum LogLevel {
     DEBUG = "debug",
 }
 
-// export const enum HttpRequestLogDetails {
-//     NO_REQUEST = 0,
-//     URL_ONLY = 1, // one line summary (ex: GET /check)
-//     MIN_HEADER = 2, // only tracking details (without cookies, tokens...)
-//     FULL_HEADER_NO_BODY = 3,
-//     FULL_HEADER_WITH_BODY = 4,
-// }
-
-// export const enum HttpResponseLogDetails {
-//     NO_RESPONSE = 0, // the only case where we don't have to process the response => log EVERY request (beginning of pipeline)
-//     SIZE_ONLY = 1, // only body size and response time (no header, no body)
-//     FULL_HEADER_NO_BODY = 2,
-//     FULL_HEADER_WITH_BODY = 3,
-// }
-
 export const enum LogDetail {
-    EMPTY = "empty",
+    NONE = "none",
     PARTIAL = "partial",
     FULL = "full",
 }

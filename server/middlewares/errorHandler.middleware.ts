@@ -47,7 +47,7 @@ export const errorHandler = (err: any, req: Request, res: Response, next: NextFu
             developerMessage: err.developerMessage,
             errorType: err.name,
             logSource: LogSource.ERROR_HANDLER,
-            stack: err.stack,
+            stack: err instanceof PageNotFound ? undefined : err.stack,
         };
 
         logger.info(err.message, meta);
@@ -78,7 +78,7 @@ export const errorHandler = (err: any, req: Request, res: Response, next: NextFu
         res.status(500);
 
         meta = {
-            requestId: req.ctx.requestId,
+            requestId: req.ctx && req.ctx.requestId,
             errorType: err.name,
             logSource: LogSource.ERROR_HANDLER,
             stack: err.stack,

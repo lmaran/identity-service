@@ -16,11 +16,10 @@ export const homepageController = {
             ip["req-socket-remoteAddress"] = req.socket && req.socket.remoteAddress;
             ip["user-agent"] = req.headers["user-agent"];
 
-            // res.render("homepage", { testUrl, ip });
-            res.json({
-                aaa: 222,
-                bbb: 333,
-            });
+            res.render("homepage", { testUrl, ip });
+
+            // res.json({aaa: 111});
+            // res.json(req.body);
         } catch (err) {
             next(err);
         }

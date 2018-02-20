@@ -15,13 +15,13 @@ const config: IEnvConfig = {
     httpLogDetails: {
         request: {
             general: LogDetail.PARTIAL,
-            headers: LogDetail.EMPTY,
-            body: LogDetail.EMPTY,
+            headers: LogDetail.NONE,
+            body: false,
         },
         response: {
-            general: LogDetail.EMPTY,
-            headers: LogDetail.EMPTY,
-            body: LogDetail.EMPTY,
+            general: false,
+            headers: true,
+            body: true,
         },
     },
 };

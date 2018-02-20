@@ -19,12 +19,12 @@ const common: IEnvConfig = {
         request: {
             general: process.env.HTTP_LOG_DETAILS_REQUEST_GENERAL || LogDetail.FULL,
             headers: process.env.HTTP_LOG_DETAILS_REQUEST_HEADERS || LogDetail.PARTIAL,
-            body: process.env.HTTP_LOG_DETAILS_REQUEST_BODY || LogDetail.EMPTY,
+            body: (process.env.HTTP_LOG_DETAILS_REQUEST_BODY as boolean | undefined) || false,
         },
         response: {
-            general: process.env.HTTP_LOG_DETAILS_RESPONSE_GENERAL || LogDetail.EMPTY,
-            headers: process.env.HTTP_LOG_DETAILS_RESPONSE_HEADERS || LogDetail.EMPTY,
-            body: process.env.HTTP_LOG_DETAILS_RESPONSE_BODY || LogDetail.EMPTY,
+            general: (process.env.HTTP_LOG_DETAILS_RESPONSE_GENERALas as boolean | undefined) || false,
+            headers: (process.env.HTTP_LOG_DETAILS_RESPONSE_HEADERSas as boolean | undefined) || false,
+            body: (process.env.HTTP_LOG_DETAILS_RESPONSE_BODYas as boolean | undefined) || false,
         },
     },
 };

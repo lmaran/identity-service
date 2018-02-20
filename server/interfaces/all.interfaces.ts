@@ -75,16 +75,21 @@ export interface IContext {
     accessToken?: any;
     tenantCode?: string;
     requestId?: string;
-    startTime?: Date;
 }
 
-interface ILogDetails {
+interface IRequestLogDetails {
     general?: string;
     headers?: string;
-    body?: string;
+    body?: boolean | undefined;
+}
+
+interface IResponseLogDetails {
+    general?: boolean;
+    headers?: boolean;
+    body?: boolean;
 }
 
 export interface IHttpLogDetails {
-    request?: ILogDetails;
-    response?: ILogDetails;
+    request?: IRequestLogDetails;
+    response?: IResponseLogDetails;
 }
