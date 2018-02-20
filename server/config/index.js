@@ -10,12 +10,12 @@ const common = {
         request: {
             general: process.env.HTTP_LOG_DETAILS_REQUEST_GENERAL || "full",
             headers: process.env.HTTP_LOG_DETAILS_REQUEST_HEADERS || "partial",
-            body: process.env.HTTP_LOG_DETAILS_REQUEST_BODY || "empty",
+            body: process.env.HTTP_LOG_DETAILS_REQUEST_BODY || false,
         },
         response: {
-            general: process.env.HTTP_LOG_DETAILS_RESPONSE_GENERAL || "empty",
-            headers: process.env.HTTP_LOG_DETAILS_RESPONSE_HEADERS || "empty",
-            body: process.env.HTTP_LOG_DETAILS_RESPONSE_BODY || "empty",
+            general: process.env.HTTP_LOG_DETAILS_RESPONSE_GENERALas || false,
+            headers: process.env.HTTP_LOG_DETAILS_RESPONSE_HEADERSas || false,
+            body: process.env.HTTP_LOG_DETAILS_RESPONSE_BODYas || false,
         },
     },
 };

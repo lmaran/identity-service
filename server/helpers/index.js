@@ -7,4 +7,3 @@ __export(require("./mongo.helper"));
 __export(require("./string.helper"));
 __export(require("./url.helper"));
 __export(require("./password.helper"));
-__export(require("./request.helper"));

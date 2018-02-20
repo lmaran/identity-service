@@ -13,6 +13,7 @@ exports.formatterFunc = options => {
                 msg = msg + " " + getColorStatus(meta.res.statusCode) + " - " + meta.res.responseTime + " ms ";
             }
         }
+        msg = msg + "\n" + JSON.stringify(meta, null, 4);
     }
     else if (meta.logSource === "errorHandler") {
         msg = msg + (undefined !== message ? message : "");

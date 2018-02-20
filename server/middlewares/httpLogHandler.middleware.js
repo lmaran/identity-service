@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const config_1 = require("../config");
+const logger_1 = require("../logger");
 exports.httpLogHandler = (req, res, next) => {
     if (req.originalUrl === "/check") {
         return next();
@@ -11,15 +12,11 @@ exports.httpLogHandler = (req, res, next) => {
     }
     const reqLog = (config_1.default.httpLogDetails && config_1.default.httpLogDetails.request) || {};
     const resLog = (config_1.default.httpLogDetails && config_1.default.httpLogDetails.response) || {};
-    const newRec = {
-        method: req.method,
-        url: req.url,
-    };
     const meta = {
-        req: {},
         logSource: "htmlLogHandler",
+        req: {},
     };
-    if (!reqLog || reqLog.general === "empty") {
+    if (!reqLog || reqLog.general === "none") {
         return next();
     }
     if (reqLog.general === "partial") {
@@ -39,37 +36,33 @@ exports.httpLogHandler = (req, res, next) => {
     else if (reqLog.headers === "full") {
         meta.req.headers = req.headers;
     }
-    if (reqLog.body === "partial" || reqLog.body === "full") {
+    if (reqLog.body) {
         if (req.body) {
             meta.req.body = req.body;
         }
     }
-    if (!resLog || allResAreNone(resLog)) {
+    if (!resLog || !resLog.general) {
+        logger_1.default.info("http-logger", meta);
         return next();
     }
     res.locals.startTime = new Date();
-    var end = res.end;
-    res.end = function (chunk, encoding) {
-        console.log("===================111111111111");
+    const end = res.end;
+    res.end = (chunk, encoding) => {
         res.end = end;
         res.end(chunk, encoding);
         meta.res = {
             statusCode: res.statusCode,
             responseTime: new Date() - res.locals.startTime,
         };
-        if (resLog.general === "partial" || resLog.general === "full") {
-        }
-        if (resLog.headers === "partial" || resLog.headers === "full") {
+        if (resLog.headers) {
             meta.res.headers = res._headers;
         }
-        if (resLog.body === "partial" || resLog.body === "full") {
-            if (chunk) {
-                const contentType = res.getHeader("content-type");
-                const isJson = typeof contentType === "string" && contentType.indexOf("json") >= 0;
-                meta.res.body = bodyToString(chunk, isJson);
-            }
+        if (resLog.body && chunk) {
+            const contentType = res.getHeader("content-type");
+            const isJson = typeof contentType === "string" && contentType.indexOf("json") >= 0;
+            meta.res.body = bodyToString(chunk, isJson);
         }
-        console.log(meta);
+        logger_1.default.info("http-logger", meta);
     };
     return next();
 };
@@ -87,9 +80,4 @@ function safeJSONParse(string) {
     catch (e) {
         return undefined;
     }
-}
-function allResAreNone(resLog) {
-    return (!resLog.general || resLog.general === "empty")
-        && (!resLog.headers || resLog.headers === "empty")
-        && (!resLog.body || resLog.body === "empty");
 }

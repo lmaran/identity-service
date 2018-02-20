@@ -13,13 +13,13 @@ const config = {
     httpLogDetails: {
         request: {
             general: "partial",
-            headers: "empty",
-            body: "empty",
+            headers: "none",
+            body: false,
         },
         response: {
-            general: "empty",
-            headers: "empty",
-            body: "empty",
+            general: false,
+            headers: true,
+            body: true,
         },
     },
 };

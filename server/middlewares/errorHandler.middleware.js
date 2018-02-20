@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const application_error_1 = require("../errors/application.error");
 const helpers_1 = require("../helpers");
 const logger_1 = require("../logger");
+const errors_1 = require("../errors");
 exports.errorHandler = (err, req, res, next) => {
     let meta;
     let returnType;
@@ -13,7 +14,7 @@ exports.errorHandler = (err, req, res, next) => {
             developerMessage: err.developerMessage,
             errorType: err.name,
             logSource: "errorHandler",
-            stack: err.stack,
+            stack: err instanceof errors_1.PageNotFound ? undefined : err.stack,
         };
         logger_1.default.info(err.message, meta);
         returnType = getReturnType(req, err);
@@ -34,7 +35,7 @@ exports.errorHandler = (err, req, res, next) => {
     if (err instanceof Error) {
         res.status(500);
         meta = {
-            requestId: req.ctx.requestId,
+            requestId: req.ctx && req.ctx.requestId,
             errorType: err.name,
             logSource: "errorHandler",
             stack: err.stack,
