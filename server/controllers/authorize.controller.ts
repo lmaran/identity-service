@@ -13,8 +13,14 @@ export const authorizeController = {
         try {
             const tenantCode = req.ctx.tenantCode;
             if (!tenantCode) {
-                throw new err.ValidationError("Missing tenant")
+                throw new err.ValidationError("Lipseste codul pentru `tenant`")
                     .withDeveloperMessage("There was no tenant code")
+                    .withReturnAs(ReturnType.HTML);
+            }
+
+            if (!req.query) {
+                throw new err.ValidationError("Lipsesc parametrii in URL")
+                    .withDeveloperMessage("There was no `req.query`")
                     .withReturnAs(ReturnType.HTML);
             }
 
@@ -23,9 +29,6 @@ export const authorizeController = {
             const redirectUri: URL = req.query.redirect_uri;
 
             const client: IClient = await clientService.getByCode(clientId, tenantCode);
-
-            // accepted values
-            const accRedirectUris: string[] = client.redirect_uris;
 
             // https://tools.ietf.org/html/rfc6749#section-4.1.2
 
@@ -40,6 +43,9 @@ export const authorizeController = {
                     .withDeveloperMessage(`Unknown client ${req.query.client_id}`)
                     .withReturnAs(ReturnType.HTML);
             }
+
+            // accepted values
+            const accRedirectUris: string[] = client.redirect_uris;
 
             if (!_.includes(accRedirectUris, redirectUri.toString())) {
                 throw new err.ValidationError("Invalid redirect URI")
