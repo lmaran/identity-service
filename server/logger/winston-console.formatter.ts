@@ -1,6 +1,7 @@
 import * as winston from "winston";
 import * as chalk from "chalk";
-import { LogSource } from "../constants";
+import { LogSource, LogDetail } from "../constants";
+import config from "../config";
 
 export const formatterFunc = options => {
     // The return string will be passed to logger.
@@ -9,6 +10,7 @@ export const formatterFunc = options => {
     let msg = "";
 
     if (meta.logSource === LogSource.HTTP_LOG_HANDLER) {
+        // one-line log message
         if (meta.req) {
             msg = msg + meta.req.method + " " + meta.req.url;
             if (meta.res) {
@@ -16,8 +18,20 @@ export const formatterFunc = options => {
             }
         }
 
-        // only for LOG_LEVEL=DEBUG (get full req/res)
-        msg = msg + "\n" + JSON.stringify(meta, null, 4);
+        // if more details are required, display also the meta object (full req/res)
+        const reqDetails = config.httpLogDetails && config.httpLogDetails.request;
+        const resDetails = config.httpLogDetails && config.httpLogDetails.response;
+        if (reqDetails && resDetails) {
+            if (reqDetails.general === LogDetail.FULL
+                || (reqDetails.headers === LogDetail.PARTIAL || reqDetails.headers === LogDetail.FULL)
+                || reqDetails.body
+                || resDetails.headers
+                || resDetails.body
+            ) {
+                msg = msg + "\n" + JSON.stringify(meta, null, 4);
+            }
+        }
+
     } else if (meta.logSource === LogSource.ERROR_HANDLER) {
         msg = msg + (undefined !== message ? message : "");
         if (meta && Object.keys(meta).length > 0) {

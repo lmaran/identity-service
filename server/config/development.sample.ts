@@ -20,8 +20,8 @@ const config: IEnvConfig = {
         },
         response: {
             general: false,
-            headers: true,
-            body: true,
+            headers: false,
+            body: false,
         },
     },
 };
