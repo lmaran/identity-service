@@ -17,19 +17,24 @@ exports.authorizeController = {
         try {
             const tenantCode = req.ctx.tenantCode;
             if (!tenantCode) {
-                throw new err.ValidationError("Missing tenant")
+                throw new err.ValidationError("Lipseste codul pentru `tenant`")
                     .withDeveloperMessage("There was no tenant code")
+                    .withReturnAs("html");
+            }
+            if (!req.query) {
+                throw new err.ValidationError("Lipsesc parametrii in URL")
+                    .withDeveloperMessage("There was no `req.query`")
                     .withReturnAs("html");
             }
             const clientId = req.query.client_id;
             const redirectUri = req.query.redirect_uri;
             const client = yield services_1.clientService.getByCode(clientId, tenantCode);
-            const accRedirectUris = client.redirect_uris;
             if (!client) {
                 throw new err.ValidationError("Unknown client")
                     .withDeveloperMessage(`Unknown client ${req.query.client_id}`)
                     .withReturnAs("html");
             }
+            const accRedirectUris = client.redirect_uris;
             if (!_.includes(accRedirectUris, redirectUri.toString())) {
                 throw new err.ValidationError("Invalid redirect URI")
                     .withDeveloperMessage(`Mismatched redirect URI, expected ${accRedirectUris} got ${redirectUri}`)

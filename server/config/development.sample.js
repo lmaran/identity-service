@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const config = {
-    port: process.env.PORT || 1420,
     mongo: {
         uri: "mongodb://localhost",
         dbName: "identity-service-dev",
@@ -18,8 +17,8 @@ const config = {
         },
         response: {
             general: false,
-            headers: true,
-            body: true,
+            headers: false,
+            body: false,
         },
     },
 };

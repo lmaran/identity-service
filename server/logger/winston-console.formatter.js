@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const winston = require("winston");
 const chalk = require("chalk");
+const config_1 = require("../config");
 exports.formatterFunc = options => {
     const meta = options.meta;
     const message = options.message;
@@ -13,7 +14,17 @@ exports.formatterFunc = options => {
                 msg = msg + " " + getColorStatus(meta.res.statusCode) + " - " + meta.res.responseTime + " ms ";
             }
         }
-        msg = msg + "\n" + JSON.stringify(meta, null, 4);
+        const reqDetails = config_1.default.httpLogDetails && config_1.default.httpLogDetails.request;
+        const resDetails = config_1.default.httpLogDetails && config_1.default.httpLogDetails.response;
+        if (reqDetails && resDetails) {
+            if (reqDetails.general === "full"
+                || (reqDetails.headers === "partial" || reqDetails.headers === "full")
+                || reqDetails.body
+                || resDetails.headers
+                || resDetails.body) {
+                msg = msg + "\n" + JSON.stringify(meta, null, 4);
+            }
+        }
     }
     else if (meta.logSource === "errorHandler") {
         msg = msg + (undefined !== message ? message : "");
