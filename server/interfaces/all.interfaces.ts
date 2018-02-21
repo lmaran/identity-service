@@ -1,9 +1,9 @@
 import { ReturnType } from "../constants";
 
-interface IBlobSecrets {
-    account?: string;
-    key?: string;
-}
+// interface IBlobSecrets {
+//     account?: string;
+//     key?: string;
+// }
 
 interface IMongoSecrets {
     uri?: string;
@@ -13,20 +13,14 @@ interface IMongoSecrets {
 
 export interface IEnvConfig {
     env?: string;
-    root?: string;
     port?: string | number;
-    userRoles?: string[];
     mongo?: IMongoSecrets;
     rollbarToken?: string;
-    azureBlobStorage?: IBlobSecrets;
-    azureBlobStorageCool?: IBlobSecrets;
-    authRootUrl?: string;
+    // azureBlobStorage?: IBlobSecrets;
+    // azureBlobStorageCool?: IBlobSecrets;
     logglyToken?: string;
     logglySubdomain?: string;
     logLevel?: string;
-    httpRequestLogDetails?: string | number;
-    httpResponseLogDetails?: string | number;
-
     httpLogDetails?: IHttpLogDetails;
 }
 
@@ -63,13 +57,6 @@ export interface IPersistedPassword {
     salt: string;
     hashedPassword: string;
 }
-
-// export interface IErrorOptions {
-//     status: number;
-//     developerMessage?: string;
-//     returnAs?: ReturnType;
-//     redirectUri?: URL;
-// }
 
 export interface IContext {
     accessToken?: any;

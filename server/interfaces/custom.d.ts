@@ -1,5 +1,3 @@
-// tslint:disable
-
 import { IContext } from "@interfaces";
 
 // method 1: used when we only use properties with primitive types
@@ -19,8 +17,6 @@ import { IContext } from "@interfaces";
 declare global {
     namespace Express {
         interface Request {
-            // access_token?: any,
-            // tenantCode?: string,
             ctx: IContext
         }
     }

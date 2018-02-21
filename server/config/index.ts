@@ -1,19 +1,22 @@
 import * as _ from "lodash";
-import * as path from "path";
-import { EnvironmentType, LogDetail } from "../constants";
+import { EnvironmentType, LogDetail, LogLevel } from "../constants";
 import { IEnvConfig } from "@interfaces";
 
-const env: string = (process.env.NODE_ENV || "development").toLowerCase();
+const env: string = (process.env.NODE_ENV || EnvironmentType.DEVELOPMENT).toLowerCase();
 const envConfig: IEnvConfig = require(`./${env}`).default;
-
-// All configurations will extend these options
-// ============================================
 
 const common: IEnvConfig = {
     env,
-    logLevel: process.env.LOG_LEVEL || "warning",
-    // httpRequestLogDetails: process.env.HTTP_REQUEST_LOG_DETAILS || HttpRequestLogDetails.MIN_HEADER,
-    // httpResponseLogDetails: process.env.HTTP_RESPONSE_LOG_DETAILS || HttpResponseLogDetails.NO_RESPONSE,
+    port: process.env.PORT || 1420,
+    mongo: {
+        uri: process.env.MONGO_URI,
+        dbName: process.env.MONGO_DB_NAME,
+    },
+    rollbarToken: process.env.ROLLBAR_TOKEN,
+    logglyToken: process.env.LOGGLY_TOKEN,
+    logglySubdomain: process.env.LOGGLY_SUBDOMAIN,
+
+    logLevel: process.env.LOG_LEVEL || LogLevel.WARNING,
 
     httpLogDetails: {
         request: {
