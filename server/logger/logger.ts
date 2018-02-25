@@ -19,7 +19,7 @@
 import * as winston from "winston";
 import config from "../config";
 import { EnvironmentType, LogLevel } from "../constants";
-import { formatterFunc } from "./winston-console.formatter";
+// import { formatterFunc } from "./winston-console.formatter";
 
 require("./winston-rollbar.transport"); // init Rollbar transport for Winston
 require("./winston-loggly.transport");
@@ -38,11 +38,6 @@ const logglyOptions = {
     json: true,
 };
 
-const consoleOptions = {
-    level: LogLevel.DEBUG, // catches all messages
-    formatter: formatterFunc,
-};
-
 const logger = new winston.Logger();
 
 // Winston && Rollbar: debug > info > warning > error
@@ -52,6 +47,11 @@ if (config.env === EnvironmentType.PRODUCTION || config.env === EnvironmentType.
     logger.add(winston.transports.Rollbar, rollbarOptions);
     logger.add(winston.transports.Loggly, logglyOptions);
 } else { // development
+    const formatterFunc = require("./winston-console.formatter").formatterFunc;
+    const consoleOptions = {
+        level: LogLevel.DEBUG, // catches all messages
+        formatter: formatterFunc,
+    };
     logger.add(winston.transports.Console, consoleOptions);
 }
 

@@ -25,9 +25,9 @@ const common: IEnvConfig = {
             body: (process.env.HTTP_LOG_DETAILS_REQUEST_BODY as boolean | undefined) || false,
         },
         response: {
-            general: (process.env.HTTP_LOG_DETAILS_RESPONSE_GENERALas as boolean | undefined) || false,
-            headers: (process.env.HTTP_LOG_DETAILS_RESPONSE_HEADERSas as boolean | undefined) || false,
-            body: (process.env.HTTP_LOG_DETAILS_RESPONSE_BODYas as boolean | undefined) || false,
+            general: (process.env.HTTP_LOG_DETAILS_RESPONSE_GENERAL as boolean | undefined) || false,
+            headers: (process.env.HTTP_LOG_DETAILS_RESPONSE_HEADERS as boolean | undefined) || false,
+            body: (process.env.HTTP_LOG_DETAILS_RESPONSE_BODY as boolean | undefined) || false,
         },
     },
 };
