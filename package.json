@@ -9,7 +9,7 @@
     "scripts": {
         "start": "run-s build watch",
         "build": "run-s clean build-tsc copy-hbs copy-pub",
-        "build-prod": "run-s clean build-tsc-prod copy-hbs",
+        "build-prod": "run-s clean build-tsc-prod copy-hbs copy-pub",
         "build-tsc": "tsc -p server/tsconfig.dev.json",
         "build-tsc-prod": "tsc -p server/tsconfig.prod.json",
         "copy-hbs": "cpx \"server/**/*.hbs\" dist/server",
