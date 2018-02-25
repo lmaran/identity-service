@@ -21,9 +21,9 @@ const common = {
             body: process.env.HTTP_LOG_DETAILS_REQUEST_BODY || false,
         },
         response: {
-            general: process.env.HTTP_LOG_DETAILS_RESPONSE_GENERALas || false,
-            headers: process.env.HTTP_LOG_DETAILS_RESPONSE_HEADERSas || false,
-            body: process.env.HTTP_LOG_DETAILS_RESPONSE_BODYas || false,
+            general: process.env.HTTP_LOG_DETAILS_RESPONSE_GENERAL || false,
+            headers: process.env.HTTP_LOG_DETAILS_RESPONSE_HEADERS || false,
+            body: process.env.HTTP_LOG_DETAILS_RESPONSE_BODY || false,
         },
     },
 };
