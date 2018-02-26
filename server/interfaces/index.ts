@@ -1,1 +1,2 @@
-export * from "./all.interfaces";
+export * from "./core.interfaces";
+export * from "./business.interfaces";
