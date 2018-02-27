@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import * as _ from "lodash";
-import { IClient } from "@interfaces";
+import { IClient } from "../interfaces";
 import { requestData } from "../data";
 import { clientService } from "../services";
 import { urlHelper } from "../helpers";

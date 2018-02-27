@@ -1,6 +1,6 @@
 // credit: https://stackoverflow.com/a/45652825
 import * as crypto from "crypto";
-import { IPersistedPassword } from "@interfaces";
+import { IPersistedPassword } from "../interfaces";
 
 const PASSWORD_LENGTH = 64; // 256
 const SALT_LENGTH = 16; // 64

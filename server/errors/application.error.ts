@@ -15,7 +15,7 @@
     // https://stackoverflow.com/a/32749533
     // https://www.loggly.com/blog/node-js-error-handling/
 
-// import { IErrorOptions } from "@interfaces";
+// import { IErrorOptions } from "../interfaces";
 import { ReturnType } from "../constants";
 
 export class ApplicationError extends Error {

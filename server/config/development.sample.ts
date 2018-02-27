@@ -1,4 +1,4 @@
-import { IEnvConfig } from "@interfaces";
+import { IEnvConfig } from "../interfaces";
 import { LogLevel, LogDetail } from "../constants";
 
 const config: IEnvConfig = {

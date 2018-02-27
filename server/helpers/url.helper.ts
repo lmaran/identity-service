@@ -2,7 +2,7 @@ import * as url from "url";
 import * as _ from "lodash";
 import { Url, UrlObject } from "url";
 
-import { IOptionsUri } from "@interfaces";
+import { IOptionsUri } from "../interfaces";
 import { stringHelper } from "../helpers";
 
 // merge 'options' into 'redirectUri' (as query string)

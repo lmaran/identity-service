@@ -1,4 +1,4 @@
-import { IUser } from "@interfaces";
+import { IUser } from "../interfaces";
 import { userData } from "../data";
 
 export const userService = {

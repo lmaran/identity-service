@@ -1,4 +1,4 @@
-import { IContext } from "@interfaces";
+import { IContext } from "../interfaces";
 
 // method 1: used when we only use properties with primitive types
 // https://stackoverflow.com/a/40762463

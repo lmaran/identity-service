@@ -6,9 +6,7 @@
         "noImplicitAny": false,
         "moduleResolution": "node",
         "outDir": "dist/server",
-        "baseUrl": ".",
         "paths": {
-            "@interfaces": [ "server/interfaces" ],
             "*": [
                 "node_modules/*",
                 "server/types/*"

@@ -1,5 +1,5 @@
 import { clientData } from "../data";
-import { IClient } from "@interfaces";
+import { IClient } from "../interfaces";
 
 export const clientService = {
 

@@ -1,5 +1,5 @@
 import { tokenData } from "../data";
-// import { IToken } from "@interfaces";
+// import { IToken } from "../interfaces";
 
 export const tokenService = {
 

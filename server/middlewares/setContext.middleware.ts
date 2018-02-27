@@ -1,7 +1,7 @@
 import * as _ from "lodash";
 import { Request, Response, NextFunction } from "express";
 import { tokenService } from "../services";
-import { IContext } from "@interfaces";
+import { IContext } from "../interfaces";
 import { isContext } from "vm";
 import * as randomstring from "randomstring";
 import { urlHelper } from "../helpers";

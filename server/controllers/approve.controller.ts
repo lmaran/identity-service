@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import * as _ from "lodash";
 import * as url from "url";
 import * as randomstring from "randomstring";
-import { IClient, IUser, IPersistedPassword } from "@interfaces";
+import { IClient, IUser, IPersistedPassword } from "../interfaces";
 import { requestData, codeData } from "../data";
 import { clientService, userService } from "../services";
 import { urlHelper, passwordHelper } from "../helpers";

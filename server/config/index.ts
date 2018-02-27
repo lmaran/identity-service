@@ -1,6 +1,6 @@
 import * as _ from "lodash";
 import { EnvironmentType, LogDetail, LogLevel } from "../constants";
-import { IEnvConfig } from "@interfaces";
+import { IEnvConfig } from "../interfaces";
 
 const env: string = (process.env.NODE_ENV || EnvironmentType.DEVELOPMENT).toLowerCase();
 const envConfig: IEnvConfig = require(`./${env}`).default;
