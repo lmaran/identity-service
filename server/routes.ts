@@ -6,11 +6,14 @@ import { contactController, checkController, authorizeController, approveControl
 
 const router = Router();
 
-// contact
-router.get("/contact", contactController.getContactPage);
-
 // check
 router.get("/check", checkController.getCheckPage);
+
+// home
+router.get("/", homeController.getHomePage);
+
+// contact
+router.get("/contact", contactController.getContactPage);
 
 // authorize
 router.get("/authorize", authorizeController.getAuthorize);
@@ -29,8 +32,5 @@ router.post("/userinfo", getAccessToken, requireAccessToken, userinfoController.
 // homepage
 router.get("/homepage", homepageController.getHomepage);
 router.post("/homepage", homepageController.getHomepage);
-
-// home
-router.get("/", homeController.getHomePage);
 
 export default router;

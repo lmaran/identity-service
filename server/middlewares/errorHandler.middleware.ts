@@ -27,7 +27,7 @@
 // }))
 
 import { Request, Response, NextFunction } from "express";
-import { ReturnType, OAuthAuthorizationError, LogSource } from "../constants";
+import { ReturnType, LogSource } from "../constants";
 import { ApplicationError } from "../errors/application.error";
 import { urlHelper } from "../helpers";
 import config from "../config";

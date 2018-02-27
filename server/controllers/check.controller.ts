@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import logger from "../logger";
-import { BadRequest } from "../errors";
+// import logger from "../logger";
+// import { BadRequest } from "../errors";
 
 export const checkController = {
 

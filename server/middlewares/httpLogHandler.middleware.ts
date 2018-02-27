@@ -16,9 +16,11 @@ export const httpLogHandler = (req: Request, res: Response, next: NextFunction) 
     }
 
     // ignore UptimeRobot's requests"
-    if (req.headers && req.headers["user-agent"] && (
-        req.headers["user-agent"].indexOf("UptimeRobot") !== -1 ||
-        req.headers["user-agent"].indexOf("Pingdom.com") !== -1)) {
+    const ua = req.headers && req.headers["user-agent"];
+    if (ua && (
+            ua.indexOf("UptimeRobot") !== -1 ||
+            ua.indexOf("Pingdom.com") !== -1)
+        ) {
         return next();
     }
 
